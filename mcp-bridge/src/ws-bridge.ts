@@ -35,34 +35,42 @@ export class WsBridge {
     this.port = port;
   }
 
-  /** WS 서버를 기동하고 포트에서 listen 시작한다. */
-  start(): void {
-    this.server = new WebSocketServer({ port: this.port });
+  /** WS 서버를 기동하고 포트 바인딩 성공 시 resolve, 실패 시 reject한다. */
+  start(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.server = new WebSocketServer({ port: this.port });
 
-    this.server.on('listening', () => {
-      console.error(`[WS] Listening on ws://localhost:${this.port}`);
-    });
+      this.server.once('listening', () => {
+        console.error(`[WS] Listening on ws://localhost:${this.port}`);
+        this.server!.on('connection', (socket: WebSocket) => {
+          this.client = socket;
+          console.error('[WS] Plugin connected');
 
-    this.server.on('connection', (socket: WebSocket) => {
-      this.client = socket;
-      console.error('[WS] Plugin connected');
+          socket.on('message', (data) => this.handleRawMessage(data.toString()));
 
-      socket.on('message', (data) => this.handleRawMessage(data.toString()));
+          socket.on('close', () => {
+            console.error('[WS] Plugin disconnected');
+            if (this.client === socket) {
+              this.client = null;
+            }
+          });
 
-      socket.on('close', () => {
-        console.error('[WS] Plugin disconnected');
-        if (this.client === socket) {
-          this.client = null;
-        }
+          socket.on('error', (err) => {
+            console.error('[WS] Socket error:', err.message);
+          });
+        });
+
+        this.server!.on('error', (err) => {
+          console.error('[WS] Server error:', err.message);
+        });
+
+        resolve();
       });
 
-      socket.on('error', (err) => {
-        console.error('[WS] Socket error:', err.message);
+      this.server.once('error', (err: NodeJS.ErrnoException) => {
+        console.error(`[WS] Failed to bind port ${this.port}: ${err.message}`);
+        reject(err);
       });
-    });
-
-    this.server.on('error', (err) => {
-      console.error('[WS] Server error:', err.message);
     });
   }
 

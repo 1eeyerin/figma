@@ -31,7 +31,7 @@ async function main(): Promise<void> {
     }
   });
 
-  bridge.start();
+  await bridge.start();
 
   // 2) MCP 서버 기동 (0단계: 빈 서버, 툴 없음)
   const server = new McpServer({
