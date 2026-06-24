@@ -10,6 +10,16 @@
           }
         ]
       }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /Users/yerinlee/figma/.claude/hooks/auto-commit.sh"
+          }
+        ]
+      }
     ]
   }
 }
