@@ -2,7 +2,7 @@
 # Claude가 한 턴을 끝낼 때(Stop 훅) 변경사항이 있으면 자동 커밋.
 # _workspace/의 완료 파일명으로 커밋 메시지를 자동 생성.
 
-cd /Users/yerinlee/figma || exit 0
+cd "$(dirname "$0")/../.." || exit 0
 
 # 변경사항 없으면 종료
 git diff --quiet && git diff --cached --quiet && [[ -z "$(git ls-files --others --exclude-standard)" ]] && exit 0

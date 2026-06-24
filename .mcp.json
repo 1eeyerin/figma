@@ -3,7 +3,7 @@
     "figma-bridge": {
       "type": "stdio",
       "command": "node",
-      "args": ["/Users/yerinlee/figma/mcp-bridge/dist/index.js"]
+      "args": ["./mcp-bridge/dist/index.js"]
     }
   }
 }

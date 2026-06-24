@@ -32,7 +32,7 @@
 
 ### 1. 빌드 검증 — PASS
 ```
-$ cd /Users/yerinlee/figma/mcp-bridge && npm run build
+$ cd mcp-bridge && npm run build
 > figma-bridge@0.1.0 build
 > tsc
 ---EXIT:0---
@@ -103,10 +103,10 @@ code.ts: postMessage({ type:'DRAW_RESULT', id: msg.id, ... })   ← REQUEST id�
 lsof -ti tcp:8765 | xargs kill 2>/dev/null
 
 # 2) 재빌드 (이미 빌드됨 — 안전하게 한 번 더)
-cd /Users/yerinlee/figma/mcp-bridge && npm run build
+cd mcp-bridge && npm run build
 
 # 3) 서버 재기동
-node /Users/yerinlee/figma/mcp-bridge/dist/index.js
+node ./mcp-bridge/dist/index.js
 ```
 
 - MCP 서버가 Claude Code의 stdio MCP 클라이언트로 등록돼 있다면, 재기동 대신 **MCP 서버를 reconnect/reload** 해야 새 dist가 로드된다 (Claude Code 측에서 MCP 재연결).

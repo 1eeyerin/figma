@@ -251,5 +251,5 @@ const id = randomUUID()
 
 ## 빌드 방법
 ```bash
-cd /Users/yerinlee/figma/mcp-bridge && npm run build
+cd mcp-bridge && npm run build
 ```
