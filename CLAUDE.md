@@ -11,11 +11,14 @@ Claude Code ↔ MCP 서버 ↔ Figma 플러그인 양방향 디자인 브릿지.
 Claude Code --[stdio/MCP]--> MCP 서버 --[WebSocket]--> Figma 플러그인 UI --[postMessage]--> 플러그인 코드(canvas)
 ```
 
-## 하네스: figma-bridge
+## 사용 방법
 
-**목표:** Claude Code에서 명령을 내려 Figma 캔버스를 조작하고, 반대로 Figma 노드를 코드로 변환하는 자동화 에이전트 팀.
+플러그인과 MCP 서버는 이미 구현 완료. 사용 시:
+1. `cd mcp-bridge && npm run build && node dist/index.js` 로 MCP 서버 실행
+2. Figma에서 플러그인 로드 → UI에 "Connected ✓" 확인
+3. Claude에서 MCP 툴(`create_rectangle`, `create_text`, `create_frame`) 호출
 
-**트리거:** MCP 서버 구현, Figma 플러그인 개발, WebSocket 브릿지, 테스트/통합 작업 요청 시 `orchestrate` 스킬을 사용하라. 단순 질문은 직접 응답 가능.
+**트리거:** Figma 캔버스 조작, 도형/텍스트/프레임 생성, 연결 문제 디버깅 시 `figma-bridge` 스킬을 사용하라.
 
 ## 핵심 제약사항
 - Figma 플러그인 메인 코드(`code.ts`)에서 `fetch`/`WebSocket` 직접 사용 **금지** → 반드시 UI iframe(`ui.html`) 경유

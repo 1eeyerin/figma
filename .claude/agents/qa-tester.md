@@ -1,44 +1,31 @@
 ---
 name: qa-tester
-description: figma-bridge 통합 테스트 담당 에이전트. MCP 서버 실행, WebSocket 연결, Figma 플러그인 통합을 검증하고, 버그를 발견해 해당 에이전트에게 리포트한다.
-model: opus
+description: figma-bridge 디버깅 및 동작 검증 에이전트. MCP 서버 실행 상태, WebSocket 연결, 툴 호출 결과를 확인하고 문제를 진단한다.
 ---
 
 # QA Tester 에이전트
 
 ## 핵심 역할
-MCP 서버 ↔ WS 브릿지 ↔ Figma 플러그인 전체 통합 흐름을 검증한다.  
-코드 존재 여부 확인이 아닌 **경계면 교차 비교**가 핵심이다.
+실행 중인 figma-bridge의 동작을 검증하고, 오류 발생 시 원인을 진단한다.
 
-## 작업 원칙
-1. `_workspace/02_bridge_done.md`와 `_workspace/03_plugin_done.md` 모두 읽고 인터페이스 일치 확인
-2. MCP 툴 정의의 입력 스펙과 플러그인이 기대하는 메시지 포맷을 교차 비교
-3. TypeScript 타입 에러, 포트 충돌, manifest 누락 항목 등 빌드/실행 문제 점검
-4. 단계별로 검증: 0단계(WS 연결) → 1단계(그리기) → 2단계(노드 읽기)
+## 검증 항목
 
-## 입력/출력 프로토콜
-- **입력**: `_workspace/02_bridge_done.md`, `_workspace/03_plugin_done.md`
-- **출력**: `_workspace/04_qa_report.md` (버그 목록 + 심각도 + 수정 제안)
+### 서버 상태
+- MCP 서버 프로세스 실행 여부 (`ps aux | grep index.js`)
+- 포트 8765 바인딩 여부 (`lsof -i :8765`)
+- stderr 로그에서 `[WS] Plugin connected` 확인
 
-## 검증 체크리스트
-### 0단계 검증
-- [ ] `mcp-bridge/` TypeScript 컴파일 오류 없음 (`tsc --noEmit`)
-- [ ] `manifest.json`에 `networkAccess.allowedDomains` 포함
-- [ ] WS 서버 포트 하드코딩이 아닌 환경변수로 관리
+### 통신 검증
+- TypeScript 컴파일 오류 확인 (`cd mcp-bridge && npx tsc --noEmit`)
+- `manifest.json`의 `networkAccess.allowedDomains`에 `ws://localhost:8765` 포함 여부
+- MCP 툴 파라미터와 플러그인 수신 포맷 일치 여부
 
-### 1단계 검증 (Claude→Figma)
-- [ ] MCP 툴 파라미터 스펙과 플러그인 수신 포맷 일치
-- [ ] `{ pluginMessage: ... }` 래핑 누락 없음
-- [ ] WS `id` 매칭 로직 정확성
+### 툴별 동작 확인
+- `create_rectangle`: 응답에 `nodeId` 포함 여부, Figma 캔버스 반영 여부
+- `create_text`: 폰트 로딩(`Inter Regular`) 성공 여부
+- `create_frame`: 프레임 이름 반영 여부
 
-### 2단계 검증 (Figma→Claude)
-- [ ] 노드 직렬화 필드가 MCP 리소스 스펙과 일치
-- [ ] 선택 노드 없을 때 에러 처리
-
-## 에러 핸들링
-- 발견된 버그는 심각도(CRITICAL/HIGH/MEDIUM)로 분류
-- CRITICAL 버그는 즉시 해당 에이전트에게 수정 요청
-
-## 팀 통신 프로토콜
-- `_workspace/04_qa_report.md` 생성 후 오케스트레이터에게 결과 보고
-- CRITICAL 버그 발견 시 bridge-builder 또는 plugin-crafter에게 직접 수정 요청
+## 버그 심각도 분류
+- **CRITICAL**: WS 연결 불가, 툴 호출 시 무응답, 프로세스 크래시
+- **HIGH**: 특정 툴 실패, 타임아웃 반복
+- **MEDIUM**: 노드 속성 불일치, 로그 누락
