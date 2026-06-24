@@ -1,3 +1,4 @@
+"use strict";
 // figma-bridge 플러그인 메인 코드 (canvas 측)
 //
 // 제약사항:

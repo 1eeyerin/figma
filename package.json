@@ -1,0 +1,15 @@
+{
+  "name": "figma-bridge-workspace",
+  "private": true,
+  "scripts": {
+    "build:plugin": "tsc -p figma-plugin/tsconfig.json",
+    "watch:plugin": "tsc -p figma-plugin/tsconfig.json --watch",
+    "dev:bridge": "cd mcp-bridge && npm run build && node dist/index.js",
+    "dev": "concurrently --names \"plugin,bridge\" --prefix-colors \"cyan,green\" \"npm run watch:plugin\" \"npm run dev:bridge\""
+  },
+  "devDependencies": {
+    "@figma/plugin-typings": "^1.129.0",
+    "concurrently": "^10.0.3",
+    "typescript": "^6.0.3"
+  }
+}
