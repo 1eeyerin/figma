@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "module": "none",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "strict": true,
-    "outFile": "code.js",
+    "noEmit": true,
     "lib": ["ES2017"],
-    "types": [],
-    "ignoreDeprecations": "6.0"
+    "types": []
   },
   "include": [
     "../node_modules/@figma/plugin-typings/index.d.ts",
