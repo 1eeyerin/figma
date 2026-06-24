@@ -1,0 +1,11 @@
+{
+  "name": "figma-bridge",
+  "id": "figma-bridge-dev",
+  "api": "1.0.0",
+  "main": "code.ts",
+  "ui": "ui.html",
+  "editorType": ["figma"],
+  "networkAccess": {
+    "allowedDomains": ["ws://localhost:8765"]
+  }
+}

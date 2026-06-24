@@ -8,15 +8,15 @@
 ## 0단계: 스캐폴딩 + WS 연결 확인
 
 ### mcp-bridge 설정
-- [ ] `mcp-bridge/package.json` 생성 (`@modelcontextprotocol/sdk`, `ws`, TypeScript 의존성)
-- [ ] `mcp-bridge/tsconfig.json` 생성
+- [x] `mcp-bridge/package.json` 생성 (`@modelcontextprotocol/sdk`, `ws`, TypeScript 의존성)
+- [x] `mcp-bridge/tsconfig.json` 생성
 - [ ] `mcp-bridge/src/index.ts` 진입점 작성 (MCP + WS 서버 통합)
-- [ ] `mcp-bridge/src/ws-bridge.ts` WebSocket 브릿지 구현
+- [x] `mcp-bridge/src/ws-bridge.ts` WebSocket 브릿지 구현
 
 ### figma-plugin 설정
-- [ ] `figma-plugin/manifest.json` 생성 (`networkAccess.allowedDomains` 포함)
-- [ ] `figma-plugin/code.ts` 플러그인 메인 코드 작성
-- [ ] `figma-plugin/ui.html` UI iframe (WS 클라이언트) 작성
+- [x] `figma-plugin/manifest.json` 생성 (`networkAccess.allowedDomains` 포함)
+- [x] `figma-plugin/code.ts` 플러그인 메인 코드 작성
+- [x] `figma-plugin/ui.html` UI iframe (WS 클라이언트) 작성
 
 ### 검증
 - [ ] 0단계 통합 검증 완료 (`_workspace/04_qa_report.md`)
@@ -32,7 +32,7 @@
 - [ ] `create_frame` 툴 구현 (name, x, y, width, height)
 
 ### 플러그인 핸들러
-- [ ] `code.ts`에 `DRAW_RECT` / `DRAW_TEXT` / `DRAW_FRAME` 메시지 핸들러 추가
+- [x] `code.ts`에 `DRAW_RECT` / `DRAW_TEXT` / `DRAW_FRAME` 메시지 핸들러 추가
 - [ ] 캔버스에 실제로 노드 생성 확인
 
 ### 검증

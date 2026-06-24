@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>figma-bridge</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 16px;
+      font-size: 13px;
+      color: #333;
+    }
+    h1 {
+      font-size: 14px;
+      margin: 0 0 12px 0;
+    }
+    #status {
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-weight: 600;
+      background: #f0f0f0;
+      color: #666;
+    }
+    #status.connecting {
+      background: #fff7e0;
+      color: #8a6d00;
+    }
+    #status.connected {
+      background: #e6f7ec;
+      color: #1a7f37;
+    }
+    #status.disconnected {
+      background: #fdecec;
+      color: #c4332b;
+    }
+    .meta {
+      margin-top: 12px;
+      font-size: 11px;
+      color: #999;
+      word-break: break-all;
+    }
+    button {
+      margin-top: 12px;
+      padding: 6px 12px;
+      font-size: 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background: #fff;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #f5f5f5;
+    }
+  </style>
+</head>
+<body>
+  <h1>figma-bridge</h1>
+  <div id="status" class="connecting">Connecting to MCP bridge...</div>
+  <div class="meta">ws://localhost:8765</div>
+  <button id="reconnect" style="display:none;">Reconnect</button>
+
+  <script>
+    var WS_URL = 'ws://localhost:8765';
+    var RECONNECT_DELAY = 3000; // 재연결 지연 (ms)
+
+    var statusEl = document.getElementById('status');
+    var reconnectBtn = document.getElementById('reconnect');
+
+    var ws = null;
+    var reconnectTimer = null;
+
+    // RFC4122 v4 UUID 생성 (crypto 우선, 폴백 포함)
+    function uuid() {
+      if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+        return crypto.randomUUID();
+      }
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = (Math.random() * 16) | 0;
+        var v = c === 'x' ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+      });
+    }
+
+    // 상태 UI 갱신
+    function setStatus(state, text) {
+      statusEl.className = state;
+      statusEl.textContent = text;
+    }
+
+    // canvas(code.ts)로 메시지 전달 — 반드시 { pluginMessage: ... } 래핑
+    function sendToCanvas(message) {
+      parent.postMessage({ pluginMessage: message }, '*');
+    }
+
+    // WS로 봉투(BridgeMessage) 송신
+    function sendToBridge(message) {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify(message));
+      }
+    }
+
+    function connect() {
+      // 기존 재연결 타이머 정리
+      if (reconnectTimer) {
+        clearTimeout(reconnectTimer);
+        reconnectTimer = null;
+      }
+
+      setStatus('connecting', 'Connecting to MCP bridge...');
+      reconnectBtn.style.display = 'none';
+
+      try {
+        ws = new WebSocket(WS_URL);
+      } catch (e) {
+        scheduleReconnect();
+        return;
+      }
+
+      ws.onopen = function () {
+        setStatus('connected', 'Connected to MCP bridge ✓');
+        reconnectBtn.style.display = 'none';
+
+        // 1) 브릿지에 connected 이벤트 송신 (확정 포맷)
+        sendToBridge({
+          id: uuid(),
+          type: 'EVENT',
+          action: 'connected',
+          payload: {}
+        });
+
+        // 2) canvas 측에 연결 로그 전달
+        sendToCanvas({ type: 'LOG', message: 'Connected to MCP bridge' });
+      };
+
+      ws.onmessage = function (event) {
+        var msg;
+        try {
+          msg = JSON.parse(event.data);
+        } catch (e) {
+          // 파싱 불가 메시지는 무시
+          return;
+        }
+
+        // ping → pong 응답 (REQUEST의 id를 그대로 echo)
+        if (msg.action === 'ping') {
+          sendToBridge({
+            id: msg.id,
+            type: 'RESPONSE',
+            action: 'pong',
+            payload: {}
+          });
+        }
+      };
+
+      ws.onclose = function () {
+        scheduleReconnect();
+      };
+
+      ws.onerror = function () {
+        // onerror 직후 onclose가 이어지므로 여기서는 소켓만 정리
+        if (ws) {
+          try { ws.close(); } catch (e) {}
+        }
+      };
+    }
+
+    function scheduleReconnect() {
+      setStatus('disconnected', 'Disconnected. Retrying...');
+      reconnectBtn.style.display = 'inline-block';
+
+      if (reconnectTimer) {
+        clearTimeout(reconnectTimer);
+      }
+      reconnectTimer = setTimeout(connect, RECONNECT_DELAY);
+    }
+
+    // 수동 재연결 버튼
+    reconnectBtn.addEventListener('click', function () {
+      connect();
+    });
+
+    // canvas(code.ts) → UI 메시지 수신
+    window.onmessage = function (event) {
+      var pm = event.data && event.data.pluginMessage;
+      if (!pm) {
+        return;
+      }
+      if (pm.type === 'PONG') {
+        console.log('[UI] PONG received from canvas');
+      }
+    };
+
+    // 최초 연결 시작
+    connect();
+  </script>
+</body>
+</html>
