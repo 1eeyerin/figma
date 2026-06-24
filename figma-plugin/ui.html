@@ -153,24 +153,26 @@
           return;
         }
 
-        // 그리기 REQUEST → canvas로 중계 (방향 A)
-        switch (msg.action) {
-          case 'create_rectangle':
-          case 'create_text':
-          case 'create_frame': {
-            var drawType = msg.action === 'create_rectangle' ? 'DRAW_RECT'
-                         : msg.action === 'create_text'      ? 'DRAW_TEXT'
-                         :                                     'DRAW_FRAME';
-            // WS id와 원본 action을 canvas까지 전달 (응답 매칭/echo용)
-            sendToCanvas(Object.assign(
-              { type: drawType, id: msg.id, action: msg.action },
-              msg.payload || {}
-            ));
-            break;
-          }
-          default:
-            // 알 수 없는 action은 무시
-            break;
+        // action → canvas 메시지 타입 매핑
+        var ACTION_MAP = {
+          'create_rectangle': 'DRAW_RECT',
+          'create_text':      'DRAW_TEXT',
+          'create_frame':     'DRAW_FRAME',
+          'set_parent':       'SET_PARENT',
+          'set_name':         'SET_NAME',
+          'remove_node':      'REMOVE_NODE',
+          'get_node':         'GET_NODE',
+          'get_page':         'GET_PAGE',
+          'export_node':      'EXPORT_NODE',
+          'create_screen':    'CREATE_SCREEN',
+        };
+
+        var canvasType = ACTION_MAP[msg.action];
+        if (canvasType) {
+          sendToCanvas(Object.assign(
+            { type: canvasType, id: msg.id, action: msg.action },
+            msg.payload || {}
+          ));
         }
       };
 
