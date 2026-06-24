@@ -1,0 +1,22 @@
+.badge {
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  background: #f0f0f0;
+  color: #666;
+}
+
+.connecting {
+  background: #fff7e0;
+  color: #8a6d00;
+}
+
+.connected {
+  background: #e6f7ec;
+  color: #1a7f37;
+}
+
+.disconnected {
+  background: #fdecec;
+  color: #c4332b;
+}
