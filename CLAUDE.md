@@ -4,29 +4,62 @@
 Claude Code ↔ MCP 서버 ↔ Figma 플러그인 양방향 디자인 브릿지.
 
 - **mcp-bridge/**: TypeScript MCP 서버 + WebSocket 브릿지 서버 (단일 프로세스)
-- **figma-plugin/**: Figma 플러그인 (`manifest.json` + `code.ts` + `ui.html`)
+- **figma-plugin/**: Figma 플러그인 (Preact UI + canvas 스레드)
 
 ## 아키텍처
 ```
-Claude Code --[stdio/MCP]--> MCP 서버 --[WebSocket]--> Figma 플러그인 UI --[postMessage]--> 플러그인 코드(canvas)
+Claude Code --[stdio/MCP]--> MCP 서버 --[WebSocket]--> UI iframe --[postMessage]--> Canvas 스레드
 ```
 
 ## 사용 방법
 
-플러그인과 MCP 서버는 이미 구현 완료. 사용 시:
 1. `cd mcp-bridge && npm run build && node dist/index.js` 로 MCP 서버 실행
 2. Figma에서 플러그인 로드 → UI에 "Connected ✓" 확인
-3. Claude에서 MCP 툴(`create_rectangle`, `create_text`, `create_frame`) 호출
+3. Claude에서 MCP 툴 호출 (`create_rectangle`, `create_text`, `create_frame` 등)
 
 **트리거:** Figma 캔버스 조작, 도형/텍스트/프레임 생성, 연결 문제 디버깅 시 `figma-bridge` 스킬을 사용하라.
 
+## figma-plugin 구조
+
+> 상세 내용은 [figma-plugin/README.md](figma-plugin/README.md) 참고.
+
+```
+src/
+├── index.tsx              UI 엔트리포인트 (render 호출만)
+├── ui/                    Preact 컴포넌트 (표현 레이어)
+├── bridge/                WS ↔ canvas 중계 레이어
+│   ├── types.ts           ConnectionState FSM 타입
+│   ├── constants.ts       WS_URL, ACTION_MAP
+│   ├── wsClient.ts        WS 연결·재연결 (UI 상태 모름)
+│   ├── canvasChannel.ts   sendToCanvas / canvas 수신 중계
+│   └── useBridgeConnection.ts  useReducer FSM 훅
+├── canvas/                Figma canvas 스레드 전용
+│   ├── main.ts            showUI + 메시지 라우팅
+│   ├── handlers.ts        메시지 타입별 핸들러
+│   ├── nodes.ts           노드 생성·조작
+│   ├── nodeQuery.ts       노드 조회·직렬화·export
+│   └── utils/             figma API 의존 순수 유틸 (UI에서 import 금지)
+└── utils/uuid.ts          범용 유틸 (어디서나 사용 가능)
+```
+
 ## 핵심 제약사항
-- Figma 플러그인 메인 코드(`code.ts`)에서 `fetch`/`WebSocket` 직접 사용 **금지** → 반드시 UI iframe(`ui.html`) 경유
-- `manifest.json`의 `networkAccess.allowedDomains`에 WS 주소 등록 필수
-- 메시지는 항상 `{ pluginMessage: ... }` 래핑 (UI ↔ canvas postMessage 규칙)
-- MCP 툴 응답은 비동기: WS 왕복을 Promise + `id` 매칭으로 처리
+
+- `src/canvas/` 에서 `fetch` / `WebSocket` 직접 사용 **금지** → UI iframe 경유 필수
+- `src/canvas/utils/`는 figma 전역 타입에 의존 → UI/bridge에서 import 금지
+- postMessage는 항상 `{ pluginMessage: ... }` 래핑
+- MCP 툴 응답은 비동기: WS 왕복을 `id` 매칭으로 처리
+
+## 빌드
+
+```bash
+cd figma-plugin
+npm run build   # 프로덕션
+npm run watch   # 개발 중 watch
+```
 
 ## 변경 이력
 | 날짜 | 변경 내용 | 대상 | 사유 |
 |------|----------|------|------|
 | 2026-06-24 | 초기 하네스 구성 | 전체 | - |
+| 2026-06-24 | ui.html → Preact 컴포넌트 구조로 리팩터링 | figma-plugin | 유지보수성 |
+| 2026-06-24 | canvas/bridge/ui 레이어 분리 (RADIO 아키텍처) | figma-plugin | 책임 분리 |
