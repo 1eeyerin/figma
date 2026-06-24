@@ -1,25 +1,38 @@
 #!/usr/bin/env bash
 # Claude가 한 턴을 끝낼 때(Stop 훅) 변경사항이 있으면 자동 커밋.
-# _workspace/의 완료 파일명으로 커밋 메시지를 자동 생성.
+# claude -p 로 diff를 요약해 커밋 메시지를 생성한다.
+# 루프 방지: AUTO_COMMIT_RUNNING 환경변수가 설정된 경우 즉시 종료.
 
 cd "$(dirname "$0")/../.." || exit 0
+
+# 루프 방지 가드
+[[ -n "$AUTO_COMMIT_RUNNING" ]] && exit 0
 
 # 변경사항 없으면 종료
 git diff --quiet && git diff --cached --quiet && [[ -z "$(git ls-files --others --exclude-standard)" ]] && exit 0
 
-# 커밋 메시지 자동 생성: 완료된 단계 파일 기준
-MSG="auto: "
-[[ -f "_workspace/01_spec.md" ]]       && MSG+="명세 작성 "
-[[ -f "_workspace/02_bridge_done.md" ]] && MSG+="브릿지 구현 "
-[[ -f "_workspace/03_plugin_done.md" ]] && MSG+="플러그인 구현 "
-[[ -f "_workspace/04_qa_report.md" ]]  && MSG+="QA 검증 "
+git add -A
 
-# 일반 파일 변경 감지 (위 조건 없을 때)
-if [[ "$MSG" == "auto: " ]]; then
-  CHANGED=$(git diff --name-only HEAD 2>/dev/null | head -3 | tr '\n' ' ')
-  [[ -z "$CHANGED" ]] && CHANGED=$(git ls-files --others --exclude-standard | head -3 | tr '\n' ' ')
-  MSG+="${CHANGED:-변경사항}"
+DIFF_STAT=$(git diff --cached --stat)
+DIFF_CONTENT=$(git diff --cached -- . ':(exclude)*.lock' ':(exclude)package-lock.json' | head -200)
+
+PROMPT="아래는 git diff 결과야. 이 변경사항을 보고 한국어로 커밋 메시지 한 줄만 작성해줘.
+- 형식: <type>: <내용> (type은 feat/fix/refactor/chore/docs 중 하나)
+- 구체적으로 무엇을 했는지 서술
+- 메시지 텍스트만 출력, 다른 설명 없이
+
+--- diff stat ---
+${DIFF_STAT}
+
+--- diff content ---
+${DIFF_CONTENT}"
+
+MSG=$(AUTO_COMMIT_RUNNING=1 claude -p "$PROMPT" --output-format text 2>/dev/null | tr -d '\n' | head -c 200)
+
+# claude 호출 실패 시 fallback
+if [[ -z "$MSG" ]]; then
+  CHANGED=$(git diff --cached --name-only | head -3 | tr '\n' ' ')
+  MSG="auto: ${CHANGED:-변경사항}"
 fi
 
-git add -A
-git commit -m "${MSG% }"
+git commit -m "$MSG"
