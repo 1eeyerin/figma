@@ -1,0 +1,31 @@
+{
+  "name": "figma-bridge-plugin",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "build-figma-plugin --typecheck --minify",
+    "watch": "build-figma-plugin --typecheck --watch"
+  },
+  "figma-plugin": {
+    "name": "figma-bridge",
+    "id": "figma-bridge-dev",
+    "api": "1.0.0",
+    "editorType": ["figma"],
+    "main": "src/code.ts",
+    "ui": "src/ui.tsx",
+    "networkAccess": {
+      "allowedDomains": ["none"],
+      "devAllowedDomains": ["ws://localhost:8765"]
+    }
+  },
+  "devDependencies": {
+    "@create-figma-plugin/build": "^3",
+    "@figma/plugin-typings": "*",
+    "typescript": "*"
+  },
+  "dependencies": {
+    "@create-figma-plugin/ui": "^3",
+    "@create-figma-plugin/utilities": "^3",
+    "preact": "^10"
+  }
+}

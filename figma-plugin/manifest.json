@@ -1,12 +1,1 @@
-{
-  "name": "figma-bridge",
-  "id": "figma-bridge-dev",
-  "api": "1.0.0",
-  "main": "dist/code.iife.js",
-  "ui": "ui.html",
-  "editorType": ["figma"],
-  "networkAccess": {
-    "allowedDomains": ["none"],
-    "devAllowedDomains": ["ws://localhost:8765"]
-  }
-}
+{"api":"1.0.0","editorType":["figma"],"id":"figma-bridge-dev","name":"figma-bridge","main":"build/main.js","ui":"build/ui.js","networkAccess":{"allowedDomains":["none"],"devAllowedDomains":["ws://localhost:8765"]}}
