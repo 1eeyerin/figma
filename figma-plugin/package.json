@@ -11,7 +11,7 @@
     "id": "figma-bridge-dev",
     "api": "1.0.0",
     "editorType": ["figma"],
-    "main": "src/code.ts",
+    "main": "src/canvas/main.ts",
     "ui": "src/index.tsx",
     "networkAccess": {
       "allowedDomains": ["none"],
