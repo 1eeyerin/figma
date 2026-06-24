@@ -2,6 +2,7 @@
   "name": "figma-bridge-plugin",
   "version": "1.0.0",
   "private": true,
+  "packageManager": "pnpm@10.30.3",
   "scripts": {
     "build": "build-figma-plugin --typecheck --minify",
     "watch": "build-figma-plugin --typecheck --watch"
