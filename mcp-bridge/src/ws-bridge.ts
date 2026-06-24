@@ -28,6 +28,9 @@ export class WsBridge {
   private client: WebSocket | null = null;
   private readonly handlers: MessageHandler[] = [];
 
+  /** id → resolve 콜백. RESPONSE 수신 시 매칭하여 호출한다. */
+  private readonly pendingRequests = new Map<string, (msg: BridgeMessage) => void>();
+
   constructor(port: number = DEFAULT_PORT) {
     this.port = port;
   }
@@ -78,6 +81,25 @@ export class WsBridge {
     this.handlers.push(handler);
   }
 
+  /**
+   * 특정 id의 RESPONSE 메시지를 기다린다.
+   * - timeout(기본 10000ms) 안에 응답이 오지 않으면 pendingRequests에서 삭제 후 reject.
+   * - 응답이 오면 handleRawMessage에서 등록된 콜백을 호출해 resolve.
+   */
+  waitForResponse(id: string, timeout = 10000): Promise<BridgeMessage> {
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => {
+        this.pendingRequests.delete(id);
+        reject(new Error(`Timeout waiting for response to ${id}`));
+      }, timeout);
+
+      this.pendingRequests.set(id, (msg) => {
+        clearTimeout(timer);
+        resolve(msg);
+      });
+    });
+  }
+
   /** 플러그인 UI 연결 여부. */
   isConnected(): boolean {
     return this.client !== null && this.client.readyState === WebSocket.OPEN;
@@ -102,8 +124,18 @@ export class WsBridge {
 
     console.error(`[WS] Received: ${message.type}/${message.action} (${message.id})`);
 
-    // 0단계: ping에 대해 자동으로 pong... 은 플러그인이 응답하는 구조이므로
-    // 여기서는 등록된 핸들러에게 라우팅만 한다.
+    // RESPONSE 메시지는 waitForResponse가 등록한 콜백으로 매칭하여 resolve한다.
+    if (message.type === 'RESPONSE') {
+      const callback = this.pendingRequests.get(message.id);
+      if (callback) {
+        this.pendingRequests.delete(message.id);
+        callback(message);
+      } else {
+        console.error(`[WS] No pending request for response id ${message.id}`);
+      }
+    }
+
+    // 등록된 핸들러에게도 라우팅한다 (EVENT/로깅용).
     for (const handler of this.handlers) {
       try {
         handler(message);

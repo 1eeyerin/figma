@@ -8,7 +8,7 @@
 //   여기서는 래핑이 풀린 본문(msg)을 그대로 수신한다.
 
 // UI(iframe)를 띄운다. __html__ 는 빌드 시 ui.html 내용으로 치환된다.
-figma.showUI(__html__, { width: 300, height: 200 });
+figma.showUI(__html__, { width: 300, height: 200, position: { x: 100, y: 100 } });
 
 // HEX(#RRGGBB) → Figma RGB(0~1) 변환. 외부 의존성 없이 인라인 구현.
 function hexToRgb(hex) {
@@ -73,7 +73,7 @@ figma.ui.onmessage = async (msg) => {
         text.x = msg.x;
         text.y = msg.y;
         text.characters = msg.content;
-        text.fontSize = msg.fontSize ?? 16;
+        text.fontSize = msg.fontSize || 16;
         figma.currentPage.appendChild(text);
         figma.ui.postMessage({
           type: 'DRAW_RESULT', id: msg.id, action: msg.action, nodeId: text.id, success: true,
