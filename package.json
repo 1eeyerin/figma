@@ -10,6 +10,7 @@
   "devDependencies": {
     "@figma/plugin-typings": "^1.129.0",
     "concurrently": "^10.0.3",
+    "esbuild": "^0.28.1",
     "typescript": "^6.0.3"
   }
 }
