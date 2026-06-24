@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /Users/yerinlee/figma/.claude/hooks/update-plan.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
