@@ -12,7 +12,7 @@
     "api": "1.0.0",
     "editorType": ["figma"],
     "main": "src/code.ts",
-    "ui": "src/ui.tsx",
+    "ui": "src/index.tsx",
     "networkAccess": {
       "allowedDomains": ["none"],
       "devAllowedDomains": ["ws://localhost:8765"]

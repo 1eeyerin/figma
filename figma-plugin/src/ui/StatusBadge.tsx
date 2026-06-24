@@ -1,5 +1,5 @@
 import { h } from 'preact'
-import type { ConnectionState } from './useWebSocket'
+import type { ConnectionState } from '../bridge/types'
 import styles from './StatusBadge.module.css'
 
 const STATUS_TEXT: Record<ConnectionState, string> = {
