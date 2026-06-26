@@ -1,10 +1,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { randomUUID } from 'crypto';
 import { z } from 'zod';
-import { WsBridge, BridgeMessage } from './ws-bridge.js';
-
-const WS_PORT = 8765;
+import { WsBridge } from './ws-bridge.js';
 
 // 공통 색상 스키마
 const colorSchema = z.string().optional().describe('HEX 색상 (예: #FF5733) 또는 rgba (예: rgba(255,87,51,0.5))');
@@ -21,16 +18,7 @@ const shadowSchema = z.object({
 }).optional();
 
 async function main(): Promise<void> {
-  const bridge = new WsBridge(WS_PORT);
-
-  bridge.onMessage((message: BridgeMessage) => {
-    if (message.action === 'connected') {
-      console.error('[Bridge] Plugin reported connected event');
-    } else if (message.action === 'pong') {
-      console.error(`[Bridge] pong received for ${message.id}`);
-    }
-  });
-
+  const bridge = new WsBridge();
   await bridge.start();
 
   const server = new McpServer({
@@ -39,21 +27,19 @@ async function main(): Promise<void> {
   });
 
   async function dispatch(action: string, payload: Record<string, unknown>) {
-    const id = randomUUID();
-    const sent = bridge.send({ id, type: 'REQUEST', action, payload });
-    if (!sent) {
-      return {
-        content: [{ type: 'text' as const, text: 'Figma 플러그인이 연결되지 않았습니다.' }],
-        isError: true,
-      };
-    }
-
-    let response: BridgeMessage;
+    let response;
     try {
-      response = await bridge.waitForResponse(id);
+      response = await bridge.sendAndWait(action, payload);
     } catch (err) {
+      const msg = (err as Error).message;
+      if (msg.includes('plugin not connected')) {
+        return {
+          content: [{ type: 'text' as const, text: 'Figma 플러그인이 연결되지 않았습니다. Figma에서 플러그인을 실행해 주세요.' }],
+          isError: true,
+        };
+      }
       return {
-        content: [{ type: 'text' as const, text: `오류: 응답 시간 초과 (${(err as Error).message})` }],
+        content: [{ type: 'text' as const, text: `오류: ${msg}` }],
         isError: true,
       };
     }

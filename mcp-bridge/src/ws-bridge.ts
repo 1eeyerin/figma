@@ -1,12 +1,17 @@
-import { WebSocketServer, WebSocket } from 'ws';
-
 /**
- * WS 메시지 공통 봉투
- * - id: UUID v4 (요청-응답 매칭용)
- * - type: REQUEST | RESPONSE | EVENT
- * - action: 'ping' | 'pong' | 'connected' 등
- * - payload: 임의 데이터
+ * MCP 프로세스 내부에서 WS 데몬(ws-server.ts)과 통신하는 HTTP 클라이언트.
+ *
+ * - WS 데몬이 없으면 자동 spawn (SIGTERM으로 부모 프로세스 종료 시 같이 종료)
+ * - 이미 데몬이 떠 있으면 재사용
+ * - 포트 바인딩 경쟁 없음: MCP 프로세스가 여러 개 떠도 데몬은 하나
  */
+
+import * as http from 'http';
+import { randomUUID } from 'crypto';
+import { spawn, ChildProcess } from 'child_process';
+import * as path from 'path';
+import * as fs from 'fs';
+
 export interface BridgeMessage {
   id: string;
   type: 'REQUEST' | 'RESPONSE' | 'EVENT';
@@ -16,141 +21,143 @@ export interface BridgeMessage {
 
 export type MessageHandler = (message: BridgeMessage) => void;
 
-const DEFAULT_PORT = 8765;
+const HTTP_PORT = Number(process.env.HTTP_PORT ?? 8766);
+const DAEMON_SCRIPT = path.resolve(__dirname, 'ws-server.js');
 
-/**
- * MCP 서버와 Figma 플러그인 UI를 잇는 WebSocket 브릿지.
- * 단일 플러그인 UI 클라이언트와의 연결을 관리한다.
- */
 export class WsBridge {
-  private readonly port: number;
-  private server: WebSocketServer | null = null;
-  private client: WebSocket | null = null;
   private readonly handlers: MessageHandler[] = [];
+  private daemonProc: ChildProcess | null = null;
 
-  /** id → resolve 콜백. RESPONSE 수신 시 매칭하여 호출한다. */
-  private readonly pendingRequests = new Map<string, (msg: BridgeMessage) => void>();
+  /** 데몬이 살아있는지 확인. 없으면 spawn. */
+  async start(): Promise<void> {
+    const alive = await this.pingDaemon();
+    if (alive) {
+      console.error('[Bridge] WS daemon already running — reusing');
+      return;
+    }
 
-  constructor(port: number = DEFAULT_PORT) {
-    this.port = port;
+    if (!fs.existsSync(DAEMON_SCRIPT)) {
+      console.error(`[Bridge] WARN: ws-server.js not found at ${DAEMON_SCRIPT} — degraded mode`);
+      return;
+    }
+
+    await this.spawnDaemon();
   }
 
-  /** WS 서버를 기동하고 포트 바인딩 성공 시 resolve, 실패 시 reject한다. */
-  start(): Promise<void> {
+  /** 플러그인 UI에 메시지를 보내고 RESPONSE를 기다린다. */
+  async sendAndWait(action: string, payload: Record<string, unknown>, timeout = 15000): Promise<BridgeMessage> {
+    const msg: BridgeMessage = {
+      id: randomUUID(),
+      type: 'REQUEST',
+      action,
+      payload,
+    };
+
     return new Promise((resolve, reject) => {
-      this.server = new WebSocketServer({ port: this.port });
-
-      this.server.once('listening', () => {
-        console.error(`[WS] Listening on ws://localhost:${this.port}`);
-        this.server!.on('connection', (socket: WebSocket) => {
-          this.client = socket;
-          console.error('[WS] Plugin connected');
-
-          socket.on('message', (data) => this.handleRawMessage(data.toString()));
-
-          socket.on('close', () => {
-            console.error('[WS] Plugin disconnected');
-            if (this.client === socket) {
-              this.client = null;
+      const body = JSON.stringify(msg);
+      const req = http.request(
+        {
+          hostname: 'localhost',
+          port: HTTP_PORT,
+          path: `/send?timeout=${timeout}`,
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) },
+        },
+        (res) => {
+          let data = '';
+          res.on('data', (chunk) => { data += chunk; });
+          res.on('end', () => {
+            if (res.statusCode === 200) {
+              try { resolve(JSON.parse(data) as BridgeMessage); } catch { reject(new Error('Invalid JSON from daemon')); }
+            } else {
+              let errMsg = `HTTP ${res.statusCode}`;
+              try { errMsg = (JSON.parse(data) as { error: string }).error ?? errMsg; } catch { /* ignore */ }
+              reject(new Error(errMsg));
             }
           });
-
-          socket.on('error', (err) => {
-            console.error('[WS] Socket error:', err.message);
-          });
-        });
-
-        this.server!.on('error', (err) => {
-          console.error('[WS] Server error:', err.message);
-        });
-
-        resolve();
-      });
-
-      this.server.once('error', (err: NodeJS.ErrnoException) => {
-        console.error(`[WS] Port ${this.port} unavailable: ${err.message} — running in degraded mode`);
-        this.server = null;
-        resolve();
-      });
+        },
+      );
+      req.on('error', (err) => reject(new Error(`Daemon unreachable: ${err.message}`)));
+      req.setTimeout(timeout + 2000, () => { req.destroy(); reject(new Error('HTTP request timeout')); });
+      req.write(body);
+      req.end();
     });
   }
 
-  /** 연결된 플러그인 UI 클라이언트에게 JSON 메시지를 전송한다. */
-  send(message: BridgeMessage): boolean {
-    if (!this.client || this.client.readyState !== WebSocket.OPEN) {
-      console.error('[WS] Cannot send — no plugin connected');
+  /** 플러그인이 데몬에 연결되어 있는지 확인. */
+  async isPluginConnected(): Promise<boolean> {
+    try {
+      const status = await this.getStatus();
+      return status.pluginConnected;
+    } catch {
       return false;
     }
-    this.client.send(JSON.stringify(message));
-    return true;
   }
 
-  /** 플러그인 UI로부터 들어오는 메시지를 받을 핸들러를 등록한다. */
   onMessage(handler: MessageHandler): void {
     this.handlers.push(handler);
   }
 
-  /**
-   * 특정 id의 RESPONSE 메시지를 기다린다.
-   * - timeout(기본 10000ms) 안에 응답이 오지 않으면 pendingRequests에서 삭제 후 reject.
-   * - 응답이 오면 handleRawMessage에서 등록된 콜백을 호출해 resolve.
-   */
-  waitForResponse(id: string, timeout = 10000): Promise<BridgeMessage> {
-    return new Promise((resolve, reject) => {
-      const timer = setTimeout(() => {
-        this.pendingRequests.delete(id);
-        reject(new Error(`Timeout waiting for response to ${id}`));
-      }, timeout);
+  stop(): void {
+    this.daemonProc?.kill('SIGTERM');
+    this.daemonProc = null;
+  }
 
-      this.pendingRequests.set(id, (msg) => {
-        clearTimeout(timer);
-        resolve(msg);
+  // ── private ──────────────────────────────────────────────────────────────
+
+  private async pingDaemon(): Promise<boolean> {
+    try {
+      const status = await this.getStatus();
+      return typeof status.pluginConnected === 'boolean';
+    } catch {
+      return false;
+    }
+  }
+
+  private getStatus(): Promise<{ pluginConnected: boolean }> {
+    return new Promise((resolve, reject) => {
+      const req = http.get(`http://localhost:${HTTP_PORT}/status`, (res) => {
+        let data = '';
+        res.on('data', (c) => { data += c; });
+        res.on('end', () => {
+          try { resolve(JSON.parse(data) as { pluginConnected: boolean }); } catch { reject(new Error('bad json')); }
+        });
       });
+      req.on('error', reject);
+      req.setTimeout(1500, () => { req.destroy(); reject(new Error('timeout')); });
     });
   }
 
-  /** 플러그인 UI 연결 여부. */
-  isConnected(): boolean {
-    return this.client !== null && this.client.readyState === WebSocket.OPEN;
-  }
+  private spawnDaemon(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const proc = spawn('node', [DAEMON_SCRIPT], {
+        detached: false,
+        stdio: ['ignore', 'ignore', 'inherit'],
+        env: { ...process.env },
+      });
 
-  /** WS 서버를 종료한다. */
-  stop(): void {
-    this.client?.close();
-    this.client = null;
-    this.server?.close();
-    this.server = null;
-  }
+      proc.on('error', (err) => {
+        console.error('[Bridge] Failed to spawn daemon:', err.message);
+        reject(err);
+      });
 
-  private handleRawMessage(raw: string): void {
-    let message: BridgeMessage;
-    try {
-      message = JSON.parse(raw) as BridgeMessage;
-    } catch {
-      console.error('[WS] Received invalid JSON:', raw);
-      return;
-    }
+      this.daemonProc = proc;
 
-    console.error(`[WS] Received: ${message.type}/${message.action} (${message.id})`);
-
-    // RESPONSE 메시지는 waitForResponse가 등록한 콜백으로 매칭하여 resolve한다.
-    if (message.type === 'RESPONSE') {
-      const callback = this.pendingRequests.get(message.id);
-      if (callback) {
-        this.pendingRequests.delete(message.id);
-        callback(message);
-      } else {
-        console.error(`[WS] No pending request for response id ${message.id}`);
-      }
-    }
-
-    // 등록된 핸들러에게도 라우팅한다 (EVENT/로깅용).
-    for (const handler of this.handlers) {
-      try {
-        handler(message);
-      } catch (err) {
-        console.error('[WS] Handler error:', err);
-      }
-    }
+      // 데몬이 HTTP API를 열 때까지 폴링 (최대 5초)
+      const deadline = Date.now() + 5000;
+      const poll = async () => {
+        if (await this.pingDaemon()) {
+          console.error('[Bridge] WS daemon started');
+          resolve();
+          return;
+        }
+        if (Date.now() > deadline) {
+          reject(new Error('Daemon did not start within 5s'));
+          return;
+        }
+        setTimeout(poll, 200);
+      };
+      setTimeout(poll, 300);
+    });
   }
 }
