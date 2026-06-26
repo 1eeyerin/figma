@@ -17,7 +17,7 @@ export function subscribeCanvasMessages(wsClient: WsClient): () => void {
         id: pm.id,
         type: 'RESPONSE',
         action: pm.action ?? 'draw_result',
-        payload: { nodeId: pm.nodeId, success: pm.success, error: pm.error },
+        payload: { nodeId: pm.nodeId, success: pm.success, error: pm.error, result: pm.result },
       })
     }
   }
