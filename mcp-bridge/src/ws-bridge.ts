@@ -68,8 +68,9 @@ export class WsBridge {
       });
 
       this.server.once('error', (err: NodeJS.ErrnoException) => {
-        console.error(`[WS] Failed to bind port ${this.port}: ${err.message}`);
-        reject(err);
+        console.error(`[WS] Port ${this.port} unavailable: ${err.message} — running in degraded mode`);
+        this.server = null;
+        resolve();
       });
     });
   }
