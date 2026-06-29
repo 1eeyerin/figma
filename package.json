@@ -2,12 +2,13 @@
   "name": "figma-bridge-workspace",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@10.30.3",
   "scripts": {
     "build:plugin": "tsdown --config figma-plugin/tsdown.config.ts",
     "watch:plugin": "tsdown --config figma-plugin/tsdown.config.ts --watch",
     "typecheck:plugin": "tsc -p figma-plugin/tsconfig.json",
-    "dev:bridge": "cd mcp-bridge && npm run build && node dist/index.js",
-    "dev": "concurrently --names \"plugin,bridge\" --prefix-colors \"cyan,green\" \"npm run watch:plugin\" \"npm run dev:bridge\""
+    "dev:bridge": "pnpm --filter figma-bridge build && pnpm --filter figma-bridge start",
+    "dev": "concurrently --names \"plugin,bridge\" --prefix-colors \"cyan,green\" \"pnpm run watch:plugin\" \"pnpm run dev:bridge\""
   },
   "devDependencies": {
     "@figma/plugin-typings": "^1.129.0",
