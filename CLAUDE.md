@@ -57,9 +57,17 @@ npm run build   # 프로덕션
 npm run watch   # 개발 중 watch
 ```
 
+## Git Hooks (husky + oxlint/oxfmt)
+
+- `pre-commit`: `pnpm run lint`(oxlint) + `pnpm run format:check`(oxfmt) 통과해야 커밋 가능
+- `pre-push`: 루트 `pnpm run build`(plugin + mcp-bridge) 통과해야 push 가능. `SKIP_PRE_PUSH=1 git push`로 스킵 가능
+- `commit-msg`: `type(scope): 한글 메시지` 형식 강제 (scope 생략 가능). 타입: feat/fix/docs/style/refactor/test/chore
+- 포맷 실패 시 `pnpm run format`으로 자동 정리 후 재커밋
+
 ## 변경 이력
 | 날짜 | 변경 내용 | 대상 | 사유 |
 |------|----------|------|------|
 | 2026-06-24 | 초기 하네스 구성 | 전체 | - |
 | 2026-06-24 | ui.html → Preact 컴포넌트 구조로 리팩터링 | figma-plugin | 유지보수성 |
 | 2026-06-24 | canvas/bridge/ui 레이어 분리 (RADIO 아키텍처) | figma-plugin | 책임 분리 |
+| 2026-06-30 | husky git hooks 도입 (oxlint/oxfmt 기반) | 전체 | looppit-frontend 패턴 이식, prettier+eslint → oxlint+oxfmt 대체 |
