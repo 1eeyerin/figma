@@ -1,0 +1,25 @@
+echo "🔄 git pull 변경사항 확인 중..."
+
+changed=$(git diff-tree -r --name-only --no-commit-id ORIG_HEAD HEAD 2>/dev/null)
+
+if echo "$changed" | grep -qE '^(mcp-bridge|figma-plugin|\.claude-plugin)/'; then
+  echo "📦 mcp-bridge / figma-plugin / .claude-plugin 변경 감지 → 재빌드 실행"
+  pnpm install
+  pnpm run build
+
+  if [ $? -ne 0 ]; then
+    echo ""
+    echo "❌ 빌드 실패. 'pnpm run build'를 직접 실행해 오류를 확인해주세요."
+    exit 0
+  fi
+
+  echo ""
+  echo "✅ 재빌드 완료"
+  echo "⚠️  Claude Code에 등록된 전역 스킬/MCP 서버는 자동으로 갱신되지 않습니다."
+  echo "   Claude Code에서 아래 명령을 실행해주세요:"
+  echo "   /plugin marketplace update figma-bridge-marketplace"
+  echo "   /plugin update figma-bridge"
+  echo "   (MCP 서버가 바뀐 경우 Claude Code 재시작 필요)"
+else
+  echo "✅ mcp-bridge / figma-plugin 변경 없음 — 재빌드 스킵"
+fi
