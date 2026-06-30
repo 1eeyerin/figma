@@ -13,7 +13,8 @@
       }
     ],
     "no-unused-expressions": "error",
-    "no-duplicate-imports": "error"
+    "no-duplicate-imports": "error",
+    "import/newline-after-import": ["error", { "count": 1 }]
   },
   "overrides": [
     {
