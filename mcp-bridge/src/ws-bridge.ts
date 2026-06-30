@@ -19,11 +19,35 @@ export interface BridgeMessage {
   payload?: Record<string, unknown>;
 }
 
-const HTTP_PORT = Number(process.env.HTTP_PORT ?? 8766);
-const DAEMON_SCRIPT = path.resolve(__dirname, 'ws-server.js');
+// WsBridge가 외부 세계와 통신하는 데 필요한 최소 인터페이스.
+// 기본값은 실제 Node API를 사용하고, 테스트에서는 fake 구현을 주입한다.
+export interface WsBridgeDeps {
+  httpRequest: typeof http.request;
+  httpGet: typeof http.get;
+  spawn: typeof spawn;
+  existsSync: typeof fs.existsSync;
+  daemonScript: string;
+  httpPort: number;
+}
+
+function defaultDeps(): WsBridgeDeps {
+  return {
+    httpRequest: http.request,
+    httpGet: http.get,
+    spawn,
+    existsSync: fs.existsSync,
+    daemonScript: path.resolve(__dirname, 'ws-server.js'),
+    httpPort: Number(process.env.HTTP_PORT ?? 8766),
+  };
+}
 
 export class WsBridge {
   private daemonProc: ChildProcess | null = null;
+  private readonly deps: WsBridgeDeps;
+
+  constructor(deps: Partial<WsBridgeDeps> = {}) {
+    this.deps = { ...defaultDeps(), ...deps };
+  }
 
   /** 데몬이 살아있는지 확인. 없으면 spawn. */
   async start(): Promise<void> {
@@ -33,9 +57,9 @@ export class WsBridge {
       return;
     }
 
-    if (!fs.existsSync(DAEMON_SCRIPT)) {
+    if (!this.deps.existsSync(this.deps.daemonScript)) {
       console.error(
-        `[Bridge] WARN: ws-server.js not found at ${DAEMON_SCRIPT} — degraded mode`,
+        `[Bridge] WARN: ws-server.js not found at ${this.deps.daemonScript} — degraded mode`,
       );
       return;
     }
@@ -58,10 +82,10 @@ export class WsBridge {
 
     return new Promise((resolve, reject) => {
       const body = JSON.stringify(msg);
-      const req = http.request(
+      const req = this.deps.httpRequest(
         {
           hostname: 'localhost',
-          port: HTTP_PORT,
+          port: this.deps.httpPort,
           path: `/send?timeout=${timeout}`,
           method: 'POST',
           headers: {
@@ -134,19 +158,22 @@ export class WsBridge {
 
   private getStatus(): Promise<{ pluginConnected: boolean }> {
     return new Promise((resolve, reject) => {
-      const req = http.get(`http://localhost:${HTTP_PORT}/status`, (res) => {
-        let data = '';
-        res.on('data', (c) => {
-          data += c;
-        });
-        res.on('end', () => {
-          try {
-            resolve(JSON.parse(data) as { pluginConnected: boolean });
-          } catch {
-            reject(new Error('bad json'));
-          }
-        });
-      });
+      const req = this.deps.httpGet(
+        `http://localhost:${this.deps.httpPort}/status`,
+        (res) => {
+          let data = '';
+          res.on('data', (c) => {
+            data += c;
+          });
+          res.on('end', () => {
+            try {
+              resolve(JSON.parse(data) as { pluginConnected: boolean });
+            } catch {
+              reject(new Error('bad json'));
+            }
+          });
+        },
+      );
       req.on('error', reject);
       req.setTimeout(1500, () => {
         req.destroy();
@@ -157,7 +184,7 @@ export class WsBridge {
 
   private spawnDaemon(): Promise<void> {
     return new Promise((resolve, reject) => {
-      const proc = spawn('node', [DAEMON_SCRIPT], {
+      const proc = this.deps.spawn('node', [this.deps.daemonScript], {
         detached: false,
         stdio: ['ignore', 'ignore', 'inherit'],
         env: { ...process.env },
