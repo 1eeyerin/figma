@@ -31,16 +31,10 @@ Claude Code ↔ MCP 서버 ↔ Figma 플러그인 양방향 디자인 브릿지.
 
 빌드 명령은 [figma-plugin/README.md](figma-plugin/README.md#빌드) 참고.
 
-## Git Hooks (husky + oxlint/oxfmt)
+## Git Hooks
 
-- `pre-commit`: 절대경로 검사 + `pnpm run lint`(oxlint) + `pnpm run format:check`(oxfmt) 통과해야 커밋 가능
-- `pre-push`: 루트 `pnpm run build`(plugin + mcp-bridge) 통과해야 push 가능. `SKIP_PRE_PUSH=1 git push`로 스킵 가능
-- `commit-msg`: `type(scope): 한글 메시지` 형식 강제 (scope 필수). 타입: feat/fix/docs/style/refactor/test/chore/build
-- 포맷 실패 시 `pnpm run format`으로 자동 정리 후 재커밋
+husky 기반 pre-commit/pre-push/commit-msg 훅과 절대경로 금지 규칙은 [docs/git-hooks.md](docs/git-hooks.md) 참고.
 
-## 절대경로 금지
+## 테스트 코드 작성 규칙
 
-- 스크립트·문서·설정에 `/Users/<사용자명>`, `/home/<사용자명>` 같은 로컬 환경 종속 절대경로를 **하드코딩 금지**. 다른 사용자/머신에서 깨진다.
-- 셸 스크립트는 `SCRIPT_DIR="$(cd -- "$(dirname -- "$0")" && pwd)"` 패턴으로 자기 위치 기준 경로를 구하라.
-- 문서의 안내 명령어는 프로젝트 루트 기준 상대경로(`cd mcp-bridge`)로 작성하라.
-- `pre-commit` 훅이 이를 자동 검사한다 (위 Git Hooks 참고).
+테스트 제목 한글 작성, 주석 JSDoc 사용 기준은 [docs/testing.md](docs/testing.md) 참고.
