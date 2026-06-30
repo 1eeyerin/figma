@@ -8,7 +8,16 @@
   "printWidth": 80,
   "tabWidth": 2,
   "useTabs": false,
-  "ignorePatterns": ["**/dist/**", "**/build/**", "**/*.module.css.d.ts"],
+  "ignorePatterns": [
+    "**/dist/**",
+    "**/build/**",
+    "**/*.module.css.d.ts",
+    "**/*.md",
+    "**/*.json",
+    "**/*.jsonc",
+    "_workspace/**",
+    ".claude/**"
+  ],
   "sortImports": {
     "groups": [
       "type-import",
