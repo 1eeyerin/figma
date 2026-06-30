@@ -1,0 +1,15 @@
+{
+  "name": "figma-bridge-marketplace",
+  "owner": {
+    "name": "yerin",
+    "email": "dev.yerin@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "figma-bridge",
+      "source": "./",
+      "description": "Claude Code ↔ MCP 서버 ↔ Figma 플러그인 양방향 디자인 브릿지 (사각형/텍스트/프레임 생성 등)",
+      "version": "0.1.0"
+    }
+  ]
+}
