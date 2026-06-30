@@ -4,16 +4,21 @@
   "type": "module",
   "packageManager": "pnpm@10.30.3",
   "scripts": {
-    "build:plugin": "tsdown --config figma-plugin/tsdown.config.ts",
-    "watch:plugin": "tsdown --config figma-plugin/tsdown.config.ts --watch",
+    "build:plugin": "pnpm --filter figma-bridge-plugin build",
+    "watch:plugin": "pnpm --filter figma-bridge-plugin watch",
     "typecheck:plugin": "tsc -p figma-plugin/tsconfig.json",
     "dev:bridge": "pnpm --filter figma-bridge build && pnpm --filter figma-bridge start",
-    "dev": "concurrently --names \"plugin,bridge\" --prefix-colors \"cyan,green\" \"pnpm run watch:plugin\" \"pnpm run dev:bridge\""
+    "dev": "concurrently --names \"plugin,bridge\" --prefix-colors \"cyan,green\" \"pnpm run watch:plugin\" \"pnpm run dev:bridge\"",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check ."
   },
   "devDependencies": {
     "@figma/plugin-typings": "^1.129.0",
     "concurrently": "^10.0.3",
-    "tsdown": "^0.22.3",
+    "oxfmt": "^0.57.0",
+    "oxlint": "^1.72.0",
     "typescript": "^6.0.3"
   }
 }

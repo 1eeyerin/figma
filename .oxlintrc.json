@@ -1,0 +1,32 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["import", "typescript", "unicorn"],
+  "ignorePatterns": ["**/dist/**", "**/build/**", "**/*.module.css.d.ts"],
+  "rules": {
+    "no-unused-vars": "off",
+    "typescript/no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "caughtErrorsIgnorePattern": "^_"
+      }
+    ],
+    "no-unused-expressions": "error",
+    "no-duplicate-imports": "error"
+  },
+  "overrides": [
+    {
+      "files": ["figma-plugin/src/**/*.ts", "figma-plugin/src/**/*.tsx"],
+      "env": {
+        "browser": true
+      }
+    },
+    {
+      "files": ["mcp-bridge/src/**/*.ts"],
+      "env": {
+        "node": true
+      }
+    }
+  ]
+}
