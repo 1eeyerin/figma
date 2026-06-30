@@ -10,18 +10,22 @@ const WEIGHT_MAP: Record<string, string> = {
   Black: 'Black',
 };
 
+export function resolveFontStyle(weight: string): string {
+  return WEIGHT_MAP[weight] ?? 'Regular';
+}
+
 export async function loadFont(
   family: string,
   weight: string,
+  loadFontAsync: (fontName: FontName) => Promise<void> = figma.loadFontAsync,
 ): Promise<FontName> {
-  const style = WEIGHT_MAP[weight] ?? 'Regular';
-  const fontName: FontName = { family, style };
+  const fontName: FontName = { family, style: resolveFontStyle(weight) };
   try {
-    await figma.loadFontAsync(fontName);
+    await loadFontAsync(fontName);
     return fontName;
   } catch {
     const fallback: FontName = { family: 'Inter', style: 'Regular' };
-    await figma.loadFontAsync(fallback);
+    await loadFontAsync(fallback);
     return fallback;
   }
 }

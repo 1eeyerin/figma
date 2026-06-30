@@ -3,40 +3,75 @@ import { colorToFill } from './utils/color';
 import { applyStroke, buildEffects } from './utils/effects';
 import { loadFont } from './utils/font';
 
-function applyFrameLayout(frame: FrameNode, def: any): void {
-  if (!def.layoutMode || def.layoutMode === 'NONE') return;
-  frame.layoutMode = def.layoutMode;
+// msg → 적용할 속성 dict 변환 (순수). figma 노드에 직접 쓰는 부분과 분리해 테스트 용이성을 확보한다.
+
+export function rectPropsFrom(msg: any): Record<string, unknown> {
+  const props: Record<string, unknown> = {
+    x: msg.x ?? 0,
+    y: msg.y ?? 0,
+  };
+  if (msg.name) props.name = msg.name;
+
+  const fill = colorToFill(msg.color);
+  if (fill) props.fills = [fill];
+  if (typeof msg.opacity === 'number') props.opacity = msg.opacity;
+  if (typeof msg.cornerRadius === 'number')
+    props.cornerRadius = msg.cornerRadius;
+  if (Array.isArray(msg.cornerRadii)) {
+    props.topLeftRadius = msg.cornerRadii[0];
+    props.topRightRadius = msg.cornerRadii[1];
+    props.bottomRightRadius = msg.cornerRadii[2];
+    props.bottomLeftRadius = msg.cornerRadii[3];
+  }
+
+  return props;
+}
+
+export function framePropsFrom(def: any): Record<string, unknown> {
+  const props: Record<string, unknown> = {
+    name: def.name ?? 'Frame',
+    x: def.x ?? 0,
+    y: def.y ?? 0,
+  };
+
+  const fill = colorToFill(def.color);
+  props.fills = fill ? [fill] : [];
+  if (typeof def.opacity === 'number') props.opacity = def.opacity;
+  if (typeof def.cornerRadius === 'number')
+    props.cornerRadius = def.cornerRadius;
+  if (def.clipContent !== undefined) props.clipsContent = def.clipContent;
+
+  return props;
+}
+
+export function frameLayoutPropsFrom(def: any): Record<string, unknown> | null {
+  if (!def.layoutMode || def.layoutMode === 'NONE') return null;
+
+  const props: Record<string, unknown> = { layoutMode: def.layoutMode };
   if (def.primaryAxisSizing)
-    frame.primaryAxisSizingMode = def.primaryAxisSizing;
+    props.primaryAxisSizingMode = def.primaryAxisSizing;
   if (def.counterAxisSizing)
-    frame.counterAxisSizingMode = def.counterAxisSizing;
-  if (typeof def.itemSpacing === 'number') frame.itemSpacing = def.itemSpacing;
-  if (typeof def.paddingTop === 'number') frame.paddingTop = def.paddingTop;
+    props.counterAxisSizingMode = def.counterAxisSizing;
+  if (typeof def.itemSpacing === 'number') props.itemSpacing = def.itemSpacing;
+  if (typeof def.paddingTop === 'number') props.paddingTop = def.paddingTop;
   if (typeof def.paddingRight === 'number')
-    frame.paddingRight = def.paddingRight;
+    props.paddingRight = def.paddingRight;
   if (typeof def.paddingBottom === 'number')
-    frame.paddingBottom = def.paddingBottom;
-  if (typeof def.paddingLeft === 'number') frame.paddingLeft = def.paddingLeft;
+    props.paddingBottom = def.paddingBottom;
+  if (typeof def.paddingLeft === 'number') props.paddingLeft = def.paddingLeft;
+
+  return props;
+}
+
+function applyFrameLayout(frame: FrameNode, def: any): void {
+  const layoutProps = frameLayoutPropsFrom(def);
+  if (layoutProps) Object.assign(frame, layoutProps);
 }
 
 export function createRect(msg: any): RectangleNode {
   const rect = figma.createRectangle();
-  if (msg.name) rect.name = msg.name;
-  rect.x = msg.x ?? 0;
-  rect.y = msg.y ?? 0;
+  Object.assign(rect, rectPropsFrom(msg));
   rect.resize(msg.width ?? 100, msg.height ?? 100);
-
-  const fill = colorToFill(msg.color);
-  if (fill) rect.fills = [fill];
-  if (typeof msg.opacity === 'number') rect.opacity = msg.opacity;
-  if (typeof msg.cornerRadius === 'number')
-    rect.cornerRadius = msg.cornerRadius;
-  if (Array.isArray(msg.cornerRadii)) {
-    rect.topLeftRadius = msg.cornerRadii[0];
-    rect.topRightRadius = msg.cornerRadii[1];
-    rect.bottomRightRadius = msg.cornerRadii[2];
-    rect.bottomLeftRadius = msg.cornerRadii[3];
-  }
 
   applyStroke(rect, msg);
   const effects = buildEffects(msg);
@@ -45,31 +80,39 @@ export function createRect(msg: any): RectangleNode {
   return rect;
 }
 
+export function textPropsFrom(msg: any): Record<string, unknown> {
+  const props: Record<string, unknown> = {
+    x: msg.x ?? 0,
+    y: msg.y ?? 0,
+    characters: msg.content ?? '',
+  };
+  if (msg.name) props.name = msg.name;
+
+  if (typeof msg.fontSize === 'number') props.fontSize = msg.fontSize;
+  const fill = colorToFill(msg.color);
+  if (fill) props.fills = [fill];
+  if (typeof msg.opacity === 'number') props.opacity = msg.opacity;
+  if (msg.textAlign) props.textAlignHorizontal = msg.textAlign;
+  if (typeof msg.letterSpacing === 'number') {
+    props.letterSpacing = { value: msg.letterSpacing, unit: 'PIXELS' };
+  }
+  if (msg.lineHeight && msg.lineHeight !== 'AUTO')
+    props.lineHeight = msg.lineHeight;
+  if (msg.autoResize) props.textAutoResize = msg.autoResize;
+
+  return props;
+}
+
 export async function createText(msg: any): Promise<TextNode> {
   const fontName = await loadFont(
     msg.fontFamily ?? 'Inter',
     msg.fontWeight ?? 'Regular',
   );
   const text = figma.createText();
-  if (msg.name) text.name = msg.name;
   text.fontName = fontName;
-  text.x = msg.x ?? 0;
-  text.y = msg.y ?? 0;
-  text.characters = msg.content ?? '';
+  Object.assign(text, textPropsFrom(msg));
 
-  if (typeof msg.fontSize === 'number') text.fontSize = msg.fontSize;
-  const fill = colorToFill(msg.color);
-  if (fill) text.fills = [fill];
-  if (typeof msg.opacity === 'number') text.opacity = msg.opacity;
-  if (msg.textAlign) text.textAlignHorizontal = msg.textAlign;
-  if (typeof msg.letterSpacing === 'number') {
-    text.letterSpacing = { value: msg.letterSpacing, unit: 'PIXELS' };
-  }
-  if (msg.lineHeight && msg.lineHeight !== 'AUTO')
-    text.lineHeight = msg.lineHeight;
-  if (msg.autoResize) {
-    text.textAutoResize = msg.autoResize;
-  } else if (typeof msg.width === 'number') {
+  if (!msg.autoResize && typeof msg.width === 'number') {
     text.textAutoResize = 'HEIGHT';
     text.resize(msg.width, text.height);
   }
@@ -79,22 +122,13 @@ export async function createText(msg: any): Promise<TextNode> {
 
 export function createFrame(msg: any): FrameNode {
   const frame = figma.createFrame();
-  frame.name = msg.name ?? 'Frame';
-  frame.x = msg.x ?? 0;
-  frame.y = msg.y ?? 0;
+  Object.assign(frame, framePropsFrom(msg));
   frame.resize(msg.width ?? 100, msg.height ?? 100);
-
-  const fill = colorToFill(msg.color);
-  frame.fills = fill ? [fill] : [];
-  if (typeof msg.opacity === 'number') frame.opacity = msg.opacity;
-  if (typeof msg.cornerRadius === 'number')
-    frame.cornerRadius = msg.cornerRadius;
 
   applyFrameLayout(frame, msg);
   applyStroke(frame, msg);
   const effects = buildEffects(msg);
   if (effects.length) frame.effects = effects;
-  if (msg.clipContent !== undefined) frame.clipsContent = msg.clipContent;
 
   return frame;
 }
