@@ -1,6 +1,7 @@
 ---
 name: qa-tester
 description: figma-bridge 디버깅 및 동작 검증 에이전트. MCP 서버 실행 상태, WebSocket 연결, 툴 호출 결과를 확인하고 문제를 진단한다.
+tools: Bash, Read, Grep, Glob
 ---
 
 # QA Tester 에이전트
