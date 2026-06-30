@@ -1,0 +1,30 @@
+commit_msg=$(cat "$1")
+
+# 머지 커밋은 검증 건너뛰기
+if echo "$commit_msg" | grep -qE '^Merge '; then
+  echo "✅ 머지 커밋은 형식 검증을 건너뜁니다."
+  exit 0
+fi
+
+# 커밋 메시지 형식 검증: type(scope): 한글~ 또는 type: 한글~
+# 타입: feat, fix, docs, style, refactor, test, chore
+# scope는 선택사항 (이 프로젝트는 scope 생략한 chore: 형태도 허용)
+# 메시지에 한글이 포함되어야 함
+
+if ! echo "$commit_msg" | grep -qE '^(feat|fix|docs|style|refactor|test|chore)(\([^)]+\))?: .*[가-힣].*'; then
+  echo "❌ 커밋 메시지 형식이 올바르지 않습니다."
+  echo ""
+  echo "올바른 형식: <type>(<scope>): <한글 메시지>  (scope는 선택)"
+  echo ""
+  echo "타입: feat, fix, docs, style, refactor, test, chore"
+  echo "메시지: 한글이 포함되어야 합니다"
+  echo ""
+  echo "예시:"
+  echo "  feat(auth): 사용자 인증 기능 추가"
+  echo "  fix(auth): 로그인 버그 수정"
+  echo "  chore: oxfmt 포맷팅 적용"
+  echo "  refactor(mcp-bridge): WsBridge 옵저버 API 제거"
+  exit 1
+fi
+
+echo "✅ 커밋 메시지 형식이 올바릅니다."

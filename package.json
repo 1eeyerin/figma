@@ -9,14 +9,17 @@
     "typecheck:plugin": "tsc -p figma-plugin/tsconfig.json",
     "dev:bridge": "pnpm --filter figma-bridge build && pnpm --filter figma-bridge start",
     "dev": "concurrently --names \"plugin,bridge\" --prefix-colors \"cyan,green\" \"pnpm run watch:plugin\" \"pnpm run dev:bridge\"",
+    "build": "pnpm --filter figma-bridge-plugin build && pnpm --filter figma-bridge build",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "format": "oxfmt .",
-    "format:check": "oxfmt --check ."
+    "format:check": "oxfmt --check .",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@figma/plugin-typings": "^1.129.0",
     "concurrently": "^10.0.3",
+    "husky": "^9.1.7",
     "oxfmt": "^0.57.0",
     "oxlint": "^1.72.0",
     "typescript": "^6.0.3"

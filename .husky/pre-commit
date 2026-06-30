@@ -1,0 +1,17 @@
+echo "🔍 린트 체크 실행 중..."
+pnpm run lint
+
+if [ $? -ne 0 ]; then
+  echo "❌ 린트 실패: 커밋이 취소되었습니다."
+  exit 1
+fi
+
+echo "🎨 포맷 체크 실행 중..."
+pnpm run format:check
+
+if [ $? -ne 0 ]; then
+  echo "❌ 포맷 실패: 'pnpm run format' 실행 후 다시 커밋해주세요."
+  exit 1
+fi
+
+echo "✅ 린트/포맷 체크 통과"
