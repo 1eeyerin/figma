@@ -18,186 +18,168 @@ function reply(msg: Msg, extra: object) {
   });
 }
 
+function errorMessageOf(e: unknown): string {
+  return e instanceof Error ? e.message : String(e);
+}
+
+// 액션 핸들러 공통 wrapper: 성공 시 extra를 success:true와 합쳐 reply, 실패 시 error를 reply.
+// notifyLabel이 있으면 실패 시 figma.notify로도 사용자에게 알린다 (생성류 액션 전용).
+async function runAction(
+  msg: Msg,
+  notifyLabel: string | null,
+  fn: () => Promise<object> | object,
+): Promise<void> {
+  try {
+    const extra = await fn();
+    reply(msg, { success: true, ...extra });
+  } catch (e) {
+    const error = errorMessageOf(e);
+    if (notifyLabel)
+      figma.notify(`${notifyLabel} 실패: ${error}`, { error: true });
+    reply(msg, { success: false, error });
+  }
+}
+
+function requireNode(nodeId: string): SceneNode {
+  const node = getNodeById(nodeId) as SceneNode | null;
+  if (!node) throw new Error(`노드를 찾을 수 없음: ${nodeId}`);
+  return node;
+}
+
+function resolveTargetNode(nodeId: string | undefined): SceneNode {
+  const node = (
+    nodeId ? getNodeById(nodeId) : figma.currentPage.selection[0]
+  ) as SceneNode | null;
+  if (!node) throw new Error('노드를 찾을 수 없습니다');
+  return node;
+}
+
+async function handleDrawRect(msg: Msg): Promise<void> {
+  await runAction(msg, '사각형 생성', () => {
+    const rect = createRect(msg);
+    appendToParent(rect, msg.parentId);
+    return { nodeId: rect.id };
+  });
+}
+
+async function handleDrawText(msg: Msg): Promise<void> {
+  await runAction(msg, '텍스트 생성', async () => {
+    const text = await createText(msg);
+    appendToParent(text, msg.parentId);
+    return { nodeId: text.id };
+  });
+}
+
+async function handleDrawFrame(msg: Msg): Promise<void> {
+  await runAction(msg, '프레임 생성', () => {
+    const frame = createFrame(msg);
+    appendToParent(frame, msg.parentId);
+    return { nodeId: frame.id };
+  });
+}
+
+async function handleSetParent(msg: Msg): Promise<void> {
+  await runAction(msg, null, () => {
+    const node = requireNode(msg.nodeId);
+    const newParent = getNodeById(msg.parentId) as
+      | (BaseNode & ChildrenMixin)
+      | null;
+    if (!newParent || !('appendChild' in newParent))
+      throw new Error(
+        `부모 노드가 없거나 자식을 가질 수 없음: ${msg.parentId}`,
+      );
+
+    if (typeof msg.index === 'number') {
+      newParent.insertChild(msg.index, node);
+    } else {
+      newParent.appendChild(node);
+    }
+    return { nodeId: node.id };
+  });
+}
+
+async function handleSetName(msg: Msg): Promise<void> {
+  await runAction(msg, null, () => {
+    const node = requireNode(msg.nodeId);
+    node.name = msg.name;
+    return { nodeId: node.id };
+  });
+}
+
+async function handleRemoveNode(msg: Msg): Promise<void> {
+  await runAction(msg, null, () => {
+    requireNode(msg.nodeId).remove();
+    return {};
+  });
+}
+
+async function handleGetNode(msg: Msg): Promise<void> {
+  await runAction(msg, null, () => {
+    const node = resolveTargetNode(msg.nodeId);
+    return { result: serializeNode(node) };
+  });
+}
+
+async function handleGetPage(msg: Msg): Promise<void> {
+  await runAction(msg, null, () => ({
+    result: figma.currentPage.children.map(serializeNode),
+  }));
+}
+
+async function handleExportNode(msg: Msg): Promise<void> {
+  await runAction(msg, null, async () => {
+    const node = resolveTargetNode(msg.nodeId);
+    const base64 = await exportNode(node, msg.scale);
+    return { result: { base64, nodeId: node.id } };
+  });
+}
+
+async function handleCreateScreen(msg: Msg): Promise<void> {
+  await runAction(msg, '스크린 생성', async () => {
+    const parent = (msg.parentId ? getNodeById(msg.parentId) : null) as
+      | (BaseNode & ChildrenMixin)
+      | null;
+    const root = await createNodeFromTree(
+      msg.tree,
+      parent ?? figma.currentPage,
+    );
+    figma.currentPage.selection = [root];
+    figma.viewport.scrollAndZoomIntoView([root]);
+    return { nodeId: root.id };
+  });
+}
+
+const ACTION_HANDLERS: Record<string, (msg: Msg) => Promise<void>> = {
+  DRAW_RECT: handleDrawRect,
+  DRAW_TEXT: handleDrawText,
+  DRAW_FRAME: handleDrawFrame,
+  SET_PARENT: handleSetParent,
+  SET_NAME: handleSetName,
+  REMOVE_NODE: handleRemoveNode,
+  GET_NODE: handleGetNode,
+  GET_PAGE: handleGetPage,
+  EXPORT_NODE: handleExportNode,
+  CREATE_SCREEN: handleCreateScreen,
+};
+
 export async function handleMessage(msg: Msg): Promise<void> {
   if (!msg || typeof msg.type !== 'string') return;
 
-  switch (msg.type) {
-    case 'LOG':
-      console.log('[Plugin]', msg.message);
-      break;
-
-    case 'PING':
-      figma.ui.postMessage({ type: 'PONG' });
-      break;
-
-    case 'CLOSE':
-      figma.closePlugin();
-      break;
-
-    case 'DRAW_RECT': {
-      try {
-        const rect = createRect(msg);
-        appendToParent(rect, msg.parentId);
-        reply(msg, { nodeId: rect.id, success: true });
-      } catch (e) {
-        const error = e instanceof Error ? e.message : String(e);
-        figma.notify('사각형 생성 실패: ' + error, { error: true });
-        reply(msg, { success: false, error });
-      }
-      break;
-    }
-
-    case 'DRAW_TEXT': {
-      try {
-        const text = await createText(msg);
-        appendToParent(text, msg.parentId);
-        reply(msg, { nodeId: text.id, success: true });
-      } catch (e) {
-        const error = e instanceof Error ? e.message : String(e);
-        figma.notify('텍스트 생성 실패: ' + error, { error: true });
-        reply(msg, { success: false, error });
-      }
-      break;
-    }
-
-    case 'DRAW_FRAME': {
-      try {
-        const frame = createFrame(msg);
-        appendToParent(frame, msg.parentId);
-        reply(msg, { nodeId: frame.id, success: true });
-      } catch (e) {
-        const error = e instanceof Error ? e.message : String(e);
-        figma.notify('프레임 생성 실패: ' + error, { error: true });
-        reply(msg, { success: false, error });
-      }
-      break;
-    }
-
-    case 'SET_PARENT': {
-      try {
-        const node = getNodeById(msg.nodeId) as SceneNode | null;
-        const newParent = getNodeById(msg.parentId) as
-          | (BaseNode & ChildrenMixin)
-          | null;
-        if (!node) throw new Error(`노드를 찾을 수 없음: ${msg.nodeId}`);
-        if (!newParent || !('appendChild' in newParent))
-          throw new Error(
-            `부모 노드가 없거나 자식을 가질 수 없음: ${msg.parentId}`,
-          );
-        if (typeof msg.index === 'number') {
-          newParent.insertChild(msg.index, node);
-        } else {
-          newParent.appendChild(node);
-        }
-        reply(msg, { nodeId: node.id, success: true });
-      } catch (e) {
-        reply(msg, {
-          success: false,
-          error: e instanceof Error ? e.message : String(e),
-        });
-      }
-      break;
-    }
-
-    case 'SET_NAME': {
-      try {
-        const node = getNodeById(msg.nodeId) as SceneNode | null;
-        if (!node) throw new Error(`노드를 찾을 수 없음: ${msg.nodeId}`);
-        node.name = msg.name;
-        reply(msg, { nodeId: node.id, success: true });
-      } catch (e) {
-        reply(msg, {
-          success: false,
-          error: e instanceof Error ? e.message : String(e),
-        });
-      }
-      break;
-    }
-
-    case 'REMOVE_NODE': {
-      try {
-        const node = getNodeById(msg.nodeId) as SceneNode | null;
-        if (!node) throw new Error(`노드를 찾을 수 없음: ${msg.nodeId}`);
-        node.remove();
-        reply(msg, { success: true });
-      } catch (e) {
-        reply(msg, {
-          success: false,
-          error: e instanceof Error ? e.message : String(e),
-        });
-      }
-      break;
-    }
-
-    case 'GET_NODE': {
-      try {
-        const node = (
-          msg.nodeId ? getNodeById(msg.nodeId) : figma.currentPage.selection[0]
-        ) as SceneNode | null;
-        if (!node) throw new Error('노드를 찾을 수 없습니다');
-        reply(msg, { success: true, result: serializeNode(node) });
-      } catch (e) {
-        reply(msg, {
-          success: false,
-          error: e instanceof Error ? e.message : String(e),
-        });
-      }
-      break;
-    }
-
-    case 'GET_PAGE': {
-      try {
-        reply(msg, {
-          success: true,
-          result: figma.currentPage.children.map(serializeNode),
-        });
-      } catch (e) {
-        reply(msg, {
-          success: false,
-          error: e instanceof Error ? e.message : String(e),
-        });
-      }
-      break;
-    }
-
-    case 'EXPORT_NODE': {
-      try {
-        const node = (
-          msg.nodeId ? getNodeById(msg.nodeId) : figma.currentPage.selection[0]
-        ) as SceneNode | null;
-        if (!node) throw new Error('노드를 찾을 수 없습니다');
-        const base64 = await exportNode(node, msg.scale);
-        reply(msg, { success: true, result: { base64, nodeId: node.id } });
-      } catch (e) {
-        reply(msg, {
-          success: false,
-          error: e instanceof Error ? e.message : String(e),
-        });
-      }
-      break;
-    }
-
-    case 'CREATE_SCREEN': {
-      try {
-        const parent = (msg.parentId ? getNodeById(msg.parentId) : null) as
-          | (BaseNode & ChildrenMixin)
-          | null;
-        const root = await createNodeFromTree(
-          msg.tree,
-          parent ?? figma.currentPage,
-        );
-        figma.currentPage.selection = [root];
-        figma.viewport.scrollAndZoomIntoView([root]);
-        reply(msg, { nodeId: root.id, success: true });
-      } catch (e) {
-        const error = e instanceof Error ? e.message : String(e);
-        figma.notify('스크린 생성 실패: ' + error, { error: true });
-        reply(msg, { success: false, error });
-      }
-      break;
-    }
-
-    default:
-      break;
+  if (msg.type === 'LOG') {
+    console.log('[Plugin]', msg.message);
+    return;
   }
+
+  if (msg.type === 'PING') {
+    figma.ui.postMessage({ type: 'PONG' });
+    return;
+  }
+
+  if (msg.type === 'CLOSE') {
+    figma.closePlugin();
+    return;
+  }
+
+  const handler = ACTION_HANDLERS[msg.type];
+  if (handler) await handler(msg);
 }
