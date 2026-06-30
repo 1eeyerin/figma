@@ -19,13 +19,10 @@ export interface BridgeMessage {
   payload?: Record<string, unknown>;
 }
 
-export type MessageHandler = (message: BridgeMessage) => void;
-
 const HTTP_PORT = Number(process.env.HTTP_PORT ?? 8766);
 const DAEMON_SCRIPT = path.resolve(__dirname, 'ws-server.js');
 
 export class WsBridge {
-  private readonly handlers: MessageHandler[] = [];
   private daemonProc: ChildProcess | null = null;
 
   /** 데몬이 살아있는지 확인. 없으면 spawn. */
@@ -92,10 +89,6 @@ export class WsBridge {
     } catch {
       return false;
     }
-  }
-
-  onMessage(handler: MessageHandler): void {
-    this.handlers.push(handler);
   }
 
   stop(): void {
