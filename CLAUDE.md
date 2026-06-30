@@ -59,10 +59,17 @@ npm run watch   # 개발 중 watch
 
 ## Git Hooks (husky + oxlint/oxfmt)
 
-- `pre-commit`: `pnpm run lint`(oxlint) + `pnpm run format:check`(oxfmt) 통과해야 커밋 가능
+- `pre-commit`: 절대경로 검사 + `pnpm run lint`(oxlint) + `pnpm run format:check`(oxfmt) 통과해야 커밋 가능
 - `pre-push`: 루트 `pnpm run build`(plugin + mcp-bridge) 통과해야 push 가능. `SKIP_PRE_PUSH=1 git push`로 스킵 가능
 - `commit-msg`: `type(scope): 한글 메시지` 형식 강제 (scope 필수). 타입: feat/fix/docs/style/refactor/test/chore/build
 - 포맷 실패 시 `pnpm run format`으로 자동 정리 후 재커밋
+
+## 절대경로 금지
+
+- 스크립트·문서·설정에 `/Users/<사용자명>`, `/home/<사용자명>` 같은 로컬 환경 종속 절대경로를 **하드코딩 금지**. 다른 사용자/머신에서 깨진다.
+- 셸 스크립트는 `SCRIPT_DIR="$(cd -- "$(dirname -- "$0")" && pwd)"` 패턴으로 자기 위치 기준 경로를 구하라.
+- 문서의 안내 명령어는 프로젝트 루트 기준 상대경로(`cd mcp-bridge`)로 작성하라.
+- `pre-commit` 훅이 스테이징된 파일에서 `/Users/`, `/home/` 패턴을 자동 검사해 커밋을 차단한다 (바이너리/lock 파일 제외).
 
 ## 변경 이력
 | 날짜 | 변경 내용 | 대상 | 사유 |

@@ -1,3 +1,30 @@
+echo "🔎 절대경로 하드코딩 검사 중..."
+
+staged_files=$(git diff --cached --name-only --diff-filter=ACM)
+leaked=""
+
+if [ -n "$staged_files" ]; then
+  for f in $staged_files; do
+    # 바이너리/잠금 파일 및 이 훅 스크립트 자신(패턴 문자열 포함) 제외
+    case "$f" in
+      *.lock|*lock.json|*.png|*.jpg|*.jpeg|*.gif|*.ico|*.woff|*.woff2|.husky/pre-commit) continue ;;
+    esac
+    if [ -f "$f" ] && grep -qE '/(Users|home)/[A-Za-z0-9_.-]+' "$f" 2>/dev/null; then
+      leaked="$leaked\n  - $f"
+    fi
+  done
+fi
+
+if [ -n "$leaked" ]; then
+  echo "❌ 절대경로(/Users/.. 또는 /home/..)가 포함된 파일이 있습니다:"
+  echo "$leaked"
+  echo ""
+  echo "사용자 환경에 종속된 경로 대신 상대경로나 \$(dirname \"\$0\") 같은 동적 경로를 사용해주세요."
+  exit 1
+fi
+
+echo "✅ 절대경로 검사 통과"
+
 echo "🔍 린트 체크 실행 중..."
 pnpm run lint
 
