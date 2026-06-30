@@ -2,7 +2,11 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
 
-import { WsBridge } from './ws-bridge.js';
+import {
+  formatDispatchError,
+  formatDispatchResponse,
+} from './dispatch-format.js';
+import { BridgeMessage, WsBridge } from './ws-bridge.js';
 
 // 공통 색상 스키마
 const colorSchema = z
@@ -36,50 +40,13 @@ async function main(): Promise<void> {
   });
 
   async function dispatch(action: string, payload: Record<string, unknown>) {
-    let response;
+    let response: BridgeMessage;
     try {
       response = await bridge.sendAndWait(action, payload);
     } catch (err) {
-      const msg = (err as Error).message;
-      if (msg.includes('plugin not connected')) {
-        return {
-          content: [
-            {
-              type: 'text' as const,
-              text: 'Figma 플러그인이 연결되지 않았습니다. Figma에서 플러그인을 실행해 주세요.',
-            },
-          ],
-          isError: true,
-        };
-      }
-      return {
-        content: [{ type: 'text' as const, text: `오류: ${msg}` }],
-        isError: true,
-      };
+      return formatDispatchError(err as Error);
     }
-
-    if (!response.payload?.success) {
-      return {
-        content: [
-          { type: 'text' as const, text: `오류: ${response.payload?.error}` },
-        ],
-        isError: true,
-      };
-    }
-
-    const data = response.payload;
-    const parts: string[] = [];
-    if (data.nodeId) parts.push(`nodeId: ${data.nodeId}`);
-    if (data.result) parts.push(JSON.stringify(data.result, null, 2));
-
-    return {
-      content: [
-        {
-          type: 'text' as const,
-          text: parts.length ? parts.join('\n') : '완료',
-        },
-      ],
-    };
+    return formatDispatchResponse(response);
   }
 
   // ─── 노드 생성 ───────────────────────────────────────────────────────────
