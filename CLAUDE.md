@@ -19,6 +19,10 @@ Claude Code ↔ MCP 서버 ↔ Figma 플러그인 양방향 디자인 브릿지.
 
 **트리거:** Figma 캔버스 조작, 도형/텍스트/프레임 생성, 연결 문제 디버깅 시 `figma-bridge` 스킬을 사용하라.
 
+## mcp-bridge 구조
+
+상세 프로세스 구조·메시지 프로토콜은 [docs/architecture.md](docs/architecture.md), 패키지 빌드 방법은 [mcp-bridge/README.md](mcp-bridge/README.md) 참고.
+
 ## figma-plugin 구조
 
 상세 디렉토리 구조·레이어 제약사항은 [docs/architecture.md](docs/architecture.md), 패키지 빌드 방법은 [figma-plugin/README.md](figma-plugin/README.md) 참고.
