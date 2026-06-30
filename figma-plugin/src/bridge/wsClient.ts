@@ -1,86 +1,90 @@
-import { WS_URL, RECONNECT_DELAY, ACTION_MAP } from './constants'
-import { uuid } from '../utils/uuid'
+import { uuid } from '../utils/uuid';
+import { WS_URL, RECONNECT_DELAY, ACTION_MAP } from './constants';
 
 export interface WsClientCallbacks {
-  onOpen: () => void
-  onClose: () => void
-  onCanvasMessage: (canvasType: string, msg: Record<string, unknown>) => void
+  onOpen: () => void;
+  onClose: () => void;
+  onCanvasMessage: (canvasType: string, msg: Record<string, unknown>) => void;
 }
 
 export interface WsClient {
-  send: (message: object) => void
-  connect: () => void
-  destroy: () => void
+  send: (message: object) => void;
+  connect: () => void;
+  destroy: () => void;
 }
 
 // UI 상태를 모름 — 콜백으로만 외부에 알림
 export function createWsClient(callbacks: WsClientCallbacks): WsClient {
-  let ws: WebSocket | null = null
-  let reconnectTimer: ReturnType<typeof setTimeout> | null = null
+  let ws: WebSocket | null = null;
+  let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
 
   function send(message: object) {
     if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify(message))
+      ws.send(JSON.stringify(message));
     }
   }
 
   function scheduleReconnect() {
-    if (reconnectTimer) clearTimeout(reconnectTimer)
-    reconnectTimer = setTimeout(connect, RECONNECT_DELAY)
+    if (reconnectTimer) clearTimeout(reconnectTimer);
+    reconnectTimer = setTimeout(connect, RECONNECT_DELAY);
   }
 
   function connect() {
     if (reconnectTimer) {
-      clearTimeout(reconnectTimer)
-      reconnectTimer = null
+      clearTimeout(reconnectTimer);
+      reconnectTimer = null;
     }
 
     try {
-      ws = new WebSocket(WS_URL)
+      ws = new WebSocket(WS_URL);
     } catch {
-      scheduleReconnect()
-      return
+      scheduleReconnect();
+      return;
     }
 
     ws.onopen = () => {
-      send({ id: uuid(), type: 'EVENT', action: 'connected', payload: {} })
-      callbacks.onOpen()
-    }
+      send({ id: uuid(), type: 'EVENT', action: 'connected', payload: {} });
+      callbacks.onOpen();
+    };
 
     ws.onmessage = (event) => {
-      let msg: Record<string, unknown>
+      let msg: Record<string, unknown>;
       try {
-        msg = JSON.parse(event.data)
+        msg = JSON.parse(event.data);
       } catch {
-        return
+        return;
       }
 
       if (msg.action === 'ping') {
-        send({ id: msg.id, type: 'RESPONSE', action: 'pong', payload: {} })
-        return
+        send({ id: msg.id, type: 'RESPONSE', action: 'pong', payload: {} });
+        return;
       }
 
-      const canvasType = ACTION_MAP[msg.action as string]
+      const canvasType = ACTION_MAP[msg.action as string];
       if (canvasType) {
-        callbacks.onCanvasMessage(canvasType, msg)
+        callbacks.onCanvasMessage(canvasType, msg);
       }
-    }
+    };
 
     ws.onclose = () => {
-      callbacks.onClose()
-      scheduleReconnect()
-    }
+      callbacks.onClose();
+      scheduleReconnect();
+    };
 
     ws.onerror = () => {
-      try { ws?.close() } catch { /* ignore */ }
-    }
+      try {
+        ws?.close();
+      } catch {
+        /* ignore */
+      }
+    };
   }
 
   function destroy() {
-    if (reconnectTimer) clearTimeout(reconnectTimer)
-    ws?.close()
-    ws = null
+    if (reconnectTimer) clearTimeout(reconnectTimer);
+    ws?.close();
+    ws = null;
   }
 
-  return { send, connect, destroy }
+  return { send, connect, destroy };
 }

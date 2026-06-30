@@ -7,8 +7,8 @@
  * MCP(index.ts)가 자동으로 spawn하거나, 수동으로 먼저 띄워도 된다.
  */
 
-import { WebSocketServer, WebSocket } from 'ws';
 import * as http from 'http';
+import { WebSocketServer, WebSocket } from 'ws';
 
 const WS_PORT = Number(process.env.WS_PORT ?? 8765);
 const HTTP_PORT = Number(process.env.HTTP_PORT ?? 8766);
@@ -25,7 +25,14 @@ interface BridgeMessage {
 let pluginSocket: WebSocket | null = null;
 
 // id → { resolve, timer } : MCP 프로세스가 응답을 기다리는 요청
-const pending = new Map<string, { resolve: (msg: BridgeMessage) => void; reject: (e: Error) => void; timer: NodeJS.Timeout }>();
+const pending = new Map<
+  string,
+  {
+    resolve: (msg: BridgeMessage) => void;
+    reject: (e: Error) => void;
+    timer: NodeJS.Timeout;
+  }
+>();
 
 // ── WebSocket 서버 (플러그인 ↔ 데몬) ─────────────────────────────────────────
 
@@ -41,9 +48,15 @@ wss.on('connection', (socket) => {
 
   socket.on('message', (raw) => {
     let msg: BridgeMessage;
-    try { msg = JSON.parse(raw.toString()); } catch { return; }
+    try {
+      msg = JSON.parse(raw.toString());
+    } catch {
+      return;
+    }
 
-    console.error(`[WS-daemon] ← plugin: ${msg.type}/${msg.action} (${msg.id})`);
+    console.error(
+      `[WS-daemon] ← plugin: ${msg.type}/${msg.action} (${msg.id})`,
+    );
 
     if (msg.type === 'RESPONSE') {
       const entry = pending.get(msg.id);
@@ -84,16 +97,24 @@ const httpServer = http.createServer((req, res) => {
 
   if (req.method === 'GET' && url.pathname === '/status') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ pluginConnected: pluginSocket?.readyState === WebSocket.OPEN }));
+    res.end(
+      JSON.stringify({
+        pluginConnected: pluginSocket?.readyState === WebSocket.OPEN,
+      }),
+    );
     return;
   }
 
   if (req.method === 'POST' && url.pathname === '/send') {
     let body = '';
-    req.on('data', (chunk) => { body += chunk; });
+    req.on('data', (chunk) => {
+      body += chunk;
+    });
     req.on('end', () => {
       let msg: BridgeMessage;
-      try { msg = JSON.parse(body); } catch {
+      try {
+        msg = JSON.parse(body);
+      } catch {
         res.writeHead(400);
         res.end(JSON.stringify({ error: 'invalid json' }));
         return;
@@ -126,7 +147,9 @@ const httpServer = http.createServer((req, res) => {
       });
 
       pluginSocket.send(JSON.stringify(msg));
-      console.error(`[WS-daemon] → plugin: ${msg.type}/${msg.action} (${msg.id})`);
+      console.error(
+        `[WS-daemon] → plugin: ${msg.type}/${msg.action} (${msg.id})`,
+      );
     });
     return;
   }
@@ -136,7 +159,9 @@ const httpServer = http.createServer((req, res) => {
 });
 
 httpServer.listen(HTTP_PORT, () => {
-  console.error(`[WS-daemon] HTTP API listening on http://localhost:${HTTP_PORT}`);
+  console.error(
+    `[WS-daemon] HTTP API listening on http://localhost:${HTTP_PORT}`,
+  );
 });
 
 httpServer.on('error', (err) => {

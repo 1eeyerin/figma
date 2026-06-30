@@ -6,11 +6,11 @@
  * - 포트 바인딩 경쟁 없음: MCP 프로세스가 여러 개 떠도 데몬은 하나
  */
 
-import * as http from 'http';
-import { randomUUID } from 'crypto';
 import { spawn, ChildProcess } from 'child_process';
-import * as path from 'path';
+import { randomUUID } from 'crypto';
 import * as fs from 'fs';
+import * as http from 'http';
+import * as path from 'path';
 
 export interface BridgeMessage {
   id: string;
@@ -34,7 +34,9 @@ export class WsBridge {
     }
 
     if (!fs.existsSync(DAEMON_SCRIPT)) {
-      console.error(`[Bridge] WARN: ws-server.js not found at ${DAEMON_SCRIPT} — degraded mode`);
+      console.error(
+        `[Bridge] WARN: ws-server.js not found at ${DAEMON_SCRIPT} — degraded mode`,
+      );
       return;
     }
 
@@ -42,7 +44,11 @@ export class WsBridge {
   }
 
   /** 플러그인 UI에 메시지를 보내고 RESPONSE를 기다린다. */
-  async sendAndWait(action: string, payload: Record<string, unknown>, timeout = 15000): Promise<BridgeMessage> {
+  async sendAndWait(
+    action: string,
+    payload: Record<string, unknown>,
+    timeout = 15000,
+  ): Promise<BridgeMessage> {
     const msg: BridgeMessage = {
       id: randomUUID(),
       type: 'REQUEST',
@@ -58,24 +64,43 @@ export class WsBridge {
           port: HTTP_PORT,
           path: `/send?timeout=${timeout}`,
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) },
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(body),
+          },
         },
         (res) => {
           let data = '';
-          res.on('data', (chunk) => { data += chunk; });
+          res.on('data', (chunk) => {
+            data += chunk;
+          });
           res.on('end', () => {
             if (res.statusCode === 200) {
-              try { resolve(JSON.parse(data) as BridgeMessage); } catch { reject(new Error('Invalid JSON from daemon')); }
+              try {
+                resolve(JSON.parse(data) as BridgeMessage);
+              } catch {
+                reject(new Error('Invalid JSON from daemon'));
+              }
             } else {
               let errMsg = `HTTP ${res.statusCode}`;
-              try { errMsg = (JSON.parse(data) as { error: string }).error ?? errMsg; } catch { /* ignore */ }
+              try {
+                errMsg =
+                  (JSON.parse(data) as { error: string }).error ?? errMsg;
+              } catch {
+                /* ignore */
+              }
               reject(new Error(errMsg));
             }
           });
         },
       );
-      req.on('error', (err) => reject(new Error(`Daemon unreachable: ${err.message}`)));
-      req.setTimeout(timeout + 2000, () => { req.destroy(); reject(new Error('HTTP request timeout')); });
+      req.on('error', (err) =>
+        reject(new Error(`Daemon unreachable: ${err.message}`)),
+      );
+      req.setTimeout(timeout + 2000, () => {
+        req.destroy();
+        reject(new Error('HTTP request timeout'));
+      });
       req.write(body);
       req.end();
     });
@@ -111,13 +136,22 @@ export class WsBridge {
     return new Promise((resolve, reject) => {
       const req = http.get(`http://localhost:${HTTP_PORT}/status`, (res) => {
         let data = '';
-        res.on('data', (c) => { data += c; });
+        res.on('data', (c) => {
+          data += c;
+        });
         res.on('end', () => {
-          try { resolve(JSON.parse(data) as { pluginConnected: boolean }); } catch { reject(new Error('bad json')); }
+          try {
+            resolve(JSON.parse(data) as { pluginConnected: boolean });
+          } catch {
+            reject(new Error('bad json'));
+          }
         });
       });
       req.on('error', reject);
-      req.setTimeout(1500, () => { req.destroy(); reject(new Error('timeout')); });
+      req.setTimeout(1500, () => {
+        req.destroy();
+        reject(new Error('timeout'));
+      });
     });
   }
 

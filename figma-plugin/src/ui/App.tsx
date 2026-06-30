@@ -1,11 +1,12 @@
-import { h } from 'preact'
-import { StatusBadge } from './StatusBadge'
-import { useBridgeConnection } from '../bridge/useBridgeConnection'
-import { WS_URL } from '../bridge/constants'
-import styles from './App.module.css'
+import { h } from 'preact';
+
+import { WS_URL } from '../bridge/constants';
+import { useBridgeConnection } from '../bridge/useBridgeConnection';
+import styles from './App.module.css';
+import { StatusBadge } from './StatusBadge';
 
 export function App() {
-  const { connState: state, reconnect } = useBridgeConnection()
+  const { connState: state, reconnect } = useBridgeConnection();
 
   return (
     <div class={styles.container}>
@@ -18,5 +19,5 @@ export function App() {
         </button>
       )}
     </div>
-  )
+  );
 }
