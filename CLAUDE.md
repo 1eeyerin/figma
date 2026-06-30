@@ -61,7 +61,7 @@ npm run watch   # 개발 중 watch
 
 - `pre-commit`: `pnpm run lint`(oxlint) + `pnpm run format:check`(oxfmt) 통과해야 커밋 가능
 - `pre-push`: 루트 `pnpm run build`(plugin + mcp-bridge) 통과해야 push 가능. `SKIP_PRE_PUSH=1 git push`로 스킵 가능
-- `commit-msg`: `type(scope): 한글 메시지` 형식 강제 (scope 생략 가능). 타입: feat/fix/docs/style/refactor/test/chore
+- `commit-msg`: `type(scope): 한글 메시지` 형식 강제 (scope 필수). 타입: feat/fix/docs/style/refactor/test/chore/build
 - 포맷 실패 시 `pnpm run format`으로 자동 정리 후 재커밋
 
 ## 변경 이력
