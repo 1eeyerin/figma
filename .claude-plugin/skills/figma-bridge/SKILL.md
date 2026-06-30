@@ -58,6 +58,7 @@ Claude ← MCP 응답(nodeId) ← WS RESPONSE ← postMessage(DRAW_RESULT)
 ```
 
 응답에는 생성된 노드의 `nodeId`가 포함된다.
+전체 메시지 타입(조작/조회/시스템 포함)과 파라미터 상세는 `docs/protocol.md` 참고.
 
 ## 트러블슈팅
 
