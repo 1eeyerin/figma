@@ -9,6 +9,16 @@
             "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/update-plan.sh"
           }
         ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/docs-staleness-check.sh",
+            "if": "Bash(git commit*)"
+          }
+        ]
       }
     ],
     "Stop": [
@@ -17,10 +27,6 @@
           {
             "type": "command",
             "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/auto-commit.sh"
-          },
-          {
-            "type": "command",
-            "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/docs-staleness-check.sh"
           }
         ]
       }

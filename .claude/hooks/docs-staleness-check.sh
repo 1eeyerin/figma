@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
-# Stop 훅: 소스 코드가 docs/보다 최근에 변경됐는데 docs/가 따라가지 못했으면 경고.
+# PostToolUse 훅 (Bash, git commit* 시점): 소스 코드가 docs/보다 최근에 변경됐는데
+# docs/가 따라가지 못했으면 경고.
 # 자동 수정은 하지 않음 — exit 2로 stderr 메시지를 Claude에게 보여주고 다음 턴 판단에 맡긴다.
-# auto-commit.sh 다음에 실행되어야 커밋된 최신 상태 기준으로 비교 가능.
+# git commit 직후에만 실행되므로 Stop처럼 같은 턴에서 무한 반복되지 않는다 —
+# 다음 경고는 또 다른 commit이 있어야 재발동.
+#
+# 테스트 파일(.test.ts, test/ 디렉토리)만 바뀐 커밋은 docs에 영향이 없으므로
+# 변경 파일 목록을 보고 걸러낸다 — SHA를 일일이 기록할 필요 없이 매번 자동 판단.
 
 cd "$(dirname "$0")/../.." || exit 0
 
@@ -23,19 +28,32 @@ DOC_EPOCH=$(last_commit_epoch "${DOC_FILES[@]}")
 # 소스 커밋 이력이 없으면(아직 한 번도 안 건드림) 점검 불필요
 [[ "$SRC_EPOCH" -eq 0 ]] && exit 0
 
-if [[ "$SRC_EPOCH" -gt "$DOC_EPOCH" ]]; then
-  # docs보다 최근에 바뀐 소스 커밋들을 사람이 보기 쉽게 나열
-  CHANGED_COMMITS=$(git log --since="@${DOC_EPOCH}" --format='- %h %s' -- "${SRC_DIRS[@]}" 2>/dev/null | head -10)
+[[ "$SRC_EPOCH" -le "$DOC_EPOCH" ]] && exit 0
 
-  cat >&2 <<EOF
+# docs보다 최근에 바뀐 커밋들 중, 테스트 파일 외의 파일을 건드린 커밋만 추출
+CANDIDATE_SHAS=$(git log --since="@${DOC_EPOCH}" --format='%H' -- "${SRC_DIRS[@]}" 2>/dev/null)
+
+NON_TEST_SHAS=""
+for sha in $CANDIDATE_SHAS; do
+  CHANGED_FILES=$(git show --name-only --format='' "$sha" -- "${SRC_DIRS[@]}" 2>/dev/null)
+  # .test.ts/.test.tsx 가 아니거나 test/ 디렉토리 밖인 파일이 하나라도 있으면 비-테스트 커밋
+  if echo "$CHANGED_FILES" | grep -qvE '(\.test\.tsx?$|/test/)'; then
+    NON_TEST_SHAS="${NON_TEST_SHAS}${sha}"$'\n'
+  fi
+done
+NON_TEST_SHAS=$(echo "$NON_TEST_SHAS" | sed '/^$/d')
+
+# 전부 테스트 파일만 건드린 커밋이면 docs 영향 없음 — 조용히 종료
+[[ -z "$NON_TEST_SHAS" ]] && exit 0
+
+CHANGED_COMMITS=$(echo "$NON_TEST_SHAS" | git log --no-walk --stdin --format='- %h %s' 2>/dev/null)
+
+cat >&2 <<EOF
 ⚠️  docs/architecture.md, docs/protocol.md 가 최근 소스 변경을 반영하지 못했을 수 있습니다.
 
-docs/ 보다 최근에 mcp-bridge/src 또는 figma-plugin/src 가 변경된 커밋:
+docs/ 보다 최근에 mcp-bridge/src 또는 figma-plugin/src 가 변경된 커밋 (테스트 전용 커밋 제외):
 ${CHANGED_COMMITS}
 
 통신 흐름(아키텍처) 또는 메시지 타입/MCP action 매핑(프로토콜)에 영향이 있다면 docs/architecture.md, docs/protocol.md 갱신을 검토하세요.
 EOF
-  exit 2
-fi
-
-exit 0
+exit 2

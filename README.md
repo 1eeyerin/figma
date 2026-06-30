@@ -21,7 +21,11 @@ Claude Code --[stdio/MCP]--> MCP 서버 --[WebSocket]--> UI iframe --[postMessag
 ```bash
 git clone https://github.com/1eeyerin/figma.git
 cd figma
+corepack enable
+pnpm install
 ```
+
+이 프로젝트는 `package.json`의 `packageManager`에 지정된 `pnpm@10.30.3`을 사용한다. `corepack enable`을 먼저 실행하면 Node.js가 프로젝트에 맞는 pnpm 버전을 자동으로 준비해 준다.
 
 클론한 디렉토리에서 Claude Code를 실행하면 아래 커맨드를 바로 쓸 수 있다 (프로젝트 레벨 커맨드라 플러그인 설치 전에도 인식됨). 절차(빌드, 마켓플레이스 등록, 버전 갱신, 재시작 필요 여부 판단 등)는 커맨드가 안내한다.
 
@@ -33,6 +37,8 @@ cd figma
 각 커맨드의 세부 단계는 [.claude/commands/](.claude/commands/)에 정의되어 있다.
 
 ## 사용법
+
+> **처음 다운로드했다면** 먼저 위 [설치 / 업데이트](#설치--업데이트)의 `/install` 커맨드를 실행해 빌드 및 플러그인 등록을 완료해야 한다. 설치 전에는 MCP 툴이 동작하지 않는다.
 
 Claude Code에서 Figma 캔버스 조작을 요청하면 `figma-bridge` 스킬이 자동으로 트리거되어 MCP 툴(`create_rectangle`, `create_text`, `create_frame` 등)을 호출한다.
 
