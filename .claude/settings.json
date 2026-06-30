@@ -17,6 +17,10 @@
           {
             "type": "command",
             "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/auto-commit.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/docs-staleness-check.sh"
           }
         ]
       }
