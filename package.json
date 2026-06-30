@@ -11,6 +11,8 @@
     "dev:bridge": "pnpm --filter figma-bridge build && pnpm --filter figma-bridge start",
     "dev": "concurrently --names \"plugin,bridge\" --prefix-colors \"cyan,green\" \"pnpm run watch:plugin\" \"pnpm run dev:bridge\"",
     "build": "pnpm --filter figma-bridge-plugin build && pnpm --filter figma-bridge build && node scripts/bump-plugin-version.mjs",
+    "test": "pnpm --filter figma-bridge-plugin test && pnpm --filter figma-bridge test",
+    "test:watch": "concurrently --names \"plugin,bridge\" --prefix-colors \"cyan,green\" \"pnpm --filter figma-bridge-plugin test:watch\" \"pnpm --filter figma-bridge test:watch\"",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "format": "oxfmt .",
@@ -19,10 +21,13 @@
   },
   "devDependencies": {
     "@figma/plugin-typings": "^1.129.0",
+    "@vitest/coverage-v8": "^4.1.9",
     "concurrently": "^10.0.3",
     "husky": "^9.1.7",
+    "jsdom": "^29.1.1",
     "oxfmt": "^0.57.0",
     "oxlint": "^1.72.0",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9"
   }
 }

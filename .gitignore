@@ -1,6 +1,7 @@
 node_modules/
 dist/
 build/
+coverage/
 _workspace_prev/
 *.js.map
 # CSS Modules 타입 선언 (build-figma-plugin 자동생성)

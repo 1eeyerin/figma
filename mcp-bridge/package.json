@@ -7,7 +7,9 @@
     "watch": "tsc --watch --preserveWatchOutput",
     "start": "node dist/index.js",
     "start:daemon": "node dist/ws-server.js",
-    "dev": "ts-node src/index.ts"
+    "dev": "ts-node src/index.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
@@ -17,6 +19,7 @@
   "devDependencies": {
     "@types/ws": "^8.5.10",
     "ts-node": "^10.9.0",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9"
   }
 }
