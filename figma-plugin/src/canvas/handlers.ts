@@ -159,7 +159,7 @@ const ACTION_HANDLERS: Record<string, (msg: Msg) => Promise<void>> = {
   GET_NODE: handleGetNode,
   GET_PAGE: handleGetPage,
   EXPORT_NODE: handleExportNode,
-  CREATE_SCREEN: handleCreateScreen,
+  DRAW_SCREEN: handleCreateScreen,
 };
 
 export async function handleMessage(msg: Msg): Promise<void> {

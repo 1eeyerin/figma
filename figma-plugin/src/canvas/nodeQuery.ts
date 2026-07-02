@@ -1,3 +1,5 @@
+import { copyIfPresent } from './utils/props';
+
 export function getNodeById(id: string): BaseNode | null {
   if (!id) return null;
   return figma.getNodeById(id);
@@ -14,12 +16,14 @@ export function serializeNode(node: SceneNode): object {
     height: (node as any).height,
     opacity: (node as any).opacity,
   };
-  if ('fills' in node) base.fills = (node as any).fills;
-  if ('strokes' in node) base.strokes = (node as any).strokes;
-  if ('effects' in node) base.effects = (node as any).effects;
+  copyIfPresent(base, node, [
+    'fills',
+    'strokes',
+    'effects',
+    'characters',
+    'fontSize',
+  ]);
   if ('children' in node) base.childCount = (node as any).children.length;
-  if ('characters' in node) base.characters = (node as any).characters;
-  if ('fontSize' in node) base.fontSize = (node as any).fontSize;
   return base;
 }
 

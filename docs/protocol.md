@@ -10,7 +10,7 @@ MCP action → canvas 타입 매핑 구현은 `figma-plugin/src/bridge/constants
 | `DRAW_RECT`     | `create_rectangle` | x, y, width, height, color, cornerRadius, strokeColor, shadow     | `DRAW_RESULT { nodeId }` |
 | `DRAW_TEXT`     | `create_text`      | x, y, content, fontSize, fontFamily, fontWeight, color, textAlign | `DRAW_RESULT { nodeId }` |
 | `DRAW_FRAME`    | `create_frame`     | x, y, width, height, color, layoutMode, padding\*, itemSpacing    | `DRAW_RESULT { nodeId }` |
-| `CREATE_SCREEN` | `create_screen`    | tree (재귀 노드 트리 정의)                                        | `DRAW_RESULT { nodeId }` |
+| `DRAW_SCREEN`   | `create_screen`    | tree (재귀 노드 트리 정의)                                        | `DRAW_RESULT { nodeId }` |
 
 ## 조작
 
@@ -47,3 +47,11 @@ MCP action → canvas 타입 매핑 구현은 `figma-plugin/src/bridge/constants
 ```
 
 전체 통신 흐름과 레이어 구조는 [architecture.md](architecture.md) 참고.
+
+## 새 action 추가 시 체크리스트
+
+새 MCP action을 추가할 때 아래 세 지점을 반드시 동시에 수정한다. 하나라도 빠지면 런타임에서 묵묵히 실패한다.
+
+1. **`mcp-bridge/src/index.ts`** — `server.tool(...)` 등록 (MCP 툴 스키마 + dispatch 호출)
+2. **`figma-plugin/src/bridge/constants.ts`** — `ACTION_MAP`에 `{ mcp_action: 'CANVAS_TYPE' }` 항목 추가
+3. **`figma-plugin/src/canvas/handlers.ts`** — `CANVAS_TYPE`에 대응하는 핸들러 함수 구현 및 dispatch 맵 등록

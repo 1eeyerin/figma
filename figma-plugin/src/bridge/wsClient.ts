@@ -1,5 +1,7 @@
 import { uuid } from '../utils/uuid';
 import { WS_URL, RECONNECT_DELAY, ACTION_MAP } from './constants';
+import { createBridgeMessage } from './createBridgeMessage';
+import type { BridgeMessage } from './types';
 
 export interface WsClientCallbacks {
   onOpen: () => void;
@@ -24,6 +26,16 @@ export function createWsClient(callbacks: WsClientCallbacks): WsClient {
     }
   }
 
+  // BridgeMessage 계약(id/type/action/payload)에 맞춰 조립 후 전송한다.
+  function sendBridgeMessage(
+    id: string,
+    type: BridgeMessage['type'],
+    action: string,
+    payload: Record<string, unknown> = {},
+  ) {
+    send(createBridgeMessage(id, type, action, payload));
+  }
+
   function scheduleReconnect() {
     if (reconnectTimer) clearTimeout(reconnectTimer);
     reconnectTimer = setTimeout(connect, RECONNECT_DELAY);
@@ -43,7 +55,7 @@ export function createWsClient(callbacks: WsClientCallbacks): WsClient {
     }
 
     ws.onopen = () => {
-      send({ id: uuid(), type: 'EVENT', action: 'connected', payload: {} });
+      sendBridgeMessage(uuid(), 'EVENT', 'connected');
       callbacks.onOpen();
     };
 
@@ -56,7 +68,7 @@ export function createWsClient(callbacks: WsClientCallbacks): WsClient {
       }
 
       if (msg.action === 'ping') {
-        send({ id: msg.id, type: 'RESPONSE', action: 'pong', payload: {} });
+        sendBridgeMessage(msg.id as string, 'RESPONSE', 'pong');
         return;
       }
 

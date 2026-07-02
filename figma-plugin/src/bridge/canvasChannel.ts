@@ -1,3 +1,4 @@
+import { createBridgeMessage } from './createBridgeMessage';
 import type { WsClient } from './wsClient';
 
 // canvas(code.ts)로 메시지 발신
@@ -13,17 +14,14 @@ export function subscribeCanvasMessages(wsClient: WsClient): () => void {
     if (pm.type === 'PONG') return;
 
     if (pm.type === 'DRAW_RESULT') {
-      wsClient.send({
-        id: pm.id,
-        type: 'RESPONSE',
-        action: pm.action ?? 'draw_result',
-        payload: {
+      wsClient.send(
+        createBridgeMessage(pm.id, 'RESPONSE', pm.action ?? 'draw_result', {
           nodeId: pm.nodeId,
           success: pm.success,
           error: pm.error,
           result: pm.result,
-        },
-      });
+        }),
+      );
     }
   }
 

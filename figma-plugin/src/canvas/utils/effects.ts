@@ -1,4 +1,5 @@
 import { colorToFill, parseColor } from './color';
+import { setIfNumber } from './props';
 
 export function buildEffects(msg: any): Effect[] {
   const effects: Effect[] = [];
@@ -30,7 +31,6 @@ export function buildEffects(msg: any): Effect[] {
 export function applyStroke(node: GeometryMixin, msg: any): void {
   const fill = colorToFill(msg.strokeColor);
   if (fill) node.strokes = [fill];
-  if (typeof msg.strokeWeight === 'number')
-    node.strokeWeight = msg.strokeWeight;
+  setIfNumber(node, 'strokeWeight', msg.strokeWeight);
   if (msg.strokeAlign) node.strokeAlign = msg.strokeAlign;
 }

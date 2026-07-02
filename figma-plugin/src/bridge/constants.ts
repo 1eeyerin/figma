@@ -13,5 +13,5 @@ export const ACTION_MAP: Record<string, string> = {
   get_node: 'GET_NODE',
   get_page: 'GET_PAGE',
   export_node: 'EXPORT_NODE',
-  create_screen: 'CREATE_SCREEN',
+  create_screen: 'DRAW_SCREEN',
 };

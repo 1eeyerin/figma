@@ -2,43 +2,50 @@ import { getNodeById } from './nodeQuery';
 import { colorToFill } from './utils/color';
 import { applyStroke, buildEffects } from './utils/effects';
 import { loadFont } from './utils/font';
+import { setIfNumber } from './utils/props';
 
 // msg → 적용할 속성 dict 변환 (순수). figma 노드에 직접 쓰는 부분과 분리해 테스트 용이성을 확보한다.
 
-export function rectPropsFrom(msg: any): Record<string, unknown> {
+// 세 props 변환 함수가 공통으로 쓰는 base: x/y 기본값 + 조건부 opacity.
+// name/fills는 함수마다 규칙이 미묘하게 달라(항상 세팅 vs 조건부) 여기서 다루지 않는다.
+function basePropsFrom(def: any): Record<string, unknown> {
   const props: Record<string, unknown> = {
-    x: msg.x ?? 0,
-    y: msg.y ?? 0,
+    x: def.x ?? 0,
+    y: def.y ?? 0,
   };
+  setIfNumber(props, 'opacity', def.opacity);
+  return props;
+}
+
+export function rectPropsFrom(msg: any): Record<string, unknown> {
+  const props = basePropsFrom(msg);
   if (msg.name) props.name = msg.name;
 
   const fill = colorToFill(msg.color);
   if (fill) props.fills = [fill];
-  if (typeof msg.opacity === 'number') props.opacity = msg.opacity;
-  if (typeof msg.cornerRadius === 'number')
-    props.cornerRadius = msg.cornerRadius;
+  setIfNumber(props, 'cornerRadius', msg.cornerRadius);
   if (Array.isArray(msg.cornerRadii)) {
-    props.topLeftRadius = msg.cornerRadii[0];
-    props.topRightRadius = msg.cornerRadii[1];
-    props.bottomRightRadius = msg.cornerRadii[2];
-    props.bottomLeftRadius = msg.cornerRadii[3];
+    const cornerRadiusKeys = [
+      'topLeftRadius',
+      'topRightRadius',
+      'bottomRightRadius',
+      'bottomLeftRadius',
+    ] as const;
+    cornerRadiusKeys.forEach((key, i) => {
+      props[key] = msg.cornerRadii[i];
+    });
   }
 
   return props;
 }
 
 export function framePropsFrom(def: any): Record<string, unknown> {
-  const props: Record<string, unknown> = {
-    name: def.name ?? 'Frame',
-    x: def.x ?? 0,
-    y: def.y ?? 0,
-  };
+  const props = basePropsFrom(def);
+  props.name = def.name ?? 'Frame';
 
   const fill = colorToFill(def.color);
   props.fills = fill ? [fill] : [];
-  if (typeof def.opacity === 'number') props.opacity = def.opacity;
-  if (typeof def.cornerRadius === 'number')
-    props.cornerRadius = def.cornerRadius;
+  setIfNumber(props, 'cornerRadius', def.cornerRadius);
   if (def.clipContent !== undefined) props.clipsContent = def.clipContent;
 
   return props;
@@ -53,12 +60,16 @@ export function frameLayoutPropsFrom(def: any): Record<string, unknown> | null {
   if (def.counterAxisSizing)
     props.counterAxisSizingMode = def.counterAxisSizing;
   if (typeof def.itemSpacing === 'number') props.itemSpacing = def.itemSpacing;
-  if (typeof def.paddingTop === 'number') props.paddingTop = def.paddingTop;
-  if (typeof def.paddingRight === 'number')
-    props.paddingRight = def.paddingRight;
-  if (typeof def.paddingBottom === 'number')
-    props.paddingBottom = def.paddingBottom;
-  if (typeof def.paddingLeft === 'number') props.paddingLeft = def.paddingLeft;
+
+  const paddingKeys = [
+    'paddingTop',
+    'paddingRight',
+    'paddingBottom',
+    'paddingLeft',
+  ] as const;
+  for (const key of paddingKeys) {
+    setIfNumber(props, key, def[key]);
+  }
 
   return props;
 }
@@ -81,17 +92,13 @@ export function createRect(msg: any): RectangleNode {
 }
 
 export function textPropsFrom(msg: any): Record<string, unknown> {
-  const props: Record<string, unknown> = {
-    x: msg.x ?? 0,
-    y: msg.y ?? 0,
-    characters: msg.content ?? '',
-  };
+  const props = basePropsFrom(msg);
+  props.characters = msg.content ?? '';
   if (msg.name) props.name = msg.name;
 
-  if (typeof msg.fontSize === 'number') props.fontSize = msg.fontSize;
+  setIfNumber(props, 'fontSize', msg.fontSize);
   const fill = colorToFill(msg.color);
   if (fill) props.fills = [fill];
-  if (typeof msg.opacity === 'number') props.opacity = msg.opacity;
   if (msg.textAlign) props.textAlignHorizontal = msg.textAlign;
   if (typeof msg.letterSpacing === 'number') {
     props.letterSpacing = { value: msg.letterSpacing, unit: 'PIXELS' };
