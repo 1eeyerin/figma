@@ -12,12 +12,7 @@ import * as fs from 'fs';
 import * as http from 'http';
 import * as path from 'path';
 
-export interface BridgeMessage {
-  id: string;
-  type: 'REQUEST' | 'RESPONSE' | 'EVENT';
-  action: string;
-  payload?: Record<string, unknown>;
-}
+import { BridgeMessage } from './types.js';
 
 // WsBridge가 외부 세계와 통신하는 데 필요한 최소 인터페이스.
 // 기본값은 실제 Node API를 사용하고, 테스트에서는 fake 구현을 주입한다.

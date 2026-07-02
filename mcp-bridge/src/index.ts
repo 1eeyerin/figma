@@ -6,7 +6,8 @@ import {
   formatDispatchError,
   formatDispatchResponse,
 } from './dispatch-format.js';
-import { BridgeMessage, WsBridge } from './ws-bridge.js';
+import { BridgeMessage } from './types.js';
+import { WsBridge } from './ws-bridge.js';
 
 // 공통 색상 스키마
 const colorSchema = z

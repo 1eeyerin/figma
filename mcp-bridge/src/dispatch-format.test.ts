@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { formatDispatchError, formatDispatchResponse } from './dispatch-format';
-import { BridgeMessage } from './ws-bridge';
+import { BridgeMessage } from './types';
 
 describe('formatDispatchError (디스패치 에러 포맷팅)', () => {
   it('plugin not connected 에러는 안내 문구로 변환한다', () => {

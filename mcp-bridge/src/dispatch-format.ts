@@ -1,4 +1,4 @@
-import { BridgeMessage } from './ws-bridge.js';
+import { BridgeMessage } from './types.js';
 
 export type ToolTextResult = {
   [x: string]: unknown;
@@ -29,7 +29,8 @@ export function formatDispatchResponse(
   response: BridgeMessage,
 ): ToolTextResult {
   if (!response.payload?.success) {
-    return textResult(`오류: ${response.payload?.error}`, true);
+    const errMsg = response.payload?.error ?? '(응답에 에러 메시지 없음)';
+    return textResult(`오류: ${errMsg}`, true);
   }
 
   const data = response.payload;
