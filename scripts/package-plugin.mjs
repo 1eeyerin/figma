@@ -10,16 +10,8 @@ const requiredPaths = [
   '.claude-plugin/marketplace.json',
   '.codex-plugin/plugin.json',
   'skills',
-  'docs',
-  'README.md',
-  'CLAUDE.md',
-  'AGENTS.md',
-  'packages/figma-bridge-mcp/package.json',
   'packages/figma-bridge-mcp/dist/index.js',
   'packages/figma-bridge-mcp/dist/cli/daemon.js',
-  'packages/figma-plugin/manifest.json',
-  'packages/figma-plugin/build/main.js',
-  'packages/figma-plugin/build/ui.js',
 ];
 
 /**
