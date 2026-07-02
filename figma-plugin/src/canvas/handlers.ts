@@ -6,14 +6,24 @@ import {
   appendToParent,
   createNodeFromTree,
 } from './nodes';
+import type {
+  CanvasMessage,
+  DrawRectMsg,
+  DrawTextMsg,
+  DrawFrameMsg,
+  SetParentMsg,
+  SetNameMsg,
+  RemoveNodeMsg,
+  GetNodeMsg,
+  ExportNodeMsg,
+  CreateScreenMsg,
+} from './types';
 
-type Msg = any;
-
-function reply(msg: Msg, extra: object) {
+function reply(msg: CanvasMessage, extra: object) {
   figma.ui.postMessage({
     type: 'DRAW_RESULT',
     id: msg.id,
-    action: msg.action,
+    action: (msg as { action?: string }).action,
     ...extra,
   });
 }
@@ -25,7 +35,7 @@ function errorMessageOf(e: unknown): string {
 // 액션 핸들러 공통 wrapper: 성공 시 extra를 success:true와 합쳐 reply, 실패 시 error를 reply.
 // notifyLabel이 있으면 실패 시 figma.notify로도 사용자에게 알린다 (생성류 액션 전용).
 async function runAction(
-  msg: Msg,
+  msg: CanvasMessage,
   notifyLabel: string | null,
   fn: () => Promise<object> | object,
 ): Promise<void> {
@@ -40,48 +50,50 @@ async function runAction(
   }
 }
 
-function requireNode(nodeId: string): SceneNode {
-  const node = getNodeById(nodeId) as SceneNode | null;
+async function requireNode(nodeId: string): Promise<SceneNode> {
+  const node = (await getNodeById(nodeId)) as SceneNode | null;
   if (!node) throw new Error(`노드를 찾을 수 없음: ${nodeId}`);
   return node;
 }
 
-function resolveTargetNode(nodeId: string | undefined): SceneNode {
+async function resolveTargetNode(
+  nodeId: string | undefined,
+): Promise<SceneNode> {
   const node = (
-    nodeId ? getNodeById(nodeId) : figma.currentPage.selection[0]
+    nodeId ? await getNodeById(nodeId) : figma.currentPage.selection[0]
   ) as SceneNode | null;
   if (!node) throw new Error('노드를 찾을 수 없습니다');
   return node;
 }
 
-async function handleDrawRect(msg: Msg): Promise<void> {
-  await runAction(msg, '사각형 생성', () => {
+async function handleDrawRect(msg: DrawRectMsg): Promise<void> {
+  await runAction(msg, '사각형 생성', async () => {
     const rect = createRect(msg);
-    appendToParent(rect, msg.parentId);
+    await appendToParent(rect, msg.parentId);
     return { nodeId: rect.id };
   });
 }
 
-async function handleDrawText(msg: Msg): Promise<void> {
+async function handleDrawText(msg: DrawTextMsg): Promise<void> {
   await runAction(msg, '텍스트 생성', async () => {
     const text = await createText(msg);
-    appendToParent(text, msg.parentId);
+    await appendToParent(text, msg.parentId);
     return { nodeId: text.id };
   });
 }
 
-async function handleDrawFrame(msg: Msg): Promise<void> {
-  await runAction(msg, '프레임 생성', () => {
+async function handleDrawFrame(msg: DrawFrameMsg): Promise<void> {
+  await runAction(msg, '프레임 생성', async () => {
     const frame = createFrame(msg);
-    appendToParent(frame, msg.parentId);
+    await appendToParent(frame, msg.parentId);
     return { nodeId: frame.id };
   });
 }
 
-async function handleSetParent(msg: Msg): Promise<void> {
-  await runAction(msg, null, () => {
-    const node = requireNode(msg.nodeId);
-    const newParent = getNodeById(msg.parentId) as
+async function handleSetParent(msg: SetParentMsg): Promise<void> {
+  await runAction(msg, null, async () => {
+    const node = await requireNode(msg.nodeId);
+    const newParent = (await getNodeById(msg.parentId)) as
       | (BaseNode & ChildrenMixin)
       | null;
     if (!newParent || !('appendChild' in newParent))
@@ -98,45 +110,45 @@ async function handleSetParent(msg: Msg): Promise<void> {
   });
 }
 
-async function handleSetName(msg: Msg): Promise<void> {
-  await runAction(msg, null, () => {
-    const node = requireNode(msg.nodeId);
+async function handleSetName(msg: SetNameMsg): Promise<void> {
+  await runAction(msg, null, async () => {
+    const node = await requireNode(msg.nodeId);
     node.name = msg.name;
     return { nodeId: node.id };
   });
 }
 
-async function handleRemoveNode(msg: Msg): Promise<void> {
-  await runAction(msg, null, () => {
-    requireNode(msg.nodeId).remove();
+async function handleRemoveNode(msg: RemoveNodeMsg): Promise<void> {
+  await runAction(msg, null, async () => {
+    (await requireNode(msg.nodeId)).remove();
     return {};
   });
 }
 
-async function handleGetNode(msg: Msg): Promise<void> {
-  await runAction(msg, null, () => {
-    const node = resolveTargetNode(msg.nodeId);
+async function handleGetNode(msg: GetNodeMsg): Promise<void> {
+  await runAction(msg, null, async () => {
+    const node = await resolveTargetNode(msg.nodeId);
     return { result: serializeNode(node) };
   });
 }
 
-async function handleGetPage(msg: Msg): Promise<void> {
+async function handleGetPage(msg: CanvasMessage): Promise<void> {
   await runAction(msg, null, () => ({
     result: figma.currentPage.children.map(serializeNode),
   }));
 }
 
-async function handleExportNode(msg: Msg): Promise<void> {
+async function handleExportNode(msg: ExportNodeMsg): Promise<void> {
   await runAction(msg, null, async () => {
-    const node = resolveTargetNode(msg.nodeId);
+    const node = await resolveTargetNode(msg.nodeId);
     const base64 = await exportNode(node, msg.scale);
     return { result: { base64, nodeId: node.id } };
   });
 }
 
-async function handleCreateScreen(msg: Msg): Promise<void> {
+async function handleCreateScreen(msg: CreateScreenMsg): Promise<void> {
   await runAction(msg, '스크린 생성', async () => {
-    const parent = (msg.parentId ? getNodeById(msg.parentId) : null) as
+    const parent = (msg.parentId ? await getNodeById(msg.parentId) : null) as
       | (BaseNode & ChildrenMixin)
       | null;
     const root = await createNodeFromTree(
@@ -149,37 +161,39 @@ async function handleCreateScreen(msg: Msg): Promise<void> {
   });
 }
 
-const ACTION_HANDLERS: Record<string, (msg: Msg) => Promise<void>> = {
-  DRAW_RECT: handleDrawRect,
-  DRAW_TEXT: handleDrawText,
-  DRAW_FRAME: handleDrawFrame,
-  SET_PARENT: handleSetParent,
-  SET_NAME: handleSetName,
-  REMOVE_NODE: handleRemoveNode,
-  GET_NODE: handleGetNode,
+const ACTION_HANDLERS: Record<string, (msg: CanvasMessage) => Promise<void>> = {
+  DRAW_RECT: handleDrawRect as (msg: CanvasMessage) => Promise<void>,
+  DRAW_TEXT: handleDrawText as (msg: CanvasMessage) => Promise<void>,
+  DRAW_FRAME: handleDrawFrame as (msg: CanvasMessage) => Promise<void>,
+  SET_PARENT: handleSetParent as (msg: CanvasMessage) => Promise<void>,
+  SET_NAME: handleSetName as (msg: CanvasMessage) => Promise<void>,
+  REMOVE_NODE: handleRemoveNode as (msg: CanvasMessage) => Promise<void>,
+  GET_NODE: handleGetNode as (msg: CanvasMessage) => Promise<void>,
   GET_PAGE: handleGetPage,
-  EXPORT_NODE: handleExportNode,
-  CREATE_SCREEN: handleCreateScreen,
+  EXPORT_NODE: handleExportNode as (msg: CanvasMessage) => Promise<void>,
+  CREATE_SCREEN: handleCreateScreen as (msg: CanvasMessage) => Promise<void>,
 };
 
-export async function handleMessage(msg: Msg): Promise<void> {
-  if (!msg || typeof msg.type !== 'string') return;
+export async function handleMessage(msg: unknown): Promise<void> {
+  if (!msg || typeof (msg as Record<string, unknown>).type !== 'string') return;
 
-  if (msg.type === 'LOG') {
-    console.log('[Plugin]', msg.message);
+  const canvasMsg = msg as CanvasMessage;
+
+  if (canvasMsg.type === 'LOG') {
+    console.log('[Plugin]', canvasMsg.message);
     return;
   }
 
-  if (msg.type === 'PING') {
+  if (canvasMsg.type === 'PING') {
     figma.ui.postMessage({ type: 'PONG' });
     return;
   }
 
-  if (msg.type === 'CLOSE') {
+  if (canvasMsg.type === 'CLOSE') {
     figma.closePlugin();
     return;
   }
 
-  const handler = ACTION_HANDLERS[msg.type];
-  if (handler) await handler(msg);
+  const handler = ACTION_HANDLERS[canvasMsg.type];
+  if (handler) await handler(canvasMsg);
 }

@@ -6,7 +6,7 @@ import { vi } from 'vitest';
   createRectangle: vi.fn(),
   createText: vi.fn(),
   createFrame: vi.fn(),
-  getNodeById: vi.fn(),
+  getNodeByIdAsync: vi.fn().mockResolvedValue(null),
   loadFontAsync: vi.fn().mockResolvedValue(undefined),
   notify: vi.fn(),
   closePlugin: vi.fn(),

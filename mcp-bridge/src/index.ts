@@ -270,7 +270,7 @@ async function main(): Promise<void> {
   ]
 }`,
     {
-      tree: z.any().describe('노드 트리 JSON'),
+      tree: z.record(z.string(), z.unknown()).describe('노드 트리 JSON'),
       parentId: z.string().optional().describe('루트 노드를 붙일 부모 ID'),
     },
     async (args) => dispatch('create_screen', args),

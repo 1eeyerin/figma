@@ -1,6 +1,18 @@
+import type { ShadowDef, StrokeAlign } from '../types';
 import { colorToFill, parseColor } from './color';
 
-export function buildEffects(msg: any): Effect[] {
+interface WithShadow {
+  shadow?: ShadowDef;
+  blur?: number;
+}
+
+interface WithStroke {
+  strokeColor?: string;
+  strokeWeight?: number;
+  strokeAlign?: StrokeAlign;
+}
+
+export function buildEffects(msg: WithShadow): Effect[] {
   const effects: Effect[] = [];
   if (msg.shadow) {
     const s = msg.shadow;
@@ -27,7 +39,7 @@ export function buildEffects(msg: any): Effect[] {
   return effects;
 }
 
-export function applyStroke(node: GeometryMixin, msg: any): void {
+export function applyStroke(node: GeometryMixin, msg: WithStroke): void {
   const fill = colorToFill(msg.strokeColor);
   if (fill) node.strokes = [fill];
   if (typeof msg.strokeWeight === 'number')

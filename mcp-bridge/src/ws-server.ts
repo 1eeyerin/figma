@@ -10,12 +10,7 @@
 import * as http from 'http';
 import { WebSocketServer, WebSocket } from 'ws';
 
-interface BridgeMessage {
-  id: string;
-  type: 'REQUEST' | 'RESPONSE' | 'EVENT';
-  action: string;
-  payload?: Record<string, unknown>;
-}
+import type { BridgeMessage } from './ws-bridge.js';
 
 export interface BridgeDaemonOptions {
   wsPort: number;

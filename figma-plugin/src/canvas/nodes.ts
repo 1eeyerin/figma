@@ -1,11 +1,12 @@
 import { getNodeById } from './nodeQuery';
+import type { RectDef, TextDef, FrameDef, NodeTreeDef } from './types';
 import { colorToFill } from './utils/color';
 import { applyStroke, buildEffects } from './utils/effects';
 import { loadFont } from './utils/font';
 
 // msg → 적용할 속성 dict 변환 (순수). figma 노드에 직접 쓰는 부분과 분리해 테스트 용이성을 확보한다.
 
-export function rectPropsFrom(msg: any): Record<string, unknown> {
+export function rectPropsFrom(msg: RectDef): Record<string, unknown> {
   const props: Record<string, unknown> = {
     x: msg.x ?? 0,
     y: msg.y ?? 0,
@@ -27,7 +28,7 @@ export function rectPropsFrom(msg: any): Record<string, unknown> {
   return props;
 }
 
-export function framePropsFrom(def: any): Record<string, unknown> {
+export function framePropsFrom(def: FrameDef): Record<string, unknown> {
   const props: Record<string, unknown> = {
     name: def.name ?? 'Frame',
     x: def.x ?? 0,
@@ -44,7 +45,9 @@ export function framePropsFrom(def: any): Record<string, unknown> {
   return props;
 }
 
-export function frameLayoutPropsFrom(def: any): Record<string, unknown> | null {
+export function frameLayoutPropsFrom(
+  def: FrameDef,
+): Record<string, unknown> | null {
   if (!def.layoutMode || def.layoutMode === 'NONE') return null;
 
   const props: Record<string, unknown> = { layoutMode: def.layoutMode };
@@ -63,12 +66,12 @@ export function frameLayoutPropsFrom(def: any): Record<string, unknown> | null {
   return props;
 }
 
-function applyFrameLayout(frame: FrameNode, def: any): void {
+function applyFrameLayout(frame: FrameNode, def: FrameDef): void {
   const layoutProps = frameLayoutPropsFrom(def);
   if (layoutProps) Object.assign(frame, layoutProps);
 }
 
-export function createRect(msg: any): RectangleNode {
+export function createRect(msg: RectDef): RectangleNode {
   const rect = figma.createRectangle();
   Object.assign(rect, rectPropsFrom(msg));
   rect.resize(msg.width ?? 100, msg.height ?? 100);
@@ -80,7 +83,7 @@ export function createRect(msg: any): RectangleNode {
   return rect;
 }
 
-export function textPropsFrom(msg: any): Record<string, unknown> {
+export function textPropsFrom(msg: TextDef): Record<string, unknown> {
   const props: Record<string, unknown> = {
     x: msg.x ?? 0,
     y: msg.y ?? 0,
@@ -103,7 +106,7 @@ export function textPropsFrom(msg: any): Record<string, unknown> {
   return props;
 }
 
-export async function createText(msg: any): Promise<TextNode> {
+export async function createText(msg: TextDef): Promise<TextNode> {
   const fontName = await loadFont(
     msg.fontFamily ?? 'Inter',
     msg.fontWeight ?? 'Regular',
@@ -120,7 +123,7 @@ export async function createText(msg: any): Promise<TextNode> {
   return text;
 }
 
-export function createFrame(msg: any): FrameNode {
+export function createFrame(msg: FrameDef): FrameNode {
   const frame = figma.createFrame();
   Object.assign(frame, framePropsFrom(msg));
   frame.resize(msg.width ?? 100, msg.height ?? 100);
@@ -133,8 +136,11 @@ export function createFrame(msg: any): FrameNode {
   return frame;
 }
 
-export function appendToParent(node: SceneNode, parentId?: string): void {
-  const parent = parentId ? getNodeById(parentId) : null;
+export async function appendToParent(
+  node: SceneNode,
+  parentId?: string,
+): Promise<void> {
+  const parent = parentId ? await getNodeById(parentId) : null;
   if (parent && 'appendChild' in parent) {
     (parent as FrameNode).appendChild(node);
   } else {
@@ -143,16 +149,17 @@ export function appendToParent(node: SceneNode, parentId?: string): void {
 }
 
 export async function createNodeFromTree(
-  def: any,
+  def: NodeTreeDef,
   parent: BaseNode & ChildrenMixin,
 ): Promise<SceneNode> {
   const type = def.type ?? 'rectangle';
 
   if (type === 'frame') {
-    const frame = createFrame(def);
+    const frame = createFrame(def as FrameDef);
     parent.appendChild(frame);
-    if (Array.isArray(def.children)) {
-      for (const childDef of def.children) {
+    const children = (def as FrameDef).children;
+    if (Array.isArray(children)) {
+      for (const childDef of children) {
         await createNodeFromTree(childDef, frame);
       }
     }
@@ -160,12 +167,12 @@ export async function createNodeFromTree(
   }
 
   if (type === 'text') {
-    const text = await createText(def);
+    const text = await createText(def as TextDef);
     parent.appendChild(text);
     return text;
   }
 
-  const rect = createRect(def);
+  const rect = createRect(def as RectDef);
   parent.appendChild(rect);
   return rect;
 }
