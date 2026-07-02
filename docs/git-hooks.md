@@ -13,7 +13,7 @@ husky로 관리하는 Git 훅 (`.husky/`). oxlint/oxfmt 기반.
 
 ## pre-push
 
-루트 `pnpm run build` (plugin + packages/figma-bridge-mcp 빌드)와 `pnpm run test` 통과해야 push 가능.
+루트 `pnpm run build` (protocol → plugin → figma-bridge-mcp 번들 빌드와 smoke test)와 `pnpm run test` 통과해야 push 가능.
 
 - 스킵: `SKIP_PRE_PUSH=1 git push`
 

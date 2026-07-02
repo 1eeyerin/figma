@@ -4,7 +4,7 @@
 
 AI 코딩 에이전트 ↔ MCP 서버 ↔ Figma 플러그인 양방향 디자인 브릿지.
 
-- **packages/figma-bridge-mcp/**: TypeScript MCP 서버 + WebSocket 브릿지 서버 (단일 프로세스)
+- **packages/figma-bridge-mcp/**: TypeScript MCP stdio 서버 + bridge daemon
 - **packages/figma-plugin/**: Figma 플러그인 (Preact UI + canvas 스레드)
 
 ## 설치 (최초 1회)
@@ -13,16 +13,14 @@ AI 코딩 에이전트 ↔ MCP 서버 ↔ Figma 플러그인 양방향 디자인
 
 ## 사용 방법
 
-플러그인을 설치했다면([설치](#설치-최초-1회) 참고) MCP 서버는 아래 매니페스트의 `mcpServers` 설정에 따라 세션 시작 시 자동 실행된다. 별도로 띄울 필요 없다.
+플러그인을 설치했다면([설치](#설치-최초-1회) 참고) MCP stdio 서버는 아래 매니페스트의 `mcpServers` 설정에 따라 세션 시작 시 자동 실행된다.
 
 | 에이전트 | 매니페스트 |
 |---|---|
 | Claude Code | [.claude-plugin/plugin.json](.claude-plugin/plugin.json) |
 | Codex | [.codex-plugin/plugin.json](.codex-plugin/plugin.json) |
 
-코딩 에이전트에서 MCP 툴 호출 (`create_rectangle`, `create_text`, `create_frame` 등)
-
-**수동 실행(디버깅용):** `cd packages/figma-bridge-mcp && npm run build && node dist/index.js`
+Figma 캔버스 작업에는 bridge daemon 프로세스와 Figma 플러그인 연결이 모두 필요하다. daemon이 응답하지 않으면 에이전트가 직접 실행 또는 진단하고, 사용자는 Figma 앱에서 `figma-bridge` 플러그인을 열어 `Connected ✓` 상태를 확인한다. 세부 절차는 [docs/usage.md](docs/usage.md)를 따른다.
 
 **트리거:** Figma 캔버스 조작, 도형/텍스트/프레임 생성, 연결 문제 디버깅 시 `figma-bridge` 플러그인의 `figma-bridge` 스킬을 사용하라.
 
@@ -39,6 +37,7 @@ AI 코딩 에이전트 ↔ MCP 서버 ↔ Figma 플러그인 양방향 디자인
 | 주제 | 문서 |
 |---|---|
 | 설치·플러그인 실행 가이드 | [docs/install.md](docs/install.md) |
+| 사용 방법·실행 책임 | [docs/usage.md](docs/usage.md) |
 | 통신 흐름·디렉토리 구조 | [docs/architecture.md](docs/architecture.md) |
 | 메시지 프로토콜 | [docs/protocol.md](docs/protocol.md) |
 | figma-bridge-mcp 빌드 방법 | [packages/figma-bridge-mcp/README.md](packages/figma-bridge-mcp/README.md) |

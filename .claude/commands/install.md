@@ -6,7 +6,7 @@ description: "figma-bridge를 클론·빌드하고 Claude Code 마켓플레이�
 
 현재 작업 디렉토리는 이미 클론된 figma-bridge 레포라고 가정한다 (README의 `git clone` 안내를 따라온 상태).
 
-1. 아래 명령으로 의존성 설치·빌드·마켓플레이스 등록·플러그인 설치를 한 번에 처리한다 (내부 동작은 [scripts/claude-plugin.mjs](../../scripts/claude-plugin.mjs) 참고)
+1. 아래 명령으로 의존성 설치·빌드/번들 검증·staging 패키지 생성·마켓플레이스 등록·플러그인 설치를 한 번에 처리한다 (내부 동작은 [scripts/claude-plugin.mjs](../../scripts/claude-plugin.mjs), [scripts/package-plugin.mjs](../../scripts/package-plugin.mjs) 참고)
 
 ```bash
 pnpm run claude:install

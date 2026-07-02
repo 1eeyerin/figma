@@ -13,7 +13,7 @@ AI 코딩 에이전트 --[stdio/MCP]--> MCP 서버 --[WebSocket]--> UI iframe --
 
 | 디렉토리 | 역할 |
 |---|---|
-| `packages/figma-bridge-mcp/` | TypeScript MCP 서버 + WebSocket 브릿지 서버 (단일 프로세스) |
+| `packages/figma-bridge-mcp/` | TypeScript MCP stdio 서버 + bridge daemon |
 | `packages/figma-plugin/` | Figma 플러그인 (Preact UI + canvas 스레드) |
 | `skills/` | Claude Code·Codex 공용 `figma-bridge` 스킬 |
 | `.claude-plugin/` | Claude Code 플러그인 매니페스트 (MCP 서버 등록) |
@@ -64,6 +64,8 @@ pnpm install
 ## 🔄 설치 / 업데이트
 
 Claude Code/Codex별 설치·업데이트 명령과 Figma 플러그인 연동 확인 절차는 [docs/install.md](docs/install.md) 참고.
+
+설치·업데이트 스크립트는 먼저 `protocol → plugin → mcp bundle` 순서로 빌드하고, `dist/plugin-package/figma-bridge` staging 산출물을 만든 뒤 그 산출물을 Codex/Claude 플러그인으로 등록한다. 설치된 플러그인 캐시에서는 `pnpm install` 없이 MCP 번들이 실행되어야 한다.
 
 ## ▶️ 사용법
 
