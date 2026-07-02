@@ -114,14 +114,19 @@ function registerCodexPlugin() {
 }
 
 const command = process.argv[2];
+const skipBuild = process.argv.includes('--skip-build');
 
 if (!['install', 'update'].includes(command)) {
-  console.error('사용법: node scripts/codex-plugin.mjs <install|update>');
+  console.error(
+    '사용법: node scripts/codex-plugin.mjs <install|update> [--skip-build]',
+  );
   process.exit(1);
 }
 
-run('pnpm', ['install']);
-run('pnpm', ['run', 'build']);
+if (!skipBuild) {
+  run('pnpm', ['install']);
+  run('pnpm', ['run', 'build']);
+}
 registerCodexPlugin();
 
 console.log('\nCodex 플러그인 등록이 완료되었습니다.');

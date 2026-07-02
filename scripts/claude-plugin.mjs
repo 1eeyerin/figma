@@ -19,25 +19,63 @@ function run(command, args) {
   }
 }
 
+function getOutput(command, args) {
+  const result = spawnSync(command, args, {
+    cwd: ROOT,
+    encoding: 'utf-8',
+    env: process.env,
+  });
+
+  return {
+    ok: result.status === 0,
+    output: `${result.stdout ?? ''}${result.stderr ?? ''}`,
+  };
+}
+
+function hasMarketplace() {
+  const result = getOutput('claude', ['plugin', 'marketplace', 'list']);
+  return result.ok && result.output.includes(MARKETPLACE_NAME);
+}
+
+function hasPlugin() {
+  return getOutput('claude', ['plugin', 'details', PLUGIN_NAME]).ok;
+}
+
 function install() {
-  run('claude', ['plugin', 'marketplace', 'add', ROOT]);
+  if (!hasMarketplace()) {
+    run('claude', ['plugin', 'marketplace', 'add', ROOT]);
+  }
   run('claude', ['plugin', 'install', `${PLUGIN_NAME}@${MARKETPLACE_NAME}`]);
 }
 
 function update() {
-  run('claude', ['plugin', 'marketplace', 'update', MARKETPLACE_NAME]);
-  run('claude', ['plugin', 'update', PLUGIN_NAME]);
+  if (hasMarketplace()) {
+    run('claude', ['plugin', 'marketplace', 'update', MARKETPLACE_NAME]);
+  } else {
+    run('claude', ['plugin', 'marketplace', 'add', ROOT]);
+  }
+
+  if (hasPlugin()) {
+    run('claude', ['plugin', 'update', PLUGIN_NAME]);
+  } else {
+    run('claude', ['plugin', 'install', `${PLUGIN_NAME}@${MARKETPLACE_NAME}`]);
+  }
 }
 
 const command = process.argv[2];
+const skipBuild = process.argv.includes('--skip-build');
 
 if (!['install', 'update'].includes(command)) {
-  console.error('사용법: node scripts/claude-plugin.mjs <install|update>');
+  console.error(
+    '사용법: node scripts/claude-plugin.mjs <install|update> [--skip-build]',
+  );
   process.exit(1);
 }
 
-run('pnpm', ['install']);
-run('pnpm', ['run', 'build']);
+if (!skipBuild) {
+  run('pnpm', ['install']);
+  run('pnpm', ['run', 'build']);
+}
 
 if (command === 'install') {
   install();

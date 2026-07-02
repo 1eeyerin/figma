@@ -76,8 +76,5 @@ mkdirSync(dirname(HASH_CACHE), { recursive: true });
 writeFileSync(HASH_CACHE, JSON.stringify({ hash: currentHash }));
 
 console.log(`📦 plugin 버전 갱신: ${plugin.name}@${nextVersion}`);
-console.log('⚠️  Claude Code에서 아래 명령을 실행해야 반영됩니다:');
-console.log('   /plugin marketplace update figma-bridge-marketplace');
-console.log('   /plugin update figma-bridge');
-console.log('⚠️  Codex에서 아래 명령을 실행해야 반영됩니다:');
-console.log('   pnpm run codex:update');
+console.log('⚠️  설치된 에이전트에 반영하려면 아래 명령을 실행하세요:');
+console.log('   pnpm run plugins:update');
