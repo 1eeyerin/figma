@@ -1,9 +1,0 @@
-{
-  "mcpServers": {
-    "figma-bridge": {
-      "type": "stdio",
-      "command": "node",
-      "args": ["./mcp-bridge/dist/index.js"]
-    }
-  }
-}

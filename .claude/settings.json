@@ -2,20 +2,11 @@
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "Write|Edit|NotebookEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/update-plan.sh"
-          }
-        ]
-      },
-      {
         "matcher": "Bash",
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/docs-staleness-check.sh",
+            "command": "ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0; test -f \"$ROOT/.claude/hooks/docs-staleness-check.sh\" && bash \"$ROOT/.claude/hooks/docs-staleness-check.sh\"",
             "if": "Bash(git commit*)"
           }
         ]
@@ -26,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${CLAUDE_PROJECT_DIR}/.claude/hooks/auto-commit.sh"
+            "command": "ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0; test -f \"$ROOT/.claude/hooks/auto-commit.sh\" && bash \"$ROOT/.claude/hooks/auto-commit.sh\""
           }
         ]
       }
