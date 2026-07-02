@@ -15,6 +15,9 @@ const PACKAGE_PLUGIN_JSON = join(
 const CODEX_PLUGIN_LINK = join(HOME, 'plugins', PLUGIN_NAME);
 const CODEX_MARKETPLACE_JSON = join(HOME, '.agents/plugins/marketplace.json');
 
+/**
+ * 명령을 실행하고 실패 시 프로세스를 종료합니다.
+ */
 function run(command, args) {
   console.log(`\n$ ${[command, ...args].join(' ')}`);
   const result = spawnSync(command, args, {
@@ -28,11 +31,17 @@ function run(command, args) {
   }
 }
 
+/**
+ * JSON 파일을 읽어 파싱한 값을 반환하고, 파일이 없으면 fallback을 반환합니다.
+ */
 function readJson(path, fallback) {
   if (!existsSync(path)) return fallback;
   return JSON.parse(readFileSync(path, 'utf-8'));
 }
 
+/**
+ * 명령 실행이 성공하는지 여부로 해당 CLI가 존재하는지 확인합니다.
+ */
 function commandExists(command, args) {
   const result = spawnSync(command, args, {
     cwd: ROOT,
@@ -42,10 +51,16 @@ function commandExists(command, args) {
   return result.status === 0;
 }
 
+/**
+ * plugin.json에서 version 필드를 읽어 반환합니다.
+ */
 function readPluginVersion(path) {
   return readJson(path, {}).version;
 }
 
+/**
+ * Codex에 figma-bridge 플러그인이 설치되어 있는지 확인합니다.
+ */
 function isCodexInstalled() {
   if (existsSync(CODEX_PLUGIN_LINK)) return true;
 
@@ -53,6 +68,9 @@ function isCodexInstalled() {
   return marketplace.plugins?.some((plugin) => plugin.name === PLUGIN_NAME);
 }
 
+/**
+ * Claude Code CLI가 설치되어 있는지 확인합니다.
+ */
 function isClaudeCodeInstalled() {
   return commandExists('claude', ['--version']);
 }

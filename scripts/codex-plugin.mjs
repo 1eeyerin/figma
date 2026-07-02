@@ -22,6 +22,9 @@ const PLUGINS_DIR = join(HOME, 'plugins');
 const PERSONAL_MARKETPLACE = join(HOME, '.agents/plugins/marketplace.json');
 const PERSONAL_PLUGIN_LINK = join(PLUGINS_DIR, PLUGIN_NAME);
 
+/**
+ * 명령을 실행하고 실패 시 프로세스를 종료합니다.
+ */
 function run(command, args) {
   console.log(`\n$ ${[command, ...args].join(' ')}`);
   const result = spawnSync(command, args, {
@@ -35,16 +38,25 @@ function run(command, args) {
   }
 }
 
+/**
+ * JSON 파일을 읽어 파싱한 값을 반환하고, 파일이 없으면 fallback을 반환합니다.
+ */
 function readJson(path, fallback) {
   if (!existsSync(path)) return fallback;
   return JSON.parse(readFileSync(path, 'utf-8'));
 }
 
+/**
+ * 값을 JSON으로 직렬화해 파일에 씁니다. 상위 디렉터리가 없으면 생성합니다.
+ */
 function writeJson(path, value) {
   mkdirSync(dirname(path), { recursive: true });
   writeFileSync(path, `${JSON.stringify(value, null, 2)}\n`);
 }
 
+/**
+ * ~/plugins/figma-bridge 심볼릭 링크가 패키지 경로를 가리키도록 생성 또는 갱신합니다.
+ */
 function ensurePluginLink() {
   mkdirSync(PLUGINS_DIR, { recursive: true });
 
@@ -70,6 +82,9 @@ function ensurePluginLink() {
   symlinkSync(PACKAGE_ROOT, PERSONAL_PLUGIN_LINK, 'dir');
 }
 
+/**
+ * ~/.agents/plugins/marketplace.json에 figma-bridge 플러그인 항목을 upsert합니다.
+ */
 function ensurePersonalMarketplace() {
   const marketplace = readJson(PERSONAL_MARKETPLACE, {
     name: MARKETPLACE_NAME,
@@ -108,6 +123,9 @@ function ensurePersonalMarketplace() {
   writeJson(PERSONAL_MARKETPLACE, marketplace);
 }
 
+/**
+ * 심볼릭 링크와 마켓플레이스를 설정한 뒤 Codex에 플러그인을 등록합니다.
+ */
 function registerCodexPlugin() {
   ensurePluginLink();
   ensurePersonalMarketplace();

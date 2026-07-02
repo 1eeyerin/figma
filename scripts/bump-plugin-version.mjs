@@ -19,11 +19,17 @@ const DIST_DIRS = [
   join(ROOT, 'packages/figma-plugin/build'),
 ];
 
+/**
+ * 버전 문자열의 패치 번호를 1 올려서 반환합니다.
+ */
 function bumpPatch(version) {
   const [major, minor, patch] = version.split('.').map(Number);
   return `${major}.${minor}.${patch + 1}`;
 }
 
+/**
+ * 디렉터리를 재귀적으로 탐색해 파일 경로 목록을 반환합니다.
+ */
 function collectFiles(dir) {
   if (!existsSync(dir)) return [];
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
@@ -32,6 +38,9 @@ function collectFiles(dir) {
   });
 }
 
+/**
+ * dist 디렉터리 전체 파일의 SHA-256 해시를 계산해 반환합니다.
+ */
 function hashDistDirs() {
   const hash = createHash('sha256');
   const files = DIST_DIRS.flatMap(collectFiles).sort((a, b) =>
