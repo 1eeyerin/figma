@@ -2,7 +2,7 @@ import {
   ACTION_MAP,
   createBridgeMessage,
   isMcpAction,
-} from '@figma-bridge/protocol';
+} from 'figma-bridge-protocol';
 
 import { uuid } from '../utils/uuid';
 import { WS_URL, RECONNECT_DELAY } from './constants';

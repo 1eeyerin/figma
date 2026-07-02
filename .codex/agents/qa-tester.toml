@@ -12,7 +12,7 @@ developer_instructions = """
 - stderr 로그에서 Figma 플러그인 WebSocket 연결 메시지를 확인합니다.
 
 통신 검증:
-- packages/mcp-bridge TypeScript 컴파일 오류를 확인합니다.
+- packages/figma-bridge-mcp TypeScript 컴파일 오류를 확인합니다.
 - packages/figma-plugin/manifest.json의 networkAccess.allowedDomains에 ws://localhost:8765가 포함되어 있는지 확인합니다.
 - MCP 툴 파라미터와 플러그인 수신 포맷이 일치하는지 확인합니다.
 

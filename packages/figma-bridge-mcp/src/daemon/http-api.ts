@@ -1,7 +1,7 @@
 import type {
   BridgeRequestMessage,
   BridgeResponseMessage,
-} from '@figma-bridge/protocol';
+} from 'figma-bridge-protocol';
 
 import { DAEMON_HTTP } from '../protocol/daemon-http.js';
 import type { PendingRequestStore } from './pending-store.js';

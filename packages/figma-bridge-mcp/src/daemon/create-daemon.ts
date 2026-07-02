@@ -1,7 +1,4 @@
-import {
-  isMcpAction,
-  type BridgeResponseMessage,
-} from '@figma-bridge/protocol';
+import { isMcpAction, type BridgeResponseMessage } from 'figma-bridge-protocol';
 import * as http from 'http';
 import { WebSocketServer, type RawData } from 'ws';
 

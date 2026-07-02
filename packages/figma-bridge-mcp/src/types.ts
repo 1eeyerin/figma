@@ -6,4 +6,4 @@ export type {
   BridgeResponseMessage,
   BridgeResponsePayload,
   BridgeSuccessPayload,
-} from '@figma-bridge/protocol';
+} from 'figma-bridge-protocol';

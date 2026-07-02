@@ -8,10 +8,10 @@ Claude Code ↔ MCP 서버 ↔ Figma 플러그인 양방향 디자인 브릿지�
 Claude
   │  MCP 툴 호출 (stdio)
   ▼
-MCP 프로세스 (packages/mcp-bridge/src/index.ts)
+MCP 프로세스 (packages/figma-bridge-mcp/src/index.ts)
   │  HTTP (POST /v1/dispatch, GET /v1/status — http://localhost:8766)
   ▼
-WS 데몬 (packages/mcp-bridge/src/cli/daemon.ts, 독립 프로세스)
+WS 데몬 (packages/figma-bridge-mcp/src/cli/daemon.ts, 독립 프로세스)
   │  WebSocket (ws://localhost:8765)
   ▼
 UI iframe (packages/figma-plugin/src/index.tsx)   ← 네트워크 담당 (WS 연결·재연결·중계)
@@ -31,7 +31,7 @@ WS 데몬 → MCP 프로세스 → Claude (nodeId 반환)
 
 ### MCP 프로세스 ↔ WS 데몬 분리 구조
 
-`mcp-bridge`는 단일 프로세스가 아니라 두 프로세스로 구성된다.
+`figma-bridge-mcp`는 단일 프로세스가 아니라 두 프로세스로 구성된다.
 
 - **MCP 프로세스** (`index.ts`): Claude Code와 stdio로 통신. `client/ws-bridge.ts`가 데몬 생존을 HTTP `/v1/status`로 확인 후, 없으면 `dist/cli/daemon.js`를 child_process로 spawn한다. 이미 떠 있으면 재사용 — 여러 MCP 프로세스가 떠도 데몬은 하나만 유지되어 포트 바인딩 경쟁이 없다.
 - **WS 데몬** (`cli/daemon.ts`, `daemon/create-daemon.ts`): Figma 플러그인과의 WebSocket(8765)을 직접 보유하는 독립 프로세스. MCP 프로세스로부터의 HTTP(8766) 요청을 받아 플러그인에 중계하고, 플러그인의 RESPONSE를 HTTP 응답으로 되돌린다.
@@ -49,15 +49,15 @@ WS 데몬 → MCP 프로세스 → Claude (nodeId 반환)
 
 | 디렉토리 | 역할 |
 |---|---|
-| `packages/mcp-bridge/` | TypeScript MCP 서버 + WebSocket 브릿지 데몬 |
+| `packages/figma-bridge-mcp/` | TypeScript MCP 서버 + WebSocket 브릿지 데몬 |
 | `packages/figma-plugin/` | Figma 플러그인 (Preact UI + canvas 스레드) |
-| `packages/protocol/` | MCP action, canvas message type, BridgeMessage 공유 계약 |
+| `packages/figma-bridge-protocol/` | MCP action, canvas message type, BridgeMessage 공유 계약 |
 | `.claude-plugin/` | Claude Code 플러그인 매니페스트 (MCP 서버 등록 + `figma-bridge` 스킬) |
 
-## mcp-bridge 내부 구조
+## figma-bridge-mcp 내부 구조
 
 ```
-packages/mcp-bridge/src/
+packages/figma-bridge-mcp/src/
 ├── index.ts                 MCP stdio 엔트리포인트
 ├── mcp/                     MCP 서버 생성과 툴 응답 포맷팅
 ├── tools/                   MCP 툴 정의와 zod 스키마
@@ -110,4 +110,4 @@ packages/figma-plugin/src/
 - postMessage는 항상 `{ pluginMessage: ... }` 래핑
 - MCP 툴 응답은 비동기: WS 왕복을 `id` 매칭으로 처리
 
-메시지 타입별 상세 계약(파라미터, 응답 형태)은 [protocol.md](protocol.md)와 `packages/protocol/` 참고.
+메시지 타입별 상세 계약(파라미터, 응답 형태)은 [protocol.md](protocol.md)와 `packages/figma-bridge-protocol/` 참고.

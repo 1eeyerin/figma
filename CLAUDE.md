@@ -4,7 +4,7 @@
 
 AI 코딩 에이전트 ↔ MCP 서버 ↔ Figma 플러그인 양방향 디자인 브릿지.
 
-- **packages/mcp-bridge/**: TypeScript MCP 서버 + WebSocket 브릿지 서버 (단일 프로세스)
+- **packages/figma-bridge-mcp/**: TypeScript MCP 서버 + WebSocket 브릿지 서버 (단일 프로세스)
 - **packages/figma-plugin/**: Figma 플러그인 (Preact UI + canvas 스레드)
 
 ## 설치 (최초 1회)
@@ -22,7 +22,7 @@ AI 코딩 에이전트 ↔ MCP 서버 ↔ Figma 플러그인 양방향 디자인
 
 코딩 에이전트에서 MCP 툴 호출 (`create_rectangle`, `create_text`, `create_frame` 등)
 
-**수동 실행(디버깅용):** `cd packages/mcp-bridge && npm run build && node dist/index.js`
+**수동 실행(디버깅용):** `cd packages/figma-bridge-mcp && npm run build && node dist/index.js`
 
 **트리거:** Figma 캔버스 조작, 도형/텍스트/프레임 생성, 연결 문제 디버깅 시 `figma-bridge` 스킬을 사용하라.
 
@@ -41,7 +41,7 @@ AI 코딩 에이전트 ↔ MCP 서버 ↔ Figma 플러그인 양방향 디자인
 | 설치·플러그인 실행 가이드 | [docs/install.md](docs/install.md) |
 | 통신 흐름·디렉토리 구조 | [docs/architecture.md](docs/architecture.md) |
 | 메시지 프로토콜 | [docs/protocol.md](docs/protocol.md) |
-| mcp-bridge 빌드 방법 | [packages/mcp-bridge/README.md](packages/mcp-bridge/README.md) |
+| figma-bridge-mcp 빌드 방법 | [packages/figma-bridge-mcp/README.md](packages/figma-bridge-mcp/README.md) |
 | figma-plugin 빌드 방법 | [packages/figma-plugin/README.md](packages/figma-plugin/README.md#빌드) |
 | Git Hooks (husky, 절대경로 금지 등) | [docs/git-hooks.md](docs/git-hooks.md) |
 | 테스트 작성 규칙 (제목 한글, JSDoc 기준) | [docs/testing.md](docs/testing.md) |

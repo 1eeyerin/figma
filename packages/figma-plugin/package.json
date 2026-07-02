@@ -1,5 +1,5 @@
 {
-  "name": "figma-bridge-plugin",
+  "name": "figma-plugin",
   "version": "1.0.0",
   "private": true,
   "packageManager": "pnpm@10.30.3",
@@ -31,7 +31,7 @@
   "dependencies": {
     "@create-figma-plugin/ui": "^3",
     "@create-figma-plugin/utilities": "^3",
-    "@figma-bridge/protocol": "workspace:*",
+    "figma-bridge-protocol": "workspace:*",
     "preact": "^10"
   }
 }

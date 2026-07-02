@@ -3,7 +3,7 @@ import type {
   DrawRectMsg,
   McpAction,
   PingMsg,
-} from '@figma-bridge/protocol';
+} from 'figma-bridge-protocol';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

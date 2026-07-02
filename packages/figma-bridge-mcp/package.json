@@ -1,5 +1,5 @@
 {
-  "name": "figma-bridge",
+  "name": "figma-bridge-mcp",
   "version": "0.1.0",
   "main": "dist/index.js",
   "scripts": {
@@ -12,7 +12,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@figma-bridge/protocol": "workspace:*",
+    "figma-bridge-protocol": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.0.0",
     "ws": "^8.17.0",
     "zod": "^3.25.76"

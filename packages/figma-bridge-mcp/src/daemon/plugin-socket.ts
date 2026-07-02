@@ -1,4 +1,4 @@
-import type { BridgeRequestMessage } from '@figma-bridge/protocol';
+import type { BridgeRequestMessage } from 'figma-bridge-protocol';
 
 import { WebSocket } from 'ws';
 

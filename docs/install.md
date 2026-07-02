@@ -17,7 +17,7 @@ pnpm install
 
 클론한 디렉토리에서 Claude Code 세션을 열면 `/install`, `/update` 커맨드로도 동일 스크립트를 실행할 수 있다. 세부 정의: [.claude/commands/](../.claude/commands/), [scripts/claude-plugin.mjs](../scripts/claude-plugin.mjs).
 
-> MCP 서버(`packages/mcp-bridge/`) 변경분은 재시작 후에만 반영된다. 스킬만 바뀌었다면 재시작 불필요.
+> MCP 서버(`packages/figma-bridge-mcp/`) 변경분은 재시작 후에만 반영된다. 스킬만 바뀌었다면 재시작 불필요.
 
 ## Codex
 

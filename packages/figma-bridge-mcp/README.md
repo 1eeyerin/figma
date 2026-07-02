@@ -1,4 +1,4 @@
-# mcp-bridge
+# figma-bridge-mcp
 
 AI 코딩 에이전트(Claude Code, Codex) ↔ Figma 플러그인을 잇는 MCP 서버.
 MCP 툴 호출을 받아 WebSocket으로 Figma 플러그인에 중계한다.

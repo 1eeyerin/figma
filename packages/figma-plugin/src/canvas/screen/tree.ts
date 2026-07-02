@@ -3,7 +3,7 @@ import type {
   NodeTreeDef,
   RectDef,
   TextDef,
-} from '@figma-bridge/protocol';
+} from 'figma-bridge-protocol';
 
 import { createFrame, createRect, createText } from '../draw/nodes';
 

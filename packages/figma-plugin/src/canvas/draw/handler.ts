@@ -2,7 +2,7 @@ import type {
   DrawFrameMsg,
   DrawRectMsg,
   DrawTextMsg,
-} from '@figma-bridge/protocol';
+} from 'figma-bridge-protocol';
 
 import { runAction } from '../dispatch/run-action';
 import { appendToParent } from '../shared/append-to-parent';

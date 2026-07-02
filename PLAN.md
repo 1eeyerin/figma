@@ -2,11 +2,11 @@
 
 ## 0단계: 스캐폴딩 + WS 연결 확인 ✅
 
-### mcp-bridge 설정
-- [x] `packages/mcp-bridge/package.json` 생성 (`@modelcontextprotocol/sdk`, `ws`, TypeScript 의존성)
-- [x] `packages/mcp-bridge/tsconfig.json` 생성
-- [x] `packages/mcp-bridge/src/index.ts` 진입점 작성 (MCP + WS 서버 통합)
-- [x] `packages/mcp-bridge/src/ws-bridge.ts` WebSocket 브릿지 구현
+### figma-bridge-mcp 설정
+- [x] `packages/figma-bridge-mcp/package.json` 생성 (`@modelcontextprotocol/sdk`, `ws`, TypeScript 의존성)
+- [x] `packages/figma-bridge-mcp/tsconfig.json` 생성
+- [x] `packages/figma-bridge-mcp/src/index.ts` 진입점 작성 (MCP + WS 서버 통합)
+- [x] `packages/figma-bridge-mcp/src/ws-bridge.ts` WebSocket 브릿지 구현
 
 ### figma-plugin 설정
 - [x] `packages/figma-plugin/manifest.json` 생성 (`networkAccess.allowedDomains` 포함)
@@ -72,7 +72,7 @@
 ## 완료 기준
 | 단계 | 완료 조건 | 상태 |
 |------|----------|------|
-| 0단계 | `mcp-bridge` 빌드 성공 + Figma 플러그인 로드 후 WS "connected" 로그 | ✅ 코드 완료 |
+| 0단계 | `figma-bridge-mcp` 빌드 성공 + Figma 플러그인 로드 후 WS "connected" 로그 | ✅ 코드 완료 |
 | 1단계 | Claude Code 명령 → Figma 캔버스에 사각형 실제 생성 | ✅ 코드 완료 / E2E 미확인 |
 | 2단계 | Figma 노드 선택 → Claude Code에서 노드 데이터 수신 | ✅ 코드 완료 / E2E 미확인 |
 | 3단계 | 트리 재귀, Auto Layout, export | 부분 완료 |

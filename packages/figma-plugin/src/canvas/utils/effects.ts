@@ -1,4 +1,4 @@
-import type { ShadowDef, StrokeAlign } from '@figma-bridge/protocol';
+import type { ShadowDef, StrokeAlign } from 'figma-bridge-protocol';
 
 import { colorToFill, parseColor } from './color';
 import { setIfNumber } from './props';

@@ -2,8 +2,8 @@ echo "🔄 git pull 변경사항 확인 중..."
 
 changed=$(git diff-tree -r --name-only --no-commit-id ORIG_HEAD HEAD 2>/dev/null)
 
-if echo "$changed" | grep -qE '^(packages/(mcp-bridge|figma-plugin)|\.claude-plugin)/'; then
-  echo "📦 packages/mcp-bridge / packages/figma-plugin / .claude-plugin 변경 감지 → 재빌드 실행"
+if echo "$changed" | grep -qE '^(packages/(figma-bridge-mcp|figma-plugin)|\.claude-plugin)/'; then
+  echo "📦 packages/figma-bridge-mcp / packages/figma-plugin / .claude-plugin 변경 감지 → 재빌드 실행"
   pnpm install
   pnpm run build
 
@@ -21,5 +21,5 @@ if echo "$changed" | grep -qE '^(packages/(mcp-bridge|figma-plugin)|\.claude-plu
   echo "   /plugin update figma-bridge"
   echo "   (MCP 서버가 바뀐 경우 Claude Code 재시작 필요)"
 else
-  echo "✅ packages/mcp-bridge / packages/figma-plugin 변경 없음 — 재빌드 스킵"
+  echo "✅ packages/figma-bridge-mcp / packages/figma-plugin 변경 없음 — 재빌드 스킵"
 fi

@@ -2,7 +2,7 @@ import type {
   ExportNodeMsg,
   GetNodeMsg,
   GetPageMsg,
-} from '@figma-bridge/protocol';
+} from 'figma-bridge-protocol';
 
 import { runAction } from '../dispatch/run-action';
 import { resolveTargetNode } from '../shared/node-lookup';

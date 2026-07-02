@@ -24,7 +24,7 @@ if ! echo "$commit_msg" | grep -qE '^(feat|fix|docs|style|refactor|test|chore|bu
   echo "  feat(auth): 사용자 인증 기능 추가"
   echo "  fix(auth): 로그인 버그 수정"
   echo "  chore(deps): oxlint/oxfmt 도입"
-  echo "  refactor(mcp-bridge): WsBridge 옵저버 API 제거"
+  echo "  refactor(figma-bridge-mcp): WsBridge 옵저버 API 제거"
   exit 1
 fi
 

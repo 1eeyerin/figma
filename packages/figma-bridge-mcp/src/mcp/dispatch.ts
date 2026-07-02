@@ -4,7 +4,7 @@ import {
   type BridgeResponseMessage,
   type BridgeSuccessPayload,
   type McpAction,
-} from '@figma-bridge/protocol';
+} from 'figma-bridge-protocol';
 
 import type { ToolTextResult } from '../protocol/tool-result.js';
 

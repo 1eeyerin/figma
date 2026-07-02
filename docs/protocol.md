@@ -1,7 +1,7 @@
 # 메시지 프로토콜
 
 UI iframe ↔ Canvas 사이의 postMessage 계약과, MCP 툴 ↔ canvas 메시지 타입 매핑.
-MCP action → canvas 타입 매핑 구현은 `packages/protocol/src/actions.ts`의 `ACTION_MAP` 참고.
+MCP action → canvas 타입 매핑 구현은 `packages/figma-bridge-protocol/src/actions.ts`의 `ACTION_MAP` 참고.
 
 ## 생성
 
@@ -61,9 +61,9 @@ MCP action → canvas 타입 매핑 구현은 `packages/protocol/src/actions.ts`
 
 새 MCP action을 추가할 때 아래 항목을 반드시 동시에 수정한다. 하나라도 빠지면 런타임에서 묵묵히 실패한다.
 
-1. **`packages/protocol/src/actions.ts`** — MCP action 이름과 `ACTION_MAP` 항목 추가
-2. **`packages/mcp-bridge/src/tools/`** — action 그룹 파일에 MCP 툴 스키마와 설명 추가
-3. **`packages/protocol/src/canvas-messages.ts`** — canvas 메시지 타입과 payload 타입 추가
+1. **`packages/figma-bridge-protocol/src/actions.ts`** — MCP action 이름과 `ACTION_MAP` 항목 추가
+2. **`packages/figma-bridge-mcp/src/tools/`** — action 그룹 파일에 MCP 툴 스키마와 설명 추가
+3. **`packages/figma-bridge-protocol/src/canvas-messages.ts`** — canvas 메시지 타입과 payload 타입 추가
 4. **`packages/figma-plugin/src/canvas/<action-group>/handler.ts`** — `CANVAS_TYPE`에 대응하는 핸들러 함수 구현
 5. **`packages/figma-plugin/src/canvas/dispatch/handle-message.ts`** — dispatch 맵에 handler 등록
 

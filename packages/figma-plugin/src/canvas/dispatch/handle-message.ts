@@ -1,4 +1,4 @@
-import type { CanvasMessage, CanvasMessageType } from '@figma-bridge/protocol';
+import type { CanvasMessage, CanvasMessageType } from 'figma-bridge-protocol';
 
 import {
   handleDrawFrame,

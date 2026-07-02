@@ -1,4 +1,4 @@
-import type { CreateScreenMsg } from '@figma-bridge/protocol';
+import type { CreateScreenMsg } from 'figma-bridge-protocol';
 
 import { runAction } from '../dispatch/run-action';
 import { getNodeById } from '../shared/node-lookup';

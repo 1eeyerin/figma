@@ -1,4 +1,4 @@
-import { createBridgeMessage, isMcpAction } from '@figma-bridge/protocol';
+import { createBridgeMessage, isMcpAction } from 'figma-bridge-protocol';
 
 import type { WsClient } from './wsClient';
 

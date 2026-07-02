@@ -1,4 +1,4 @@
-import { isBridgeFailure, isBridgeSuccess } from '@figma-bridge/protocol';
+import { isBridgeFailure, isBridgeSuccess } from 'figma-bridge-protocol';
 import { describe, expect, it } from 'vitest';
 
 describe('BridgeMessage (브릿지 메시지 타입 가드)', () => {

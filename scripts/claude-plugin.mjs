@@ -85,5 +85,5 @@ if (command === 'install') {
 
 console.log('\nClaude Code 플러그인 등록이 완료되었습니다.');
 console.log(
-  'mcp-bridge 변경분을 반영하려면 Claude Code를 재시작하세요. 스킬만 변경됐다면 재시작 없이 반영됩니다.',
+  'figma-bridge-mcp 변경분을 반영하려면 Claude Code를 재시작하세요. 스킬만 변경됐다면 재시작 없이 반영됩니다.',
 );

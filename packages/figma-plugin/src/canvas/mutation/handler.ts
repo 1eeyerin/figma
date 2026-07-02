@@ -2,7 +2,7 @@ import type {
   RemoveNodeMsg,
   SetNameMsg,
   SetParentMsg,
-} from '@figma-bridge/protocol';
+} from 'figma-bridge-protocol';
 
 import { runAction } from '../dispatch/run-action';
 import { getNodeById, requireSceneNode } from '../shared/node-lookup';

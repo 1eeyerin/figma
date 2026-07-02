@@ -1,4 +1,4 @@
-import type { FrameDef, RectDef, TextDef } from '@figma-bridge/protocol';
+import type { FrameDef, RectDef, TextDef } from 'figma-bridge-protocol';
 
 import { colorToFill } from '../utils/color';
 import { setIfNumber } from '../utils/props';

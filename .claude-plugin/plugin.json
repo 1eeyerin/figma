@@ -11,7 +11,7 @@
       "command": "sh",
       "args": [
         "-lc",
-        "ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd); exec node \"$ROOT/packages/mcp-bridge/dist/index.js\""
+        "ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd); exec node \"$ROOT/packages/figma-bridge-mcp/dist/index.js\""
       ]
     }
   },

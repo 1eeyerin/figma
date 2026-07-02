@@ -2,7 +2,7 @@ import type {
   BridgeRequestMessage,
   BridgeResponseMessage,
   McpAction,
-} from '@figma-bridge/protocol';
+} from 'figma-bridge-protocol';
 
 import { randomUUID } from 'crypto';
 import * as http from 'http';

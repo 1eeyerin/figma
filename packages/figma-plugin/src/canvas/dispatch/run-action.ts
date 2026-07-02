@@ -1,4 +1,4 @@
-import type { CanvasMessage } from '@figma-bridge/protocol';
+import type { CanvasMessage } from 'figma-bridge-protocol';
 
 import { reply } from './reply';
 

@@ -1,4 +1,4 @@
-import type { FrameDef, RectDef, TextDef } from '@figma-bridge/protocol';
+import type { FrameDef, RectDef, TextDef } from 'figma-bridge-protocol';
 
 import { applyStroke, buildEffects } from '../utils/effects';
 import { loadFont } from '../utils/font';

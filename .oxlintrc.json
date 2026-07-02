@@ -27,7 +27,7 @@
       }
     },
     {
-      "files": ["packages/mcp-bridge/src/**/*.ts"],
+      "files": ["packages/figma-bridge-mcp/src/**/*.ts"],
       "env": {
         "node": true
       }

@@ -11,7 +11,7 @@
 cd "$(dirname "$0")/../.." || exit 0
 
 # 추적 대상: 소스 디렉토리 → 관련 docs 매핑
-declare -a SRC_DIRS=("packages/mcp-bridge/src" "packages/figma-plugin/src")
+declare -a SRC_DIRS=("packages/figma-bridge-mcp/src" "packages/figma-plugin/src")
 declare -a DOC_FILES=("docs/architecture.md" "docs/protocol.md")
 
 last_commit_epoch() {
@@ -51,7 +51,7 @@ CHANGED_COMMITS=$(echo "$NON_TEST_SHAS" | git log --no-walk --stdin --format='- 
 cat >&2 <<EOF
 ⚠️  docs/architecture.md, docs/protocol.md 가 최근 소스 변경을 반영하지 못했을 수 있습니다.
 
-docs/ 보다 최근에 packages/mcp-bridge/src 또는 packages/figma-plugin/src 가 변경된 커밋 (테스트 전용 커밋 제외):
+docs/ 보다 최근에 packages/figma-bridge-mcp/src 또는 packages/figma-plugin/src 가 변경된 커밋 (테스트 전용 커밋 제외):
 ${CHANGED_COMMITS}
 
 통신 흐름(아키텍처) 또는 메시지 타입/MCP action 매핑(프로토콜)에 영향이 있다면 docs/architecture.md, docs/protocol.md 갱신을 검토하세요.
