@@ -9,6 +9,9 @@ Claude
   │  MCP 툴 호출 (stdio)
   ▼
 MCP 프로세스 (packages/figma-bridge-mcp/src/index.ts)
+  │  시작 전 preflight (Node/runtime/import/port 상태 확인)
+  ▼
+MCP 프로세스 (preflight 통과 시 daemon 시작 또는 기존 daemon 재사용)
   │  HTTP (POST /v1/dispatch, GET /v1/status — http://localhost:8766)
   ▼
 WS 데몬 (packages/figma-bridge-mcp/src/cli/daemon.ts, 독립 프로세스)
@@ -45,6 +48,19 @@ WS 데몬 → MCP 프로세스 → Claude (nodeId 반환)
 - 플러그인은 마지막에 연결된 WS 클라이언트 1개만 데몬에 보관된다 (다중 UI 인스턴스 동시 연결 미지원).
 - 포트는 `WS_PORT`(기본 8765), `HTTP_PORT`(기본 8766) 환경변수로 오버라이드 가능.
 
+### 시작 전 preflight
+
+MCP 프로세스는 stdio transport 연결 전에 `runStartupPreflight()`를 실행한다. 이 검사는 패키지 설치형 런타임에서 필요한 파일과 의존성이 실제로 로드 가능한지, 그리고 daemon 포트 상태가 정상인지 먼저 확인하기 위한 단계다.
+
+검사 항목은 다음과 같다.
+
+- Node.js major version이 20 이상인지 확인한다.
+- 현재 런타임 디렉토리에 `index.js`와 `cli/daemon.js`가 있는지 확인한다.
+- `figma-bridge-protocol`과 `ws` import가 가능하고 필요한 export가 있는지 확인한다.
+- `WS_PORT`/`HTTP_PORT`의 포트 상태를 확인한다. 두 포트가 모두 비어 있으면 새 daemon을 시작할 수 있고, 기존 daemon이 있으면 `/v1/status` 응답의 `pluginConnected` boolean을 확인해 재사용 가능 여부를 판단한다.
+
+preflight가 실패하면 MCP 서버 자체는 stdio에 연결되지만 daemon은 시작하지 않는다. 이후 MCP 툴 호출은 Figma로 전달되지 않고 preflight 실패 리포트를 `isError` 응답으로 반환한다.
+
 ## 디렉토리 역할
 
 | 디렉토리 | 역할 |
@@ -59,6 +75,7 @@ WS 데몬 → MCP 프로세스 → Claude (nodeId 반환)
 ```
 packages/figma-bridge-mcp/src/
 ├── index.ts                 MCP stdio 엔트리포인트
+├── preflight.ts             시작 전 런타임·의존성·포트 상태 진단
 ├── mcp/                     MCP 서버 생성과 툴 응답 포맷팅
 ├── tools/                   MCP 툴 정의와 zod 스키마
 ├── protocol/                action, BridgeMessage, 데몬 HTTP 계약
