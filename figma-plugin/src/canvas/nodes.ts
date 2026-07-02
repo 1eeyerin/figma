@@ -133,8 +133,11 @@ export function createFrame(msg: any): FrameNode {
   return frame;
 }
 
-export function appendToParent(node: SceneNode, parentId?: string): void {
-  const parent = parentId ? getNodeById(parentId) : null;
+export async function appendToParent(
+  node: SceneNode,
+  parentId?: string,
+): Promise<void> {
+  const parent = parentId ? await getNodeById(parentId) : null;
   if (parent && 'appendChild' in parent) {
     (parent as FrameNode).appendChild(node);
   } else {

@@ -40,24 +40,26 @@ async function runAction(
   }
 }
 
-function requireNode(nodeId: string): SceneNode {
-  const node = getNodeById(nodeId) as SceneNode | null;
+async function requireNode(nodeId: string): Promise<SceneNode> {
+  const node = (await getNodeById(nodeId)) as SceneNode | null;
   if (!node) throw new Error(`노드를 찾을 수 없음: ${nodeId}`);
   return node;
 }
 
-function resolveTargetNode(nodeId: string | undefined): SceneNode {
+async function resolveTargetNode(
+  nodeId: string | undefined,
+): Promise<SceneNode> {
   const node = (
-    nodeId ? getNodeById(nodeId) : figma.currentPage.selection[0]
+    nodeId ? await getNodeById(nodeId) : figma.currentPage.selection[0]
   ) as SceneNode | null;
   if (!node) throw new Error('노드를 찾을 수 없습니다');
   return node;
 }
 
 async function handleDrawRect(msg: Msg): Promise<void> {
-  await runAction(msg, '사각형 생성', () => {
+  await runAction(msg, '사각형 생성', async () => {
     const rect = createRect(msg);
-    appendToParent(rect, msg.parentId);
+    await appendToParent(rect, msg.parentId);
     return { nodeId: rect.id };
   });
 }
@@ -65,23 +67,23 @@ async function handleDrawRect(msg: Msg): Promise<void> {
 async function handleDrawText(msg: Msg): Promise<void> {
   await runAction(msg, '텍스트 생성', async () => {
     const text = await createText(msg);
-    appendToParent(text, msg.parentId);
+    await appendToParent(text, msg.parentId);
     return { nodeId: text.id };
   });
 }
 
 async function handleDrawFrame(msg: Msg): Promise<void> {
-  await runAction(msg, '프레임 생성', () => {
+  await runAction(msg, '프레임 생성', async () => {
     const frame = createFrame(msg);
-    appendToParent(frame, msg.parentId);
+    await appendToParent(frame, msg.parentId);
     return { nodeId: frame.id };
   });
 }
 
 async function handleSetParent(msg: Msg): Promise<void> {
-  await runAction(msg, null, () => {
-    const node = requireNode(msg.nodeId);
-    const newParent = getNodeById(msg.parentId) as
+  await runAction(msg, null, async () => {
+    const node = await requireNode(msg.nodeId);
+    const newParent = (await getNodeById(msg.parentId)) as
       | (BaseNode & ChildrenMixin)
       | null;
     if (!newParent || !('appendChild' in newParent))
@@ -99,23 +101,23 @@ async function handleSetParent(msg: Msg): Promise<void> {
 }
 
 async function handleSetName(msg: Msg): Promise<void> {
-  await runAction(msg, null, () => {
-    const node = requireNode(msg.nodeId);
+  await runAction(msg, null, async () => {
+    const node = await requireNode(msg.nodeId);
     node.name = msg.name;
     return { nodeId: node.id };
   });
 }
 
 async function handleRemoveNode(msg: Msg): Promise<void> {
-  await runAction(msg, null, () => {
-    requireNode(msg.nodeId).remove();
+  await runAction(msg, null, async () => {
+    (await requireNode(msg.nodeId)).remove();
     return {};
   });
 }
 
 async function handleGetNode(msg: Msg): Promise<void> {
-  await runAction(msg, null, () => {
-    const node = resolveTargetNode(msg.nodeId);
+  await runAction(msg, null, async () => {
+    const node = await resolveTargetNode(msg.nodeId);
     return { result: serializeNode(node) };
   });
 }
@@ -128,7 +130,7 @@ async function handleGetPage(msg: Msg): Promise<void> {
 
 async function handleExportNode(msg: Msg): Promise<void> {
   await runAction(msg, null, async () => {
-    const node = resolveTargetNode(msg.nodeId);
+    const node = await resolveTargetNode(msg.nodeId);
     const base64 = await exportNode(node, msg.scale);
     return { result: { base64, nodeId: node.id } };
   });
@@ -136,7 +138,7 @@ async function handleExportNode(msg: Msg): Promise<void> {
 
 async function handleCreateScreen(msg: Msg): Promise<void> {
   await runAction(msg, '스크린 생성', async () => {
-    const parent = (msg.parentId ? getNodeById(msg.parentId) : null) as
+    const parent = (msg.parentId ? await getNodeById(msg.parentId) : null) as
       | (BaseNode & ChildrenMixin)
       | null;
     const root = await createNodeFromTree(
