@@ -24,7 +24,7 @@ AI 코딩 에이전트 ↔ MCP 서버 ↔ Figma 플러그인 양방향 디자인
 
 **수동 실행(디버깅용):** `cd packages/figma-bridge-mcp && npm run build && node dist/index.js`
 
-**트리거:** Figma 캔버스 조작, 도형/텍스트/프레임 생성, 연결 문제 디버깅 시 `figma-bridge` 스킬을 사용하라.
+**트리거:** Figma 캔버스 조작, 도형/텍스트/프레임 생성, 연결 문제 디버깅 시 `figma-bridge` 플러그인의 `figma-bridge` 스킬을 사용하라.
 
 ## 아키텍처 (필수 준수)
 

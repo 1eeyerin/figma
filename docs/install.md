@@ -26,7 +26,7 @@ pnpm install
 | `pnpm run codex:install` | 최초 설치 (의존성 → 빌드 → 개인 marketplace 등록 → 플러그인 설치) |
 | `pnpm run codex:update` | 레포 변경 사항을 전역 플러그인에 반영 |
 
-설치 스크립트가 `~/.agents/plugins/marketplace.json`에 `figma-bridge`를 등록하고 `~/plugins/figma-bridge`를 현재 레포로 링크한 뒤 `codex plugin add figma-bridge@personal`을 실행한다. MCP 서버 설정은 [.codex-plugin/plugin.json](../.codex-plugin/plugin.json), 스킬은 Claude Code와 공유하는 루트 [skills/](../skills/) 하나뿐이다.
+`pnpm run codex:install`은 현재 레포를 Codex 개인 플러그인으로 등록하고 설치한다. 설치 후 Codex는 [.codex-plugin/plugin.json](../.codex-plugin/plugin.json)에 정의된 MCP 서버 설정을 사용한다.
 
 각 설치 명령은 `pnpm install` → `pnpm run build` → 마켓플레이스 등록 → 플러그인 설치를 한 번에 처리한다. 빌드를 별도로 먼저 돌릴 필요 없음. 플러그인은 빌드가 돼 있어야 동작하므로 다른 작업보다 이 설치부터 끝낸다.
 
