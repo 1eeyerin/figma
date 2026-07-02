@@ -2,7 +2,11 @@ import type { FrameDef, RectDef, TextDef } from '@figma-bridge/protocol';
 
 import { colorToFill } from '../utils/color';
 import { setIfNumber } from '../utils/props';
+import { CORNER_RADIUS_KEYS, FRAME_PADDING_KEYS } from './constants';
 
+/**
+ * 도형 정의에서 모든 draw 노드가 공유하는 기본 위치와 투명도 속성을 만듭니다.
+ */
 function basePropsFrom(
   def: RectDef | TextDef | FrameDef,
 ): Record<string, unknown> {
@@ -14,6 +18,9 @@ function basePropsFrom(
   return props;
 }
 
+/**
+ * 사각형 정의를 Figma RectangleNode에 할당할 수 있는 속성 객체로 변환합니다.
+ */
 export function rectPropsFrom(msg: RectDef): Record<string, unknown> {
   const props = basePropsFrom(msg);
   if (msg.name) props.name = msg.name;
@@ -23,13 +30,7 @@ export function rectPropsFrom(msg: RectDef): Record<string, unknown> {
   setIfNumber(props, 'cornerRadius', msg.cornerRadius);
   if (Array.isArray(msg.cornerRadii)) {
     const cornerRadii = msg.cornerRadii;
-    const cornerRadiusKeys = [
-      'topLeftRadius',
-      'topRightRadius',
-      'bottomRightRadius',
-      'bottomLeftRadius',
-    ] as const;
-    cornerRadiusKeys.forEach((key, index) => {
+    CORNER_RADIUS_KEYS.forEach((key, index) => {
       props[key] = cornerRadii[index];
     });
   }
@@ -37,6 +38,9 @@ export function rectPropsFrom(msg: RectDef): Record<string, unknown> {
   return props;
 }
 
+/**
+ * 텍스트 정의를 Figma TextNode에 할당할 수 있는 속성 객체로 변환합니다.
+ */
 export function textPropsFrom(msg: TextDef): Record<string, unknown> {
   const props = basePropsFrom(msg);
   props.characters = msg.content ?? '';
@@ -57,6 +61,9 @@ export function textPropsFrom(msg: TextDef): Record<string, unknown> {
   return props;
 }
 
+/**
+ * 프레임 정의를 Figma FrameNode에 할당할 수 있는 기본 속성 객체로 변환합니다.
+ */
 export function framePropsFrom(def: FrameDef): Record<string, unknown> {
   const props = basePropsFrom(def);
   props.name = def.name ?? 'Frame';
@@ -69,6 +76,9 @@ export function framePropsFrom(def: FrameDef): Record<string, unknown> {
   return props;
 }
 
+/**
+ * 프레임 정의의 자동 레이아웃 설정을 Figma 레이아웃 속성 객체로 변환합니다.
+ */
 export function frameLayoutPropsFrom(
   def: FrameDef,
 ): Record<string, unknown> | null {
@@ -83,13 +93,7 @@ export function frameLayoutPropsFrom(
   }
   if (typeof def.itemSpacing === 'number') props.itemSpacing = def.itemSpacing;
 
-  const paddingKeys = [
-    'paddingTop',
-    'paddingRight',
-    'paddingBottom',
-    'paddingLeft',
-  ] as const;
-  for (const key of paddingKeys) {
+  for (const key of FRAME_PADDING_KEYS) {
     setIfNumber(props, key, def[key]);
   }
 
