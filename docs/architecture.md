@@ -78,7 +78,7 @@ packages/figma-bridge-mcp/src/
 ├── preflight.ts             시작 전 런타임·의존성·포트 상태 진단
 ├── mcp/                     MCP 서버 생성과 툴 응답 포맷팅
 ├── tools/                   MCP 툴 정의와 zod 스키마
-├── protocol/                action, BridgeMessage, 데몬 HTTP 계약
+├── protocol/                데몬 HTTP 계약과 MCP 툴 응답 타입
 ├── client/                  MCP 프로세스 → 데몬 HTTP 클라이언트와 spawn 관리
 ├── daemon/                  WS/HTTP 데몬 조립, pending 요청, 플러그인 소켓 관리
 └── cli/daemon.ts            데몬 CLI 엔트리포인트
