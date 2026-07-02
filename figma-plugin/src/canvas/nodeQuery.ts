@@ -1,8 +1,8 @@
 import { copyIfPresent } from './utils/props';
 
-export function getNodeById(id: string): BaseNode | null {
+export async function getNodeById(id: string): Promise<BaseNode | null> {
   if (!id) return null;
-  return figma.getNodeById(id);
+  return figma.getNodeByIdAsync(id);
 }
 
 export function serializeNode(node: SceneNode): object {

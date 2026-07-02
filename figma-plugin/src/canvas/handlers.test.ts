@@ -84,7 +84,7 @@ describe('handleMessage (DRAW_RECT 처리)', () => {
 
 describe('handleMessage (SET_NAME 처리)', () => {
   it('노드를 찾을 수 없으면 success:false를 회신하고 notify는 하지 않는다', async () => {
-    (figma.getNodeById as any).mockReturnValue(null);
+    (figma.getNodeByIdAsync as any).mockResolvedValue(null);
 
     await handleMessage({
       id: 'm3',
@@ -101,7 +101,7 @@ describe('handleMessage (SET_NAME 처리)', () => {
 
   it('노드를 찾으면 이름을 바꾸고 성공을 회신한다', async () => {
     const node: any = { id: 'n1', name: 'old' };
-    (figma.getNodeById as any).mockReturnValue(node);
+    (figma.getNodeByIdAsync as any).mockResolvedValue(node);
 
     await handleMessage({
       id: 'm4',
