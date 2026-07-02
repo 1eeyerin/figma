@@ -1,4 +1,4 @@
-import type { McpAction } from './actions';
+import type { McpAction } from './actions.js';
 
 export type BridgeMessageType = 'REQUEST' | 'RESPONSE' | 'EVENT';
 

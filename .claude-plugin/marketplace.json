@@ -1,5 +1,9 @@
 {
   "name": "figma-bridge-marketplace",
+  "description": "Figma 캔버스를 MCP 도구로 조작하는 figma-bridge 플러그인 마켓플레이스",
+  "metadata": {
+    "description": "Figma 캔버스를 MCP 도구로 조작하는 figma-bridge 플러그인 마켓플레이스"
+  },
   "owner": {
     "name": "yerin",
     "email": "dev.yerin@gmail.com"
@@ -9,7 +13,7 @@
       "name": "figma-bridge",
       "source": "./",
       "description": "Claude Code ↔ MCP 서버 ↔ Figma 플러그인 양방향 디자인 브릿지 (사각형/텍스트/프레임 생성 등)",
-      "version": "0.1.10"
+      "version": "0.1.11"
     }
   ]
 }

@@ -1,6 +1,7 @@
 import { spawn, type ChildProcess } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
+import { fileURLToPath } from 'url';
 
 import { DAEMON_HTTP } from '../protocol/daemon-http.js';
 import type { DaemonClient } from './daemon-client.js';
@@ -11,11 +12,21 @@ export interface DaemonProcessDeps {
   daemonScript: string;
 }
 
+function defaultDaemonScript(): string {
+  const currentDir = path.dirname(fileURLToPath(import.meta.url));
+  const candidates = [
+    path.resolve(currentDir, 'cli/daemon.js'),
+    path.resolve(currentDir, '../cli/daemon.js'),
+  ];
+
+  return candidates.find(fs.existsSync) ?? candidates[0];
+}
+
 function defaultDeps(): DaemonProcessDeps {
   return {
     spawn,
     existsSync: fs.existsSync,
-    daemonScript: path.resolve(__dirname, '../cli/daemon.js'),
+    daemonScript: defaultDaemonScript(),
   };
 }
 

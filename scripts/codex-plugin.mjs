@@ -14,6 +14,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
+const PACKAGE_ROOT = join(ROOT, 'dist/plugin-package/figma-bridge');
 const PLUGIN_NAME = 'figma-bridge';
 const MARKETPLACE_NAME = 'personal';
 const HOME = homedir();
@@ -51,7 +52,7 @@ function ensurePluginLink() {
     const stat = lstatSync(PERSONAL_PLUGIN_LINK);
     const target = realpathSync(PERSONAL_PLUGIN_LINK);
 
-    if (target === realpathSync(ROOT)) {
+    if (target === realpathSync(PACKAGE_ROOT)) {
       return;
     }
 
@@ -66,7 +67,7 @@ function ensurePluginLink() {
     }
   }
 
-  symlinkSync(ROOT, PERSONAL_PLUGIN_LINK, 'dir');
+  symlinkSync(PACKAGE_ROOT, PERSONAL_PLUGIN_LINK, 'dir');
 }
 
 function ensurePersonalMarketplace() {
@@ -125,7 +126,9 @@ if (!['install', 'update'].includes(command)) {
 
 if (!skipBuild) {
   run('pnpm', ['install']);
-  run('pnpm', ['run', 'build']);
+  run('pnpm', ['run', 'build:package']);
+} else {
+  run('node', ['scripts/package-plugin.mjs']);
 }
 registerCodexPlugin();
 

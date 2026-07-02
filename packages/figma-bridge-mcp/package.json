@@ -1,9 +1,11 @@
 {
   "name": "figma-bridge-mcp",
   "version": "0.1.0",
+  "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "pnpm run typecheck && node scripts/build.mjs && node scripts/smoke-bundle.mjs",
+    "typecheck": "tsc --noEmit",
     "watch": "tsc --watch --preserveWatchOutput",
     "start": "node dist/index.js",
     "start:daemon": "node dist/cli/daemon.js",
@@ -19,6 +21,7 @@
   },
   "devDependencies": {
     "@types/ws": "^8.5.10",
+    "esbuild": "^0.28.0",
     "ts-node": "^10.9.0",
     "typescript": "^6.0.3",
     "vitest": "^4.1.9"

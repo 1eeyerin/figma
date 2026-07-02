@@ -3,6 +3,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
+const PACKAGE_ROOT = join(ROOT, 'dist/plugin-package/figma-bridge');
 const PLUGIN_NAME = 'figma-bridge';
 const MARKETPLACE_NAME = 'figma-bridge-marketplace';
 
@@ -41,19 +42,20 @@ function hasPlugin() {
   return getOutput('claude', ['plugin', 'details', PLUGIN_NAME]).ok;
 }
 
-function install() {
-  if (!hasMarketplace()) {
-    run('claude', ['plugin', 'marketplace', 'add', ROOT]);
+function configureMarketplace() {
+  if (hasMarketplace()) {
+    run('claude', ['plugin', 'marketplace', 'remove', MARKETPLACE_NAME]);
   }
+  run('claude', ['plugin', 'marketplace', 'add', PACKAGE_ROOT]);
+}
+
+function install() {
+  configureMarketplace();
   run('claude', ['plugin', 'install', `${PLUGIN_NAME}@${MARKETPLACE_NAME}`]);
 }
 
 function update() {
-  if (hasMarketplace()) {
-    run('claude', ['plugin', 'marketplace', 'update', MARKETPLACE_NAME]);
-  } else {
-    run('claude', ['plugin', 'marketplace', 'add', ROOT]);
-  }
+  configureMarketplace();
 
   if (hasPlugin()) {
     run('claude', ['plugin', 'update', PLUGIN_NAME]);
@@ -74,7 +76,9 @@ if (!['install', 'update'].includes(command)) {
 
 if (!skipBuild) {
   run('pnpm', ['install']);
-  run('pnpm', ['run', 'build']);
+  run('pnpm', ['run', 'build:package']);
+} else {
+  run('node', ['scripts/package-plugin.mjs']);
 }
 
 if (command === 'install') {

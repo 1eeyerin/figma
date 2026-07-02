@@ -1,3 +1,3 @@
-export * from './actions';
-export * from './bridge-message';
-export * from './canvas-messages';
+export * from './actions.js';
+export * from './bridge-message.js';
+export * from './canvas-messages.js';

@@ -1,4 +1,4 @@
-import type { CanvasMessageType } from './canvas-messages';
+import type { CanvasMessageType } from './canvas-messages.js';
 
 export type McpAction =
   | 'create_rectangle'
