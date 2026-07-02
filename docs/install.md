@@ -34,11 +34,14 @@ Claude Code 세션에서는 `/install`, `/update` 커맨드로도 동일 스크�
 
 ## 4. 업데이트와 재시작
 
-버전이 올라가면 설치된 에이전트만 갱신한다.
+플러그인 배포 단위가 바뀌면 먼저 버전을 수동으로 올린 뒤, 설치된 에이전트만 갱신한다.
 
 ```bash
+pnpm run version:plugin
 pnpm run plugins:update
 ```
+
+`pnpm run plugins:update`는 현재 플러그인 버전과 `dist/plugin-package/figma-bridge`에 마지막으로 패키징된 버전을 비교해 업데이트 여부를 판단한다.
 
 MCP 서버(`packages/figma-bridge-mcp/`) 변경분은 에이전트 재시작 후에만 반영된다. 스킬만 바뀌었다면 재시작 불필요.
 

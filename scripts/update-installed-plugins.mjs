@@ -8,6 +8,10 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const HOME = homedir();
 const PLUGIN_NAME = 'figma-bridge';
 const PLUGIN_JSON = join(ROOT, '.claude-plugin/plugin.json');
+const PACKAGE_PLUGIN_JSON = join(
+  ROOT,
+  'dist/plugin-package/figma-bridge/.claude-plugin/plugin.json',
+);
 const CODEX_PLUGIN_LINK = join(HOME, 'plugins', PLUGIN_NAME);
 const CODEX_MARKETPLACE_JSON = join(HOME, '.agents/plugins/marketplace.json');
 
@@ -38,8 +42,8 @@ function commandExists(command, args) {
   return result.status === 0;
 }
 
-function readPluginVersion() {
-  return readJson(PLUGIN_JSON, {}).version;
+function readPluginVersion(path) {
+  return readJson(path, {}).version;
 }
 
 function isCodexInstalled() {
@@ -53,19 +57,20 @@ function isClaudeCodeInstalled() {
   return commandExists('claude', ['--version']);
 }
 
-const previousVersion = readPluginVersion();
+const packagedVersion = readPluginVersion(PACKAGE_PLUGIN_JSON);
+const currentVersion = readPluginVersion(PLUGIN_JSON);
 
 run('pnpm', ['install']);
 run('pnpm', ['run', 'build']);
 
-const nextVersion = readPluginVersion();
-
-if (previousVersion === nextVersion) {
+if (packagedVersion === currentVersion) {
   console.log('\n플러그인 버전 변경 없음 — 전역 업데이트를 건너뜁니다.');
   process.exit(0);
 }
 
-console.log(`\n플러그인 버전 변경 감지: ${previousVersion} → ${nextVersion}`);
+console.log(
+  `\n플러그인 버전 변경 감지: ${packagedVersion ?? '없음'} → ${currentVersion}`,
+);
 
 const codexInstalled = isCodexInstalled();
 const claudeInstalled = isClaudeCodeInstalled();
