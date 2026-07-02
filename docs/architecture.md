@@ -51,6 +51,7 @@ WS 데몬 → MCP 프로세스 → Claude (nodeId 반환)
 |---|---|
 | `mcp-bridge/` | TypeScript MCP 서버 + WebSocket 브릿지 데몬 |
 | `figma-plugin/` | Figma 플러그인 (Preact UI + canvas 스레드) |
+| `packages/protocol/` | MCP action, canvas message type, BridgeMessage 공유 계약 |
 | `.claude-plugin/` | Claude Code 플러그인 매니페스트 (MCP 서버 등록 + `figma-bridge` 스킬) |
 
 ## mcp-bridge 내부 구조
@@ -77,17 +78,20 @@ figma-plugin/src/
 │   └── StatusBadge.tsx             연결 상태 표시 (connecting / connected / disconnected)
 │
 ├── bridge/                         WS ↔ canvas 중계 레이어
-│   ├── types.ts                    ConnectionState FSM 타입, BridgeMessage 인터페이스
-│   ├── constants.ts                WS_URL, RECONNECT_DELAY, ACTION_MAP
+│   ├── types.ts                    ConnectionState FSM 타입
+│   ├── constants.ts                WS_URL, RECONNECT_DELAY
 │   ├── wsClient.ts                 WS 연결·재연결 순수 로직 (UI 상태 모름, 콜백 노출)
 │   ├── canvasChannel.ts            sendToCanvas / canvas→UI 메시지 수신 후 WS 중계
 │   └── useBridgeConnection.ts      useReducer FSM으로 ConnectionState 관리
 │
 ├── canvas/                         Figma canvas 스레드 전용 (figma API 의존)
-│   ├── main.ts                     showUI + figma.ui.onmessage 라우팅 (3줄)
-│   ├── handlers.ts                 메시지 타입별 핸들러, reply() 헬퍼로 응답
-│   ├── nodes.ts                    노드 생성·조작 (createRect / createText / createFrame)
-│   ├── nodeQuery.ts                노드 조회·직렬화·export (읽기 전용)
+│   ├── main.ts                     showUI + figma.ui.onmessage 연결
+│   ├── dispatch/                   LOG/PING/CLOSE 및 action dispatch, 공통 응답 처리
+│   ├── draw/                       DRAW_RECT / DRAW_TEXT / DRAW_FRAME 생성
+│   ├── screen/                     DRAW_SCREEN 재귀 트리 생성
+│   ├── query/                      GET_NODE / GET_PAGE / EXPORT_NODE 조회·직렬화
+│   ├── mutation/                   SET_PARENT / SET_NAME / REMOVE_NODE 조작
+│   ├── shared/                     여러 action 그룹에서 공유하는 노드 조회·부모 append 헬퍼
 │   └── utils/                      canvas 스레드 전용 순수 유틸 (UI에서 import 불가)
 │       ├── color.ts                hex/rgba 파싱 → SolidPaint 변환
 │       ├── font.ts                 폰트 로딩 + Inter 폴백
@@ -106,4 +110,4 @@ figma-plugin/src/
 - postMessage는 항상 `{ pluginMessage: ... }` 래핑
 - MCP 툴 응답은 비동기: WS 왕복을 `id` 매칭으로 처리
 
-메시지 타입별 상세 계약(파라미터, 응답 형태)은 [protocol.md](protocol.md) 참고.
+메시지 타입별 상세 계약(파라미터, 응답 형태)은 [protocol.md](protocol.md)와 `packages/protocol/` 참고.

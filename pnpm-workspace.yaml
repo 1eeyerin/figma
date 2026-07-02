@@ -1,5 +1,6 @@
 packages:
   - mcp-bridge
   - figma-plugin
+  - packages/*
 allowBuilds:
   esbuild: true

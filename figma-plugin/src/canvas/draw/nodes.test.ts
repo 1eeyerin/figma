@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
+import { CORNER_RADIUS_KEYS, FRAME_PADDING_KEYS } from './constants';
 import {
   frameLayoutPropsFrom,
   framePropsFrom,
   rectPropsFrom,
   textPropsFrom,
-} from './nodes';
+} from './props';
 
 describe('rectPropsFrom (사각형 속성 변환)', () => {
   it('기본 좌표만 있으면 x/y만 채운다', () => {
@@ -18,13 +19,13 @@ describe('rectPropsFrom (사각형 속성 변환)', () => {
   });
 
   it('cornerRadii 배열을 4개 모서리에 순서대로 매핑한다', () => {
-    const props = rectPropsFrom({ cornerRadii: [1, 2, 3, 4] });
-    expect(props).toMatchObject({
-      topLeftRadius: 1,
-      topRightRadius: 2,
-      bottomRightRadius: 3,
-      bottomLeftRadius: 4,
+    const cornerRadii: [number, number, number, number] = [1, 2, 3, 4];
+    const props = rectPropsFrom({ cornerRadii });
+    const expected: Record<string, number> = {};
+    CORNER_RADIUS_KEYS.forEach((key, index) => {
+      expected[key] = cornerRadii[index];
     });
+    expect(props).toMatchObject(expected);
   });
 
   it('color가 있으면 fills를 채운다', () => {
@@ -82,15 +83,20 @@ describe('frameLayoutPropsFrom (프레임 레이아웃 속성 변환)', () => {
   });
 
   it('layoutMode가 있으면 패딩/간격을 함께 채운다', () => {
+    const paddingValues = [16, 24, 32, 40];
+    const paddingProps: Record<string, number> = {};
+    FRAME_PADDING_KEYS.forEach((key, index) => {
+      paddingProps[key] = paddingValues[index];
+    });
     const props = frameLayoutPropsFrom({
       layoutMode: 'VERTICAL',
       itemSpacing: 8,
-      paddingTop: 16,
+      ...paddingProps,
     });
     expect(props).toEqual({
       layoutMode: 'VERTICAL',
       itemSpacing: 8,
-      paddingTop: 16,
+      ...paddingProps,
     });
   });
 });

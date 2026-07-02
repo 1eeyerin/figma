@@ -1,7 +1,12 @@
+import {
+  ACTION_MAP,
+  createBridgeMessage,
+  isMcpAction,
+  type BridgeMessage,
+} from '@figma-bridge/protocol';
+
 import { uuid } from '../utils/uuid';
-import { WS_URL, RECONNECT_DELAY, ACTION_MAP } from './constants';
-import { createBridgeMessage } from './createBridgeMessage';
-import type { BridgeMessage } from './types';
+import { WS_URL, RECONNECT_DELAY } from './constants';
 
 export interface WsClientCallbacks {
   onOpen: () => void;
@@ -72,8 +77,9 @@ export function createWsClient(callbacks: WsClientCallbacks): WsClient {
         return;
       }
 
-      const canvasType = ACTION_MAP[msg.action as string];
-      if (canvasType) {
+      const action = String(msg.action);
+      if (isMcpAction(action)) {
+        const canvasType = ACTION_MAP[action];
         callbacks.onCanvasMessage(canvasType, msg);
       }
     };
