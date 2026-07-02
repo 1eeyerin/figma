@@ -1,7 +1,7 @@
 {
   "name": "figma-bridge",
   "description": "Claude Code ↔ MCP 서버 ↔ Figma 플러그인 양방향 디자인 브릿지. 사각형/텍스트/프레임 생성 등 Figma 캔버스 조작 MCP 툴 제공.",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "author": {
     "name": "yerin",
     "email": "dev.yerin@gmail.com"
