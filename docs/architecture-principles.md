@@ -16,8 +16,6 @@
 
 원칙: 상태가 3개 이상이고 서로 배타적이며 비동기 이벤트로 전이한다면, boolean 플래그 조합이 아니라 FSM으로 모델링한다.
 
-현재 적용 예: `bridge/types.ts`의 `ConnectionState`(`connecting`/`connected`/`disconnected`)가 `useReducer` 기반 transition 함수로 관리된다.
-
 규칙:
 - 새로운 상태를 `isLoading`/`isError`/`isRetrying` 같은 boolean 여러 개로 늘리지 않는다. 상태가 3개 이상 배타적으로 늘어나면 transition 함수 기반 FSM으로 옮긴다.
 - 허용되지 않는 전이는 transition 함수에서 명시적으로 막는다 (현재 `disconnected` 상태에서 `OPEN` 이벤트는 무시되는 것처럼).
@@ -35,7 +33,7 @@
 
 규칙:
 - 새 통신 경로를 추가할 때는 "한 번만 필요한가 / 계속 갱신되어야 하는가", "누가 먼저 말하는가"를 먼저 답하고 프로토콜을 고른다.
-- WebSocket 사용 시 재연결(`wsClient.ts`)·순서 보장(id 매칭)·backpressure(데몬은 마지막 연결 1개만 유지, 다중 UI 인스턴스 미지원)를 항상 문서화한다. 이 제약이 바뀌면 [architecture.md](architecture.md)도 함께 갱신한다.
+- WebSocket 사용 시 재연결(`wsClient.ts`)·순서 보장(id 매칭)·역압(backpressure, 데몬은 마지막 연결 1개만 유지, 다중 UI 인스턴스 미지원)을 항상 문서화한다. 이 제약이 바뀌면 [architecture.md](architecture.md)도 함께 갱신한다.
 - canvas 스레드는 네트워크를 직접 열지 않는다 — thin/thick 경계(4번)와 연결된 기존 규칙을 유지한다.
 
 ## 4. Thin/Thick 경계
@@ -57,7 +55,7 @@
 
 ## 5. Agentic UI 설계 원칙
 
-이 프로젝트 자체가 "AI가 도구를 호출해 외부 시스템(Figma 캔버스)을 조작"하는 agentic 구조다. 이를 이 레포 규모에 맞게 규칙화한다.
+원칙: AI가 도구를 호출해 외부 시스템(Figma 캔버스)을 조작하는 agentic 구조에 맞게, 작업의 가역성과 추적 가능성을 설계 단계에서 보장한다.
 
 - **작업 위험도 분류**
   - read only (`GET_NODE`, `GET_PAGE`, `EXPORT_NODE`, `PING`): 승인 없이 자동 실행.
@@ -73,12 +71,6 @@
 
 - 에러 로그에는 최소한 `action`, `id`, 실패 원인을 함께 남긴다 — id 없는 에러 로그 금지.
 - PII(개인정보)를 로그에 남기지 않는다. 이 시스템은 디자인 데이터만 다뤄 현재 위험은 낮지만, 향후 사용자 인증/계정 정보가 추가되면 이 규칙을 재확인한다.
-
-## 해당 없음 (검토했으나 이 레포에 적용하지 않는 원칙)
-
-- **RADIO 프레임워크, 자동완성 케이스**: 특정 신규 기능(검색창 등) 설계 프로세스이지 상시 아키텍처 규칙이 아니다. 새 기능 설계 시 참고 자료로만 남긴다.
-- **Micro Frontend**: 단일 팀·단일 배포 단위 프로젝트라 Shell/Remote 분리가 주는 이득보다 runtime 조합 비용이 크다. 조직/배포가 여러 팀으로 쪼개지기 전까지 도입하지 않는다.
-- **렌더링 전략 (CSR/SSR/SSG/RSC)**: Figma 플러그인 UI는 iframe 내 완전한 CSR이며 서버 렌더링 대상이 아니다.
 
 ---
 

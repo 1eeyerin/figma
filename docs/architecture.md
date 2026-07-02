@@ -128,3 +128,5 @@ packages/figma-plugin/src/
 - MCP 툴 응답은 비동기: WS 왕복을 `id` 매칭으로 처리
 
 메시지 타입별 상세 계약(파라미터, 응답 형태)은 [protocol.md](protocol.md)와 `packages/figma-bridge-protocol/` 참고.
+
+설계 원칙(왜 이렇게 설계했는가, 무엇을 지켜야 하는가)은 [architecture-principles.md](architecture-principles.md) 참고.
