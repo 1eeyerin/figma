@@ -51,13 +51,17 @@
 - `bridge/`, `ui/`에 figma 전역 타입이나 노드 생성/변환 로직을 넣지 않는다 (기존 규칙과 일치: `canvas/utils/`는 반대로 UI에서 import 금지).
 - 새 MCP action을 추가할 때 "이 로직이 UI에서 처리 가능한가, canvas에서만 가능한가"를 먼저 판단한다. Figma API에 닿는 로직은 예외 없이 `canvas/`에 둔다.
 
+### canvas/ 내부 구조 — action 그룹별 디렉토리
+
+`canvas/` 레이어 내부는 action 종류별로 하위 디렉토리로 나눈다. 새 action을 추가할 때 기존 파일에 이어 붙이지 않고 해당 그룹 디렉토리에 파일을 만든다. 세부 목표 구조와 네이밍 규칙은 [frontend-guidelines.md](frontend-guidelines.md)의 "응집도" 섹션 참고.
+
 ## 5. Agentic UI 설계 원칙
 
 이 프로젝트 자체가 "AI가 도구를 호출해 외부 시스템(Figma 캔버스)을 조작"하는 agentic 구조다. 이를 이 레포 규모에 맞게 규칙화한다.
 
 - **작업 위험도 분류**
   - read only (`GET_NODE`, `GET_PAGE`, `EXPORT_NODE`, `PING`): 승인 없이 자동 실행.
-  - write-but-reversible (`DRAW_RECT`, `DRAW_TEXT`, `DRAW_FRAME`, `CREATE_SCREEN`, `SET_PARENT`, `SET_NAME`): 자동 실행 허용 — Figma 자체 Undo(Cmd+Z)로 되돌릴 수 있다.
+  - write-but-reversible (`DRAW_RECT`, `DRAW_TEXT`, `DRAW_FRAME`, `DRAW_SCREEN`, `SET_PARENT`, `SET_NAME`): 자동 실행 허용 — Figma 자체 Undo(Cmd+Z)로 되돌릴 수 있다.
   - **destructive** (`REMOVE_NODE`): 되돌리기 비용이 상대적으로 크다. 향후 단일 노드 삭제 범위를 넘는 destructive action(예: 다중 삭제, 페이지 초기화)을 추가할 때는 확인 단계 없이 자동 실행하지 않는다.
 - **에러는 실패한 단계를 구체적으로 알린다**: `success: false, error: string` 응답에서 `error`는 "실패했습니다" 같은 뭉뚱그린 문구가 아니라 어떤 액션의 어떤 파라미터가 왜 실패했는지 담는다.
 - **부분 실패를 구분한다**: `create_screen`처럼 여러 노드를 한 번에 만드는 재귀 액션은 일부 노드 생성이 실패해도 전체를 롤백하지 않고, 성공한 노드와 실패한 노드를 구분해 응답에 담는다.

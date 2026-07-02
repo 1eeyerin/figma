@@ -45,3 +45,4 @@ AI 코딩 에이전트 ↔ MCP 서버 ↔ Figma 플러그인 양방향 디자인
 | figma-plugin 빌드 방법 | [figma-plugin/README.md](figma-plugin/README.md#빌드) |
 | Git Hooks (husky, 절대경로 금지 등) | [docs/git-hooks.md](docs/git-hooks.md) |
 | 테스트 작성 규칙 (제목 한글, JSDoc 기준) | [docs/testing.md](docs/testing.md) |
+| 프론트엔드 설계 지침 (가독성·예측 가능성·응집도) | [docs/frontend-guidelines.md](docs/frontend-guidelines.md) |
