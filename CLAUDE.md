@@ -30,6 +30,10 @@ AI 코딩 에이전트 ↔ MCP 서버 ↔ Figma 플러그인 양방향 디자인
 
 새 기능·리팩터링 시 [docs/architecture-principles.md](docs/architecture-principles.md)의 규칙(상태 배치, FSM 우선, 통신 프로토콜 선택 기준, thin/thick 경계, agentic UI 설계, 관측성 최소 기준)을 어기지 않아야 한다.
 
+## 커밋 원칙
+
+커밋할 때는 pre-commit/commit-msg 훅을 우회하지 않는다. 훅이 환경 문제로 실패하면 `--no-verify`로 넘기지 말고 원인을 해결한 뒤 다시 커밋한다.
+
 ## 문서 참고
 
 | 주제 | 문서 |
