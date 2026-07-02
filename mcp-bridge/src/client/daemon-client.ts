@@ -1,13 +1,13 @@
-import type { McpAction } from '@figma-bridge/protocol';
+import type {
+  BridgeRequestMessage,
+  BridgeResponseMessage,
+  McpAction,
+} from '@figma-bridge/protocol';
 
 import { randomUUID } from 'crypto';
 import * as http from 'http';
 
 import { BridgeError } from '../errors.js';
-import type {
-  BridgeRequestMessage,
-  BridgeResponseMessage,
-} from '../protocol/bridge-message.js';
 import {
   DAEMON_HTTP,
   type DaemonStatusResponse,

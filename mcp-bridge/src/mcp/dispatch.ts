@@ -1,11 +1,11 @@
-import type { McpAction } from '@figma-bridge/protocol';
-
 import {
   isBridgeFailure,
   isBridgeSuccess,
   type BridgeResponseMessage,
   type BridgeSuccessPayload,
-} from '../protocol/bridge-message.js';
+  type McpAction,
+} from '@figma-bridge/protocol';
+
 import type { ToolTextResult } from '../protocol/tool-result.js';
 
 export interface DispatchBridge {

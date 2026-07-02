@@ -1,7 +1,7 @@
 import type {
   BridgeRequestMessage,
   BridgeResponseMessage,
-} from './bridge-message.js';
+} from '@figma-bridge/protocol';
 
 export const DAEMON_HTTP = {
   statusPath: '/v1/status',

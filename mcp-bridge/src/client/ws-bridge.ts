@@ -1,6 +1,5 @@
-import type { McpAction } from '@figma-bridge/protocol';
+import type { BridgeResponseMessage, McpAction } from '@figma-bridge/protocol';
 
-import type { BridgeResponseMessage } from '../protocol/bridge-message.js';
 import { DaemonClient, type DaemonClientDeps } from './daemon-client.js';
 import { DaemonProcess, type DaemonProcessDeps } from './daemon-process.js';
 

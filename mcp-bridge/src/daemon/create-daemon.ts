@@ -1,8 +1,10 @@
-import { isMcpAction } from '@figma-bridge/protocol';
+import {
+  isMcpAction,
+  type BridgeResponseMessage,
+} from '@figma-bridge/protocol';
 import * as http from 'http';
 import { WebSocketServer, type RawData } from 'ws';
 
-import type { BridgeResponseMessage } from '../protocol/bridge-message.js';
 import { createHttpHandler } from './http-api.js';
 import { PendingRequestStore } from './pending-store.js';
 import { PluginSocket } from './plugin-socket.js';

@@ -1,6 +1,4 @@
-import type { McpAction } from '@figma-bridge/protocol';
-
-import type { BridgeResponseMessage } from '../protocol/bridge-message.js';
+import type { BridgeResponseMessage, McpAction } from '@figma-bridge/protocol';
 
 interface PendingRequest {
   action: McpAction;

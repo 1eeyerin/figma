@@ -1,4 +1,4 @@
-import { createBridgeMessage } from '@figma-bridge/protocol';
+import { createBridgeMessage, isMcpAction } from '@figma-bridge/protocol';
 
 import type { WsClient } from './wsClient';
 
@@ -15,8 +15,10 @@ export function subscribeCanvasMessages(wsClient: WsClient): () => void {
     if (pm.type === 'PONG') return;
 
     if (pm.type === 'DRAW_RESULT') {
+      if (!isMcpAction(String(pm.action))) return;
+
       wsClient.send(
-        createBridgeMessage(pm.id, 'RESPONSE', pm.action ?? 'draw_result', {
+        createBridgeMessage(pm.id, 'RESPONSE', pm.action, {
           nodeId: pm.nodeId,
           success: pm.success,
           error: pm.error,

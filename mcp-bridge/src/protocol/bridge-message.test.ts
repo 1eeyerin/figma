@@ -1,6 +1,5 @@
+import { isBridgeFailure, isBridgeSuccess } from '@figma-bridge/protocol';
 import { describe, expect, it } from 'vitest';
-
-import { isBridgeFailure, isBridgeSuccess } from './bridge-message';
 
 describe('BridgeMessage (브릿지 메시지 타입 가드)', () => {
   it('성공 payload를 success 응답으로 판별한다', () => {

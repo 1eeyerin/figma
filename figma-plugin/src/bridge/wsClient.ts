@@ -2,7 +2,6 @@ import {
   ACTION_MAP,
   createBridgeMessage,
   isMcpAction,
-  type BridgeMessage,
 } from '@figma-bridge/protocol';
 
 import { uuid } from '../utils/uuid';
@@ -31,16 +30,6 @@ export function createWsClient(callbacks: WsClientCallbacks): WsClient {
     }
   }
 
-  // BridgeMessage 계약(id/type/action/payload)에 맞춰 조립 후 전송한다.
-  function sendBridgeMessage(
-    id: string,
-    type: BridgeMessage['type'],
-    action: string,
-    payload: Record<string, unknown> = {},
-  ) {
-    send(createBridgeMessage(id, type, action, payload));
-  }
-
   function scheduleReconnect() {
     if (reconnectTimer) clearTimeout(reconnectTimer);
     reconnectTimer = setTimeout(connect, RECONNECT_DELAY);
@@ -60,7 +49,7 @@ export function createWsClient(callbacks: WsClientCallbacks): WsClient {
     }
 
     ws.onopen = () => {
-      sendBridgeMessage(uuid(), 'EVENT', 'connected');
+      send(createBridgeMessage(uuid(), 'EVENT', 'connected'));
       callbacks.onOpen();
     };
 
@@ -73,7 +62,7 @@ export function createWsClient(callbacks: WsClientCallbacks): WsClient {
       }
 
       if (msg.action === 'ping') {
-        sendBridgeMessage(msg.id as string, 'RESPONSE', 'pong');
+        send(createBridgeMessage(String(msg.id), 'EVENT', 'pong'));
         return;
       }
 

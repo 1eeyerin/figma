@@ -120,7 +120,7 @@ describe('WsBridge (WebSocket 브릿지)', () => {
             JSON.stringify({
               id: 'x',
               type: 'RESPONSE',
-              action: 'a',
+              action: 'create_rectangle',
               payload: { success: true },
             }),
           );

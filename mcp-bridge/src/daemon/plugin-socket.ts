@@ -1,6 +1,6 @@
-import { WebSocket } from 'ws';
+import type { BridgeRequestMessage } from '@figma-bridge/protocol';
 
-import type { BridgeRequestMessage } from '../protocol/bridge-message.js';
+import { WebSocket } from 'ws';
 
 export class PluginSocket {
   private socket: WebSocket | null = null;
