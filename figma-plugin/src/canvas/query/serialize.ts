@@ -1,4 +1,4 @@
-import { copyIfPresent } from './utils/props';
+import { copyIfPresent } from '../utils/props';
 
 export interface SerializedNode {
   id: string;
@@ -17,13 +17,7 @@ export interface SerializedNode {
   fontSize?: number | symbol;
 }
 
-export async function getNodeById(id: string): Promise<BaseNode | null> {
-  if (!id) return null;
-  return figma.getNodeByIdAsync(id);
-}
-
 export function serializeNode(node: SceneNode): SerializedNode {
-  // SceneNode가 레이아웃 속성을 공통으로 가지지 않는 union이므로 타입 단언으로 접근한다.
   const n = node as SceneNode & {
     x?: number;
     y?: number;

@@ -31,6 +31,7 @@
   "dependencies": {
     "@create-figma-plugin/ui": "^3",
     "@create-figma-plugin/utilities": "^3",
+    "@figma-bridge/protocol": "workspace:*",
     "preact": "^10"
   }
 }

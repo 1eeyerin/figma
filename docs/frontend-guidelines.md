@@ -119,6 +119,10 @@ const overlay = useOverlay();
 
 ```
 canvas/
+├── dispatch/      # LOG/PING/CLOSE 및 action dispatch, 공통 reply/runAction
+│   ├── handle-message.ts
+│   ├── reply.ts
+│   └── run-action.ts
 ├── draw/          # DRAW_RECT, DRAW_TEXT, DRAW_FRAME
 │   ├── handler.ts
 │   ├── nodes.ts
@@ -132,12 +136,15 @@ canvas/
 │   └── serialize.ts
 ├── mutation/      # SET_PARENT, SET_NAME, REMOVE_NODE
 │   └── handler.ts
+├── shared/        # 여러 action 그룹에서 공유하는 Figma 노드 조회·부모 append 헬퍼
+│   ├── node-lookup.ts
+│   └── append-to-parent.ts
 ├── utils/         # 여러 action에서 공유하는 순수 유틸
 │   ├── color.ts
 │   ├── effects.ts
 │   ├── font.ts
 │   └── props.ts
-└── main.ts        # ACTION_HANDLERS 조합 및 handleMessage
+└── main.ts        # showUI + figma.ui.onmessage 연결
 ```
 
 새 action은 기존 파일에 이어 붙이지 않고 새 파일로 묶는다.

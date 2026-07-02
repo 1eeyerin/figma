@@ -26,7 +26,7 @@
 - **파일 네이밍 컨벤션**: 컴포넌트(PascalCase), 훅(`use-` 접두사), 유틸/상수/타입 파일명 규칙을 확정. 현재 `useBridgeConnection.ts`, `StatusBadge.tsx` 등 기존 컨벤션을 기준선으로 삼는다.
 - **배럴 export(`index.ts`) 사용 기준**: 현재 레포에는 재수출용 배럴이 하나도 없다(`index.ts`/`index.tsx`는 번들 엔트리포인트 전용). 새로 배럴을 도입할지 말지, 순환 참조 유발 가능성이 있는 곳(예: `bridge/` ↔ `canvas/` 상호 참조 지점)은 배럴 사용을 금지하는 기준을 문서로 남긴다. 없는 것을 정리하는 게 아니라 **앞으로의 기준을 세우는 작업**임에 유의.
 - **~~라우트 경로 네이밍~~ → 메시지/액션 타입 네이밍**: 이 프로젝트는 URL 라우팅이 없는 Figma 플러그인(단일 UI iframe) + MCP stdio 서버다. 대신 `canvas` 메시지 타입(`DRAW_RECT`, `GET_NODE` 등, [protocol.md](protocol.md) 참고)과 MCP action 이름(`create_rectangle` 등)의 네이밍 규칙을 확정하고 혼재를 통일한다.
-- **~~API 클라이언트 레이어 네이밍~~ → WS 액션 핸들러/브릿지 콜백 네이밍**: 이 프로젝트에는 REST/GraphQL fetcher나 `useXxxQuery` 훅이 없다. 대신 실제 수정·탐색 빈도가 가장 높은 지점은 `canvas/handlers.ts`의 액션별 핸들러 함수, `bridge/wsClient.ts`의 콜백(`onOpen`/`onClose`/`onCanvasMessage`), `bridge/constants.ts`의 `ACTION_MAP`이다. 이 세 지점의 네이밍 규칙을 최우선으로 통일한다.
+- **~~API 클라이언트 레이어 네이밍~~ → WS 액션 핸들러/브릿지 콜백 네이밍**: 이 프로젝트에는 REST/GraphQL fetcher나 `useXxxQuery` 훅이 없다. 대신 실제 수정·탐색 빈도가 가장 높은 지점은 `canvas/<action-group>/handler.ts`의 액션별 핸들러 함수, `canvas/dispatch/handle-message.ts`의 dispatch 맵, `bridge/wsClient.ts`의 콜백(`onOpen`/`onClose`/`onCanvasMessage`), `packages/protocol/src/actions.ts`의 `ACTION_MAP`이다. 이 지점의 네이밍 규칙을 최우선으로 통일한다.
 - **스타일 정의 위치**: 이미 컴포넌트-스타일 co-location이 지켜지고 있다(`App.tsx`+`App.module.css`). 이 원칙을 확인하고 예외가 있으면 통일한다.
 - **~~상태관리 슬라이스/스토어 간 중복~~ → FSM 중복 로직**: Redux/Zustand 같은 전역 스토어는 없다. `useBridgeConnection`의 FSM(`ConnectionState`) 하나뿐이므로 이 항목은 현재 낮은 우선순위다 — 다만 향후 FSM이 늘어날 경우를 대비해 transition 함수 네이밍/위치 기준만 정의해 둔다.
 

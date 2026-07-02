@@ -1,4 +1,5 @@
-import { createBridgeMessage } from './createBridgeMessage';
+import { createBridgeMessage } from '@figma-bridge/protocol';
+
 import type { WsClient } from './wsClient';
 
 // canvas(code.ts)로 메시지 발신

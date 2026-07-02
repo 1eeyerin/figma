@@ -44,6 +44,9 @@ importers:
       '@create-figma-plugin/utilities':
         specifier: ^3
         version: 3.2.1
+      '@figma-bridge/protocol':
+        specifier: workspace:*
+        version: link:../packages/protocol
       preact:
         specifier: ^10
         version: 10.29.3
@@ -88,6 +91,12 @@ importers:
       vitest:
         specifier: ^4.1.9
         version: 4.1.9(@types/node@26.0.1)(@vitest/coverage-v8@4.1.9)(jsdom@29.1.1)(vite@8.1.0(@types/node@26.0.1))
+
+  packages/protocol:
+    devDependencies:
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
 
 packages:
 

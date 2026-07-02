@@ -1,10 +1,3 @@
-/**
- * canvas 스레드에서 수신·처리하는 메시지 타입.
- * handlers.ts / nodes.ts / utils가 공유하는 단일 출처.
- */
-
-// ── 공통 ──────────────────────────────────────────────────────────────────
-
 export type StrokeAlign = 'INSIDE' | 'OUTSIDE' | 'CENTER';
 export type TextAlign = 'LEFT' | 'CENTER' | 'RIGHT' | 'JUSTIFIED';
 export type TextAutoResize =
@@ -35,8 +28,6 @@ export interface ShadowDef {
   spread?: number;
   opacity?: number;
 }
-
-// ── 노드 생성 파라미터 ─────────────────────────────────────────────────────
 
 export interface RectDef {
   x?: number;
@@ -104,8 +95,6 @@ export interface FrameDef {
 export type NodeTreeDef = (RectDef | TextDef | FrameDef) & {
   type?: 'rectangle' | 'text' | 'frame';
 };
-
-// ── canvas 스레드 메시지 ───────────────────────────────────────────────────
 
 interface BaseCanvasMsg {
   id: string;
@@ -191,3 +180,5 @@ export type CanvasMessage =
   | LogMsg
   | PingMsg
   | CloseMsg;
+
+export type CanvasMessageType = CanvasMessage['type'];

@@ -5,7 +5,7 @@ import {
   framePropsFrom,
   rectPropsFrom,
   textPropsFrom,
-} from './nodes';
+} from './props';
 
 describe('rectPropsFrom (사각형 속성 변환)', () => {
   it('기본 좌표만 있으면 x/y만 채운다', () => {

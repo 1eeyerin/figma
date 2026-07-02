@@ -10,14 +10,14 @@ function transition(
 ): ConnectionState {
   switch (state) {
     case 'connecting':
-      if (event === 'OPEN') return 'connected';
-      if (event === 'CLOSE') return 'disconnected';
+      if (event.type === 'OPEN') return 'connected';
+      if (event.type === 'CLOSE') return 'disconnected';
       return state;
     case 'connected':
-      if (event === 'CLOSE') return 'disconnected';
+      if (event.type === 'CLOSE') return 'disconnected';
       return state;
     case 'disconnected':
-      if (event === 'RECONNECT') return 'connecting';
+      if (event.type === 'RECONNECT') return 'connecting';
       return state;
   }
 }
@@ -29,17 +29,17 @@ export function useBridgeConnection() {
   const clientRef = useRef<ReturnType<typeof createWsClient> | null>(null);
 
   function reconnect() {
-    dispatch({ type: 'RECONNECT' } as unknown as ConnectionEvent);
+    dispatch({ type: 'RECONNECT' });
     clientRef.current?.connect();
   }
 
   useEffect(() => {
     const client = createWsClient({
       onOpen: () => {
-        dispatch('OPEN');
+        dispatch({ type: 'OPEN' });
         sendToCanvas({ type: 'LOG', message: 'Connected to MCP bridge' });
       },
-      onClose: () => dispatch('CLOSE'),
+      onClose: () => dispatch({ type: 'CLOSE' }),
       onCanvasMessage: (canvasType, msg) => {
         sendToCanvas(
           Object.assign(
