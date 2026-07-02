@@ -52,9 +52,9 @@ Figma 캔버스에 프레임 생성
 ## 통신 흐름 (참고)
 
 ```
-Claude → MCP 툴 호출 → WS(8765) → Figma UI iframe → postMessage → Canvas API
+AI 코딩 에이전트 → MCP 툴 호출 → WS(8765) → Figma UI iframe → postMessage → Canvas API
                                                                    ↓
-Claude ← MCP 응답(nodeId) ← WS RESPONSE ← postMessage(DRAW_RESULT)
+AI 코딩 에이전트 ← MCP 응답(nodeId) ← WS RESPONSE ← postMessage(DRAW_RESULT)
 ```
 
 응답에는 생성된 노드의 `nodeId`가 포함된다.

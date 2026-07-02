@@ -6,23 +6,13 @@ description: "figma-bridge를 클론·빌드하고 Claude Code 마켓플레이�
 
 현재 작업 디렉토리는 이미 클론된 figma-bridge 레포라고 가정한다 (README의 `git clone` 안내를 따라온 상태).
 
-1. 의존성 설치 및 빌드
+1. 아래 명령으로 의존성 설치·빌드·마켓플레이스 등록·플러그인 설치를 한 번에 처리한다 (내부 동작은 [scripts/claude-plugin.mjs](../../scripts/claude-plugin.mjs) 참고)
 
 ```bash
-pnpm install
-pnpm run build   # figma-plugin + mcp-bridge 둘 다 빌드
+pnpm run claude:install
 ```
 
-2. 마켓플레이스 추가 및 플러그인 설치 (현재 디렉토리의 절대 경로를 사용)
-
-```
-/plugin marketplace add <현재 디렉토리 절대 경로>
-/plugin install figma-bridge@figma-bridge-marketplace
-```
-
-설치 완료 시 `figma-bridge` MCP 서버(`mcp-bridge/dist/index.js`)와 `figma-bridge` 스킬이 Claude Code 전역에 등록된다. `${CLAUDE_PLUGIN_ROOT}` 기반으로 경로가 자동 설정되므로 별도 경로 지정은 불필요하다.
-
-3. Figma 측 설정
+2. Figma 측 설정
 
 - Figma 데스크톱 앱 → `Plugins` → `Development` → `Import plugin from manifest...`
 - `figma-plugin/manifest.json` 선택

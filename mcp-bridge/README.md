@@ -1,6 +1,6 @@
 # mcp-bridge
 
-Claude Code ↔ Figma 플러그인을 잇는 MCP 서버.
+AI 코딩 에이전트(Claude Code, Codex) ↔ Figma 플러그인을 잇는 MCP 서버.
 MCP 툴 호출을 받아 WebSocket으로 Figma 플러그인에 중계한다.
 
 전체 통신 흐름, 프로세스 구조, 레이어 간 제약사항은 [../docs/architecture.md](../docs/architecture.md) 참고.

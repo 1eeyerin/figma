@@ -12,13 +12,10 @@ description: "figma-bridge 로컬 마켓플레이스를 최신 코드로 갱신�
 git pull
 ```
 
-`mcp-bridge/`, `figma-plugin/`, `.claude-plugin/` 중 하나라도 변경됐다면 `post-merge` 훅이 자동으로 `pnpm install && pnpm run build`를 실행한다.
+2. 아래 명령으로 빌드·마켓플레이스 갱신·플러그인 업데이트를 한 번에 처리한다 (내부 동작은 [scripts/claude-plugin.mjs](../../scripts/claude-plugin.mjs) 참고)
 
-2. 빌드 완료 후 출력되는 명령을 그대로 실행
-
-```
-/plugin marketplace update figma-bridge-marketplace
-/plugin update figma-bridge
+```bash
+pnpm run claude:update
 ```
 
 3. 아래 사항을 확인하고 필요하면 사용자에게 안내하라

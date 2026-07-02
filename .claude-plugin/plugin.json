@@ -8,9 +8,10 @@
   },
   "mcpServers": {
     "figma-bridge": {
-      "command": "node",
+      "command": "sh",
       "args": [
-        "${CLAUDE_PLUGIN_ROOT}/mcp-bridge/dist/index.js"
+        "-lc",
+        "ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd); exec node \"$ROOT/mcp-bridge/dist/index.js\""
       ]
     }
   },

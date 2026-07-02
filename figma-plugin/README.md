@@ -1,6 +1,6 @@
 # figma-plugin
 
-Claude Code ↔ MCP 서버 ↔ Figma 캔버스를 잇는 브릿지 플러그인.
+AI 코딩 에이전트(Claude Code, Codex) ↔ MCP 서버 ↔ Figma 캔버스를 잇는 브릿지 플러그인.
 WebSocket으로 MCP 명령을 수신하고 Figma API로 실행한다.
 
 전체 통신 흐름, 디렉토리 구조, 레이어 간 제약사항은 [../docs/architecture.md](../docs/architecture.md) 참고.

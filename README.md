@@ -1,18 +1,23 @@
 # figma-bridge
 
-Claude Code ↔ MCP 서버 ↔ Figma 플러그인 양방향 디자인 브릿지.
+AI 코딩 에이전트 ↔ MCP 서버 ↔ Figma 플러그인 양방향 디자인 브릿지.
+Claude Code와 Codex를 모두 지원한다.
+
+> 레포를 처음 받았다면 코딩 에이전트에게 "[CLAUDE.md](CLAUDE.md)(Codex는 [AGENTS.md](AGENTS.md))를 읽고 플러그인 설치를 진행해줘"라고 요청하면 된다.
 
 ## 아키텍처
 
 ```
-Claude Code --[stdio/MCP]--> MCP 서버 --[WebSocket]--> UI iframe --[postMessage]--> Canvas 스레드
+AI 코딩 에이전트 --[stdio/MCP]--> MCP 서버 --[WebSocket]--> UI iframe --[postMessage]--> Canvas 스레드
 ```
 
 | 디렉토리 | 역할 |
 |---|---|
 | `mcp-bridge/` | TypeScript MCP 서버 + WebSocket 브릿지 서버 (단일 프로세스) |
 | `figma-plugin/` | Figma 플러그인 (Preact UI + canvas 스레드) |
-| `.claude-plugin/` | Claude Code 플러그인 매니페스트 (MCP 서버 등록 + `figma-bridge` 스킬) |
+| `skills/` | Claude Code·Codex 공용 `figma-bridge` 스킬 |
+| `.claude-plugin/` | Claude Code 플러그인 매니페스트 (MCP 서버 등록) |
+| `.codex-plugin/` | Codex 플러그인 매니페스트 (MCP 서버 등록) |
 
 상세 통신 흐름·디렉토리 구조는 [docs/architecture.md](docs/architecture.md), 메시지 프로토콜은 [docs/protocol.md](docs/protocol.md) 참고.
 
@@ -21,26 +26,20 @@ Claude Code --[stdio/MCP]--> MCP 서버 --[WebSocket]--> UI iframe --[postMessag
 ```bash
 git clone https://github.com/1eeyerin/figma.git
 cd figma
-corepack enable
+corepack enable   # package.json의 pnpm@10.30.3 버전을 자동 준비
 pnpm install
 ```
 
-이 프로젝트는 `package.json`의 `packageManager`에 지정된 `pnpm@10.30.3`을 사용한다. `corepack enable`을 먼저 실행하면 Node.js가 프로젝트에 맞는 pnpm 버전을 자동으로 준비해 준다.
-
-클론한 디렉토리에서 Claude Code를 실행하면 아래 커맨드를 바로 쓸 수 있다 (프로젝트 레벨 커맨드라 플러그인 설치 전에도 인식됨). 절차(빌드, 마켓플레이스 등록, 버전 갱신, 재시작 필요 여부 판단 등)는 커맨드가 안내한다.
-
-| 커맨드 | 언제 사용 |
-|---|---|
-| `/install` | 처음 설치할 때 (빌드 → 마켓플레이스 추가 → 플러그인 설치 → Figma 플러그인 로드) |
-| `/update` | 레포에 변경 사항이 생겼을 때 (`git pull` → 재빌드 → 마켓플레이스/플러그인 갱신) |
-
-각 커맨드의 세부 단계는 [.claude/commands/](.claude/commands/)에 정의되어 있다.
+Claude Code/Codex별 설치·업데이트 명령과 Figma 플러그인 연동 확인 절차는 [docs/install.md](docs/install.md) 참고.
 
 ## 사용법
 
-> **처음 다운로드했다면** 먼저 위 [설치 / 업데이트](#설치--업데이트)의 `/install` 커맨드를 실행해 빌드 및 플러그인 등록을 완료해야 한다. 설치 전에는 MCP 툴이 동작하지 않는다.
+> 처음 다운로드했다면 [설치 / 업데이트](#설치--업데이트)를 먼저 끝내야 한다. 설치 전에는 MCP 툴이 동작하지 않는다.
 
-Claude Code에서 Figma 캔버스 조작을 요청하면 `figma-bridge` 스킬이 자동으로 트리거되어 MCP 툴(`create_rectangle`, `create_text`, `create_frame` 등)을 호출한다.
+| 에이전트 | 사용 방법 |
+|---|---|
+| Claude Code | Figma 캔버스 조작을 요청하면 `figma-bridge` 스킬이 자동 트리거되어 MCP 툴(`create_rectangle`, `create_text`, `create_frame` 등)을 호출한다 |
+| Codex | `codex:install` 이후 새 세션에서 캔버스 조작을 요청하면 `figma-bridge:figma-bridge` 스킬과 MCP 툴을 사용할 수 있다 |
 
 ## 로컬 개발
 
