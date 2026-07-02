@@ -15,6 +15,16 @@ npm run build && node dist/index.js
 - 포트: `ws://localhost:8765`
 - Figma에서 플러그인 로드 후 UI에 "Connected ✓" 표시되면 준비 완료
 
+## 버전업 후 업데이트
+
+버전이 올라가면 설치된 에이전트만 갱신한다.
+
+```bash
+pnpm run plugins:update
+```
+
+Codex와 Claude Code가 모두 설치되어 있으면 둘 다 갱신하고, 하나만 설치되어 있으면 그 하나만 갱신한다.
+
 ## 사용 가능한 MCP 툴
 
 ### create_rectangle
