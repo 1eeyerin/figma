@@ -34,4 +34,20 @@ describe('createDispatch (MCP 디스패치)', () => {
       'Figma 플러그인이 연결되지 않았습니다',
     );
   });
+
+  it('시작 전 검사 실패가 있으면 모든 툴 응답을 에러로 반환한다', async () => {
+    const bridge = {
+      sendAndWait: vi.fn(),
+    };
+
+    const dispatch = createDispatch(
+      bridge,
+      '[Preflight] figma-bridge MCP startup preflight failed',
+    );
+    const result = await dispatch('create_rectangle', {});
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('preflight failed');
+    expect(bridge.sendAndWait).not.toHaveBeenCalled();
+  });
 });

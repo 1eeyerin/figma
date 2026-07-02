@@ -29,11 +29,18 @@ function formatSuccess(payload: BridgeSuccessPayload): ToolTextResult {
   return textResult(parts.length ? parts.join('\n') : '완료');
 }
 
-export function createDispatch(bridge: DispatchBridge) {
+export function createDispatch(
+  bridge: DispatchBridge,
+  startupFailure?: string,
+) {
   return async (
     action: McpAction,
     payload: Record<string, unknown>,
   ): Promise<ToolTextResult> => {
+    if (startupFailure) {
+      return textResult(startupFailure, true);
+    }
+
     try {
       const response = await bridge.sendAndWait(action, payload);
       if (isBridgeSuccess(response.payload)) {

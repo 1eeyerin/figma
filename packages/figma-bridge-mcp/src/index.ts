@@ -2,13 +2,29 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 
 import { createMcpServer } from './mcp/create-server.js';
 import { createDispatch } from './mcp/dispatch.js';
+import { formatPreflightReport, runStartupPreflight } from './preflight.js';
 import { WsBridge } from './ws-bridge.js';
 
 async function main(): Promise<void> {
-  const bridge = new WsBridge();
-  await bridge.start();
+  const preflight = await runStartupPreflight();
+  console.error(formatPreflightReport(preflight));
 
-  const server = createMcpServer(createDispatch(bridge));
+  const bridge = new WsBridge();
+  let startupFailure: string | undefined;
+
+  if (!preflight.ok) {
+    startupFailure = formatPreflightReport(preflight);
+  } else {
+    try {
+      await bridge.start();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      startupFailure = `[Startup] figma-bridge daemon 시작 실패: ${message}`;
+      console.error(startupFailure);
+    }
+  }
+
+  const server = createMcpServer(createDispatch(bridge, startupFailure));
   const transport = new StdioServerTransport();
   await server.connect(transport);
 
