@@ -30,7 +30,7 @@ Claude Code 세션에서는 `/install`, `/update` 커맨드로도 동일 스크�
 2. `packages/figma-plugin/manifest.json` 선택
 3. 플러그인 실행 → UI에 `Connected ✓` 확인
 
-> **에이전트 지침:** 설치 스크립트 실행을 마쳤으면, 사용자에게 위 3단계를 Figma에서 직접 확인해 `Connected ✓`가 뜨는지 알려 달라고 안내해야 한다.
+> **에이전트 지침:** 설치 스크립트 실행을 마쳤으면, 사용자에게 Claude Code 또는 Codex를 재시작하거나 새 세션을 연 뒤 위 3단계를 Figma에서 직접 확인해 `Connected ✓`가 뜨는지 알려 달라고 안내해야 한다.
 
 ## 4. 업데이트와 재시작
 
