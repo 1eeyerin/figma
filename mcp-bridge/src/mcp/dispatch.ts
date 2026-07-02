@@ -1,4 +1,5 @@
-import type { McpAction } from '../protocol/actions.js';
+import type { McpAction } from '@figma-bridge/protocol';
+
 import {
   isBridgeFailure,
   isBridgeSuccess,

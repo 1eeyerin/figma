@@ -1,7 +1,7 @@
+import { isMcpAction } from '@figma-bridge/protocol';
 import * as http from 'http';
 import { WebSocketServer, type RawData } from 'ws';
 
-import { isMcpAction } from '../protocol/actions.js';
 import type { BridgeResponseMessage } from '../protocol/bridge-message.js';
 import { createHttpHandler } from './http-api.js';
 import { PendingRequestStore } from './pending-store.js';

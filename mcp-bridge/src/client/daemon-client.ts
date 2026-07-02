@@ -1,8 +1,9 @@
+import type { McpAction } from '@figma-bridge/protocol';
+
 import { randomUUID } from 'crypto';
 import * as http from 'http';
 
 import { BridgeError } from '../errors.js';
-import type { McpAction } from '../protocol/actions.js';
 import type {
   BridgeRequestMessage,
   BridgeResponseMessage,

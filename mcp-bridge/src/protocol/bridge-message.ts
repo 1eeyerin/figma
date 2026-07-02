@@ -1,4 +1,4 @@
-import type { McpAction } from './actions.js';
+import type { McpAction } from '@figma-bridge/protocol';
 
 export type BridgeMessageType = 'REQUEST' | 'RESPONSE' | 'EVENT';
 
