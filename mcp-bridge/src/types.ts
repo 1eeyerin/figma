@@ -1,6 +1,9 @@
-export interface BridgeMessage {
-  id: string;
-  type: 'REQUEST' | 'RESPONSE' | 'EVENT';
-  action: string;
-  payload?: Record<string, unknown>;
-}
+export type {
+  BridgeEventMessage,
+  BridgeFailurePayload,
+  BridgeMessage,
+  BridgeRequestMessage,
+  BridgeResponseMessage,
+  BridgeResponsePayload,
+  BridgeSuccessPayload,
+} from './protocol/bridge-message.js';

@@ -48,10 +48,26 @@ MCP action → canvas 타입 매핑 구현은 `figma-plugin/src/bridge/constants
 
 전체 통신 흐름과 레이어 구조는 [architecture.md](architecture.md) 참고.
 
+## MCP 프로세스 ↔ WS 데몬 내부 HTTP API
+
+| 엔드포인트 | 동작 |
+| --- | --- |
+| `GET /v1/status` | `{ pluginConnected: boolean }` 반환 |
+| `POST /v1/dispatch?timeout=15000` | `BridgeRequestMessage`를 플러그인에 전달하고 `BridgeResponseMessage` 반환 |
+
+`/status`, `/send`, `dist/ws-server.js` 경로는 더 이상 사용하지 않는다. 데몬 엔트리포인트는 `dist/cli/daemon.js`다.
+
 ## 새 action 추가 시 체크리스트
 
 새 MCP action을 추가할 때 아래 세 지점을 반드시 동시에 수정한다. 하나라도 빠지면 런타임에서 묵묵히 실패한다.
 
-1. **`mcp-bridge/src/index.ts`** — `server.tool(...)` 등록 (MCP 툴 스키마 + dispatch 호출)
-2. **`figma-plugin/src/bridge/constants.ts`** — `ACTION_MAP`에 `{ mcp_action: 'CANVAS_TYPE' }` 항목 추가
-3. **`figma-plugin/src/canvas/handlers.ts`** — `CANVAS_TYPE`에 대응하는 핸들러 함수 구현 및 dispatch 맵 등록
+1. **`mcp-bridge/src/protocol/actions.ts`** — `MCP_ACTIONS`에 action 이름 추가
+2. **`mcp-bridge/src/tools/`** — action 그룹 파일에 MCP 툴 스키마와 설명 추가
+3. **`figma-plugin/src/bridge/constants.ts`** — `ACTION_MAP`에 `{ mcp_action: 'CANVAS_TYPE' }` 항목 추가
+4. **`figma-plugin/src/canvas/handlers.ts`** — `CANVAS_TYPE`에 대응하는 핸들러 함수 구현 및 dispatch 맵 등록
+
+## 호환되지 않는 변경
+
+- 데몬 HTTP API가 `/status`, `/send`에서 `/v1/status`, `/v1/dispatch`로 변경되었다.
+- MCP 브릿지 프로세스가 실행하는 데몬 엔트리포인트가 `dist/ws-server.js`에서 `dist/cli/daemon.js`로 변경되었다.
+- `BridgeMessage.payload`는 성공/실패 union 타입으로 해석한다.

@@ -6,7 +6,7 @@
     "build": "tsc",
     "watch": "tsc --watch --preserveWatchOutput",
     "start": "node dist/index.js",
-    "start:daemon": "node dist/ws-server.js",
+    "start:daemon": "node dist/cli/daemon.js",
     "dev": "ts-node src/index.ts",
     "test": "vitest run",
     "test:watch": "vitest"

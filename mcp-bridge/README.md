@@ -14,6 +14,10 @@ npm run build
 
 # 개발 중 watch (파일 저장 시 자동 재빌드)
 npm run watch
+
+# WS 데몬 직접 실행
+npm run start:daemon
 ```
 
-빌드 결과로 `dist/`가 갱신된다. `npm run start`로 MCP 프로세스를 직접 실행할 수 있다.
+빌드 결과로 `dist/`가 갱신된다. `npm run start`로 MCP 프로세스를 직접 실행할 수 있고,
+`npm run start:daemon`은 `dist/cli/daemon.js`를 실행한다.

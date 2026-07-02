@@ -96,13 +96,13 @@ describe('WsBridge (WebSocket 브릿지)', () => {
         httpGet,
         spawn: spawnFn,
         existsSync: () => true,
-        daemonScript: '/fake/ws-server.js',
+        daemonScript: '/fake/daemon.js',
       });
       await bridge.start();
 
       expect(spawnFn).toHaveBeenCalledWith(
         'node',
-        ['/fake/ws-server.js'],
+        ['/fake/daemon.js'],
         expect.any(Object),
       );
     }, 10000);

@@ -9,9 +9,9 @@ Claude
   │  MCP 툴 호출 (stdio)
   ▼
 MCP 프로세스 (mcp-bridge/src/index.ts)
-  │  HTTP (POST /send, GET /status — http://localhost:8766)
+  │  HTTP (POST /v1/dispatch, GET /v1/status — http://localhost:8766)
   ▼
-WS 데몬 (mcp-bridge/src/ws-server.ts, 독립 프로세스)
+WS 데몬 (mcp-bridge/src/cli/daemon.ts, 독립 프로세스)
   │  WebSocket (ws://localhost:8765)
   ▼
 UI iframe (figma-plugin/src/index.tsx)   ← 네트워크 담당 (WS 연결·재연결·중계)
@@ -33,16 +33,14 @@ WS 데몬 → MCP 프로세스 → Claude (nodeId 반환)
 
 `mcp-bridge`는 단일 프로세스가 아니라 두 프로세스로 구성된다.
 
-- **MCP 프로세스** (`index.ts`): Claude Code와 stdio로 통신. `WsBridge.start()`가 데몬 생존을 HTTP `/status`로 확인 후, 없으면 `ws-server.js`를 child_process로 spawn한다. 이미 떠 있으면 재사용 — 여러 MCP 프로세스가 떠도 데몬은 하나만 유지되어 포트 바인딩 경쟁이 없다.
-- **WS 데몬** (`ws-server.ts`): Figma 플러그인과의 WebSocket(8765)을 직접 보유하는 독립 프로세스. MCP 프로세스로부터의 HTTP(8766) 요청을 받아 플러그인에 중계하고, 플러그인의 RESPONSE를 HTTP 응답으로 되돌린다.
+- **MCP 프로세스** (`index.ts`): Claude Code와 stdio로 통신. `client/ws-bridge.ts`가 데몬 생존을 HTTP `/v1/status`로 확인 후, 없으면 `dist/cli/daemon.js`를 child_process로 spawn한다. 이미 떠 있으면 재사용 — 여러 MCP 프로세스가 떠도 데몬은 하나만 유지되어 포트 바인딩 경쟁이 없다.
+- **WS 데몬** (`cli/daemon.ts`, `daemon/create-daemon.ts`): Figma 플러그인과의 WebSocket(8765)을 직접 보유하는 독립 프로세스. MCP 프로세스로부터의 HTTP(8766) 요청을 받아 플러그인에 중계하고, 플러그인의 RESPONSE를 HTTP 응답으로 되돌린다.
 - 둘 사이의 메시지 봉투는 동일한 `BridgeMessage` 타입을 공유한다:
   ```typescript
-  interface BridgeMessage {
-    id: string;        // UUID v4 — 요청/응답 매칭
-    type: 'REQUEST' | 'RESPONSE' | 'EVENT';
-    action: string;
-    payload?: Record<string, unknown>;
-  }
+  type BridgeMessage =
+    | { id: string; type: 'REQUEST'; action: McpAction; payload: Record<string, unknown> }
+    | { id: string; type: 'RESPONSE'; action: McpAction; payload: BridgeResponsePayload }
+    | { id: string; type: 'EVENT'; action: string; payload?: Record<string, unknown> };
   ```
 - 플러그인은 마지막에 연결된 WS 클라이언트 1개만 데몬에 보관된다 (다중 UI 인스턴스 동시 연결 미지원).
 - 포트는 `WS_PORT`(기본 8765), `HTTP_PORT`(기본 8766) 환경변수로 오버라이드 가능.
@@ -51,9 +49,22 @@ WS 데몬 → MCP 프로세스 → Claude (nodeId 반환)
 
 | 디렉토리 | 역할 |
 |---|---|
-| `mcp-bridge/` | TypeScript MCP 서버 + WebSocket 브릿지 서버 (단일 프로세스) |
+| `mcp-bridge/` | TypeScript MCP 서버 + WebSocket 브릿지 데몬 |
 | `figma-plugin/` | Figma 플러그인 (Preact UI + canvas 스레드) |
 | `.claude-plugin/` | Claude Code 플러그인 매니페스트 (MCP 서버 등록 + `figma-bridge` 스킬) |
+
+## mcp-bridge 내부 구조
+
+```
+mcp-bridge/src/
+├── index.ts                 MCP stdio 엔트리포인트
+├── mcp/                     MCP 서버 생성과 툴 응답 포맷팅
+├── tools/                   MCP 툴 정의와 zod 스키마
+├── protocol/                action, BridgeMessage, 데몬 HTTP 계약
+├── client/                  MCP 프로세스 → 데몬 HTTP 클라이언트와 spawn 관리
+├── daemon/                  WS/HTTP 데몬 조립, pending 요청, 플러그인 소켓 관리
+└── cli/daemon.ts            데몬 CLI 엔트리포인트
+```
 
 ## figma-plugin 내부 구조
 
