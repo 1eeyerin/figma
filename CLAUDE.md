@@ -45,3 +45,4 @@ Figma 캔버스 작업에는 bridge daemon 프로세스와 Figma 플러그인 �
 | Git Hooks (husky, 절대경로 금지 등) | [docs/git-hooks.md](docs/git-hooks.md) |
 | 테스트 작성 규칙 (제목 한글, JSDoc 기준) | [docs/testing.md](docs/testing.md) |
 | 프론트엔드 설계 지침 (가독성·예측 가능성·응집도) | [docs/frontend-guidelines.md](docs/frontend-guidelines.md) |
+| 코드 작성 규칙 (JSDoc 주석 형식 등) | [docs/code-style.md](docs/code-style.md) |
