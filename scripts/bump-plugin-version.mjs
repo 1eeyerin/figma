@@ -15,8 +15,8 @@ const CODEX_PLUGIN_JSON = join(ROOT, '.codex-plugin/plugin.json');
 const MARKETPLACE_JSON = join(ROOT, '.claude-plugin/marketplace.json');
 const HASH_CACHE = join(ROOT, 'node_modules/.cache/plugin-dist-hash.json');
 const DIST_DIRS = [
-  join(ROOT, 'mcp-bridge/dist'),
-  join(ROOT, 'figma-plugin/build'),
+  join(ROOT, 'packages/mcp-bridge/dist'),
+  join(ROOT, 'packages/figma-plugin/build'),
 ];
 
 function bumpPatch(version) {

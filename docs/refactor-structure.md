@@ -22,7 +22,7 @@
 
 규칙은 작업 시작 시 기존 코드베이스를 분석해 먼저 정의하고, 전체에 일관 적용한다. 정의 시 아래 항목을 반드시 포함할 것.
 
-- **디렉토리 구조**: `figma-plugin/src`는 계층 단위(layer-based: `ui/` `bridge/` `canvas/` `utils/`)로 구성되어 있고, `mcp-bridge/src`는 평면 구조다. 최상위 레이어 구분(`ui/` `bridge/` `canvas/`)은 유지하되, `canvas/` 내부는 action 그룹별 하위 디렉토리(feature-based)로 나눈다 — 세부 목표 구조는 [frontend-guidelines.md](frontend-guidelines.md)의 "응집도" 섹션 참고.
+- **디렉토리 구조**: `packages/figma-plugin/src`는 계층 단위(layer-based: `ui/` `bridge/` `canvas/` `utils/`)로 구성되어 있고, `packages/mcp-bridge/src`는 평면 구조다. 최상위 레이어 구분(`ui/` `bridge/` `canvas/`)은 유지하되, `canvas/` 내부는 action 그룹별 하위 디렉토리(feature-based)로 나눈다 — 세부 목표 구조는 [frontend-guidelines.md](frontend-guidelines.md)의 "응집도" 섹션 참고.
 - **파일 네이밍 컨벤션**: 컴포넌트(PascalCase), 훅(`use-` 접두사), 유틸/상수/타입 파일명 규칙을 확정. 현재 `useBridgeConnection.ts`, `StatusBadge.tsx` 등 기존 컨벤션을 기준선으로 삼는다.
 - **배럴 export(`index.ts`) 사용 기준**: 현재 레포에는 재수출용 배럴이 하나도 없다(`index.ts`/`index.tsx`는 번들 엔트리포인트 전용). 새로 배럴을 도입할지 말지, 순환 참조 유발 가능성이 있는 곳(예: `bridge/` ↔ `canvas/` 상호 참조 지점)은 배럴 사용을 금지하는 기준을 문서로 남긴다. 없는 것을 정리하는 게 아니라 **앞으로의 기준을 세우는 작업**임에 유의.
 - **~~라우트 경로 네이밍~~ → 메시지/액션 타입 네이밍**: 이 프로젝트는 URL 라우팅이 없는 Figma 플러그인(단일 UI iframe) + MCP stdio 서버다. 대신 `canvas` 메시지 타입(`DRAW_RECT`, `GET_NODE` 등, [protocol.md](protocol.md) 참고)과 MCP action 이름(`create_rectangle` 등)의 네이밍 규칙을 확정하고 혼재를 통일한다.
@@ -55,8 +55,8 @@
 
 - **허용**: 타입체크 — 이 레포는 패키지별 `tsconfig.json`이 분리되어 있어 단일 `tsc --noEmit` 명령이 없다. 아래 두 명령을 각 단계마다 모두 통과시킨다.
   ```bash
-  tsc -p figma-plugin/tsconfig.json --noEmit
-  tsc -p mcp-bridge/tsconfig.json --noEmit
+  tsc -p packages/figma-plugin/tsconfig.json --noEmit
+  tsc -p packages/mcp-bridge/tsconfig.json --noEmit
   ```
 - **허용(선택)**: 정적 분석 — 이 레포는 ESLint가 아니라 **oxlint**를 쓴다. `pnpm run lint`(검출 전용)만 사용하고 `pnpm run lint:fix`, `pnpm run format`(자동 수정)은 **금지**. 포맷 검사가 필요하면 `pnpm run format:check`(검출 전용)까지만 허용.
 - **금지**: 빌드 실행(`pnpm run build`), Playwright 등 실행 기반 검증

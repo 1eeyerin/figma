@@ -18,13 +18,16 @@
   },
   "overrides": [
     {
-      "files": ["figma-plugin/src/**/*.ts", "figma-plugin/src/**/*.tsx"],
+      "files": [
+        "packages/figma-plugin/src/**/*.ts",
+        "packages/figma-plugin/src/**/*.tsx"
+      ],
       "env": {
         "browser": true
       }
     },
     {
-      "files": ["mcp-bridge/src/**/*.ts"],
+      "files": ["packages/mcp-bridge/src/**/*.ts"],
       "env": {
         "node": true
       }

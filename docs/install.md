@@ -17,7 +17,7 @@ pnpm install
 
 클론한 디렉토리에서 Claude Code 세션을 열면 `/install`, `/update` 커맨드로도 동일 스크립트를 실행할 수 있다. 세부 정의: [.claude/commands/](../.claude/commands/), [scripts/claude-plugin.mjs](../scripts/claude-plugin.mjs).
 
-> MCP 서버(`mcp-bridge/`) 변경분은 재시작 후에만 반영된다. 스킬만 바뀌었다면 재시작 불필요.
+> MCP 서버(`packages/mcp-bridge/`) 변경분은 재시작 후에만 반영된다. 스킬만 바뀌었다면 재시작 불필요.
 
 ## Codex
 
@@ -45,7 +45,7 @@ Codex와 Claude Code가 모두 설치되어 있으면 둘 다 갱신하고, 하�
 설치 스크립트 실행이 끝나면 Figma 데스크톱 앱에서 아래 단계를 직접 확인한다.
 
 1. `Plugins` → `Development` → `Import plugin from manifest...`
-2. `figma-plugin/manifest.json` 선택
+2. `packages/figma-plugin/manifest.json` 선택
 3. 플러그인 실행 → UI에 `Connected ✓` 확인
 
 > **에이전트 지침:** 설치 스크립트 실행을 마쳤으면, 사용자에게 위 3단계를 Figma에서 직접 확인해 `Connected ✓`가 뜨는지 알려 달라고 안내해야 한다.

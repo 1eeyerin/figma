@@ -3,14 +3,14 @@
 ## 0단계: 스캐폴딩 + WS 연결 확인 ✅
 
 ### mcp-bridge 설정
-- [x] `mcp-bridge/package.json` 생성 (`@modelcontextprotocol/sdk`, `ws`, TypeScript 의존성)
-- [x] `mcp-bridge/tsconfig.json` 생성
-- [x] `mcp-bridge/src/index.ts` 진입점 작성 (MCP + WS 서버 통합)
-- [x] `mcp-bridge/src/ws-bridge.ts` WebSocket 브릿지 구현
+- [x] `packages/mcp-bridge/package.json` 생성 (`@modelcontextprotocol/sdk`, `ws`, TypeScript 의존성)
+- [x] `packages/mcp-bridge/tsconfig.json` 생성
+- [x] `packages/mcp-bridge/src/index.ts` 진입점 작성 (MCP + WS 서버 통합)
+- [x] `packages/mcp-bridge/src/ws-bridge.ts` WebSocket 브릿지 구현
 
 ### figma-plugin 설정
-- [x] `figma-plugin/manifest.json` 생성 (`networkAccess.allowedDomains` 포함)
-- [x] `figma-plugin/src/canvas/main.ts` 플러그인 메인 코드 작성
+- [x] `packages/figma-plugin/manifest.json` 생성 (`networkAccess.allowedDomains` 포함)
+- [x] `packages/figma-plugin/src/canvas/main.ts` 플러그인 메인 코드 작성
 - [x] Preact UI 컴포넌트 구조 (`src/ui/`, `src/bridge/`)
 
 ### 검증

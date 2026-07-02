@@ -13,8 +13,8 @@ AI 코딩 에이전트 --[stdio/MCP]--> MCP 서버 --[WebSocket]--> UI iframe --
 
 | 디렉토리 | 역할 |
 |---|---|
-| `mcp-bridge/` | TypeScript MCP 서버 + WebSocket 브릿지 서버 (단일 프로세스) |
-| `figma-plugin/` | Figma 플러그인 (Preact UI + canvas 스레드) |
+| `packages/mcp-bridge/` | TypeScript MCP 서버 + WebSocket 브릿지 서버 (단일 프로세스) |
+| `packages/figma-plugin/` | Figma 플러그인 (Preact UI + canvas 스레드) |
 | `skills/` | Claude Code·Codex 공용 `figma-bridge` 스킬 |
 | `.claude-plugin/` | Claude Code 플러그인 매니페스트 (MCP 서버 등록) |
 | `.codex-plugin/` | Codex 플러그인 매니페스트 (MCP 서버 등록) |
@@ -45,7 +45,7 @@ Claude Code/Codex별 설치·업데이트 명령과 Figma 플러그인 연동 �
 
 ```bash
 pnpm run dev           # plugin watch + bridge 서버 동시 실행
-pnpm run watch:bridge   # mcp-bridge만 watch (dist 자동 재생성, 재시작 전까지 구버전 유지)
+pnpm run watch:bridge   # packages/mcp-bridge만 watch (dist 자동 재생성, 재시작 전까지 구버전 유지)
 ```
 
-자세한 내용은 [CLAUDE.md](CLAUDE.md), [docs/architecture.md](docs/architecture.md), [figma-plugin/README.md](figma-plugin/README.md) 참고.
+자세한 내용은 [CLAUDE.md](CLAUDE.md), [docs/architecture.md](docs/architecture.md), [packages/figma-plugin/README.md](packages/figma-plugin/README.md) 참고.

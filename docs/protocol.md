@@ -62,10 +62,10 @@ MCP action → canvas 타입 매핑 구현은 `packages/protocol/src/actions.ts`
 새 MCP action을 추가할 때 아래 항목을 반드시 동시에 수정한다. 하나라도 빠지면 런타임에서 묵묵히 실패한다.
 
 1. **`packages/protocol/src/actions.ts`** — MCP action 이름과 `ACTION_MAP` 항목 추가
-2. **`mcp-bridge/src/tools/`** — action 그룹 파일에 MCP 툴 스키마와 설명 추가
+2. **`packages/mcp-bridge/src/tools/`** — action 그룹 파일에 MCP 툴 스키마와 설명 추가
 3. **`packages/protocol/src/canvas-messages.ts`** — canvas 메시지 타입과 payload 타입 추가
-4. **`figma-plugin/src/canvas/<action-group>/handler.ts`** — `CANVAS_TYPE`에 대응하는 핸들러 함수 구현
-5. **`figma-plugin/src/canvas/dispatch/handle-message.ts`** — dispatch 맵에 handler 등록
+4. **`packages/figma-plugin/src/canvas/<action-group>/handler.ts`** — `CANVAS_TYPE`에 대응하는 핸들러 함수 구현
+5. **`packages/figma-plugin/src/canvas/dispatch/handle-message.ts`** — dispatch 맵에 handler 등록
 
 ## 호환되지 않는 변경
 

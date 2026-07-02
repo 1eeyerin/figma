@@ -18,7 +18,7 @@ model: opus
 - stderr 로그에서 `[WS] Plugin connected` 확인
 
 ### 통신 검증
-- TypeScript 컴파일 오류 확인 (`cd mcp-bridge && npx tsc --noEmit`)
+- TypeScript 컴파일 오류 확인 (`cd packages/mcp-bridge && npx tsc --noEmit`)
 - `manifest.json`의 `networkAccess.allowedDomains`에 `ws://localhost:8765` 포함 여부
 - MCP 툴 파라미터와 플러그인 수신 포맷 일치 여부
 

@@ -8,7 +8,7 @@ description: "figma-bridge를 사용해 Figma 캔버스를 조작하는 스킬. 
 ## MCP 서버 실행
 
 ```bash
-cd mcp-bridge   # 프로젝트 루트 기준
+cd packages/mcp-bridge   # 프로젝트 루트 기준
 npm run build && node dist/index.js
 ```
 

@@ -8,16 +8,16 @@ Claude Code ↔ MCP 서버 ↔ Figma 플러그인 양방향 디자인 브릿지�
 Claude
   │  MCP 툴 호출 (stdio)
   ▼
-MCP 프로세스 (mcp-bridge/src/index.ts)
+MCP 프로세스 (packages/mcp-bridge/src/index.ts)
   │  HTTP (POST /v1/dispatch, GET /v1/status — http://localhost:8766)
   ▼
-WS 데몬 (mcp-bridge/src/cli/daemon.ts, 독립 프로세스)
+WS 데몬 (packages/mcp-bridge/src/cli/daemon.ts, 독립 프로세스)
   │  WebSocket (ws://localhost:8765)
   ▼
-UI iframe (figma-plugin/src/index.tsx)   ← 네트워크 담당 (WS 연결·재연결·중계)
+UI iframe (packages/figma-plugin/src/index.tsx)   ← 네트워크 담당 (WS 연결·재연결·중계)
   │  postMessage { pluginMessage }
   ▼
-Canvas 스레드 (figma-plugin/src/canvas/main.ts) ← Figma API 실행
+Canvas 스레드 (packages/figma-plugin/src/canvas/main.ts) ← Figma API 실행
   │  postMessage DRAW_RESULT
   ▼
 UI iframe
@@ -49,15 +49,15 @@ WS 데몬 → MCP 프로세스 → Claude (nodeId 반환)
 
 | 디렉토리 | 역할 |
 |---|---|
-| `mcp-bridge/` | TypeScript MCP 서버 + WebSocket 브릿지 데몬 |
-| `figma-plugin/` | Figma 플러그인 (Preact UI + canvas 스레드) |
+| `packages/mcp-bridge/` | TypeScript MCP 서버 + WebSocket 브릿지 데몬 |
+| `packages/figma-plugin/` | Figma 플러그인 (Preact UI + canvas 스레드) |
 | `packages/protocol/` | MCP action, canvas message type, BridgeMessage 공유 계약 |
 | `.claude-plugin/` | Claude Code 플러그인 매니페스트 (MCP 서버 등록 + `figma-bridge` 스킬) |
 
 ## mcp-bridge 내부 구조
 
 ```
-mcp-bridge/src/
+packages/mcp-bridge/src/
 ├── index.ts                 MCP stdio 엔트리포인트
 ├── mcp/                     MCP 서버 생성과 툴 응답 포맷팅
 ├── tools/                   MCP 툴 정의와 zod 스키마
@@ -70,7 +70,7 @@ mcp-bridge/src/
 ## figma-plugin 내부 구조
 
 ```
-figma-plugin/src/
+packages/figma-plugin/src/
 ├── index.tsx                       엔트리포인트 — render(App) 호출만
 │
 ├── ui/                             Preact UI 컴포넌트 (표현 레이어)
@@ -105,8 +105,8 @@ figma-plugin/src/
 
 ## 레이어 간 제약사항
 
-- `figma-plugin/src/canvas/` 에서 `fetch` / `WebSocket` 직접 사용 **금지** → UI iframe 경유 필수
-- `figma-plugin/src/canvas/utils/`는 figma 전역 타입에 의존 → UI/bridge에서 import 금지
+- `packages/figma-plugin/src/canvas/` 에서 `fetch` / `WebSocket` 직접 사용 **금지** → UI iframe 경유 필수
+- `packages/figma-plugin/src/canvas/utils/`는 figma 전역 타입에 의존 → UI/bridge에서 import 금지
 - postMessage는 항상 `{ pluginMessage: ... }` 래핑
 - MCP 툴 응답은 비동기: WS 왕복을 `id` 매칭으로 처리
 

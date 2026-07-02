@@ -15,7 +15,7 @@ pnpm run claude:install
 2. Figma 측 설정
 
 - Figma 데스크톱 앱 → `Plugins` → `Development` → `Import plugin from manifest...`
-- `figma-plugin/manifest.json` 선택
+- `packages/figma-plugin/manifest.json` 선택
 - 플러그인 실행 후 UI에 `Connected ✓` 표시 확인
 
 위 단계를 사용자 대신 순서대로 실행하고, 각 단계 결과(빌드 성공 여부, marketplace/plugin 등록 성공 여부)를 확인해 보고하라. 실패하면 원인을 진단하고 다음 단계로 넘어가지 마라.

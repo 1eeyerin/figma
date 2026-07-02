@@ -13,7 +13,7 @@ husky로 관리하는 Git 훅 (`.husky/`). oxlint/oxfmt 기반.
 
 ## pre-push
 
-루트 `pnpm run build` (plugin + mcp-bridge 빌드)와 `pnpm run test` 통과해야 push 가능.
+루트 `pnpm run build` (plugin + packages/mcp-bridge 빌드)와 `pnpm run test` 통과해야 push 가능.
 
 - 스킵: `SKIP_PRE_PUSH=1 git push`
 
@@ -28,5 +28,5 @@ husky로 관리하는 Git 훅 (`.husky/`). oxlint/oxfmt 기반.
 
 - 스크립트·문서·설정에 `/Users/<사용자명>`, `/home/<사용자명>` 같은 로컬 환경 종속 절대경로를 **하드코딩 금지**. 다른 사용자/머신에서 깨진다.
 - 셸 스크립트는 `SCRIPT_DIR="$(cd -- "$(dirname -- "$0")" && pwd)"` 패턴으로 자기 위치 기준 경로를 구하라.
-- 문서의 안내 명령어는 프로젝트 루트 기준 상대경로(`cd mcp-bridge`)로 작성하라.
+- 문서의 안내 명령어는 프로젝트 루트 기준 상대경로(`cd packages/mcp-bridge`)로 작성하라.
 - `pre-commit` 훅이 이를 자동 검사한다 (위 pre-commit 참고).

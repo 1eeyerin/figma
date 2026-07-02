@@ -36,7 +36,7 @@ importers:
         specifier: ^4.1.9
         version: 4.1.9(@types/node@26.0.1)(@vitest/coverage-v8@4.1.9)(jsdom@29.1.1)(vite@8.1.0(@types/node@26.0.1))
 
-  figma-plugin:
+  packages/figma-plugin:
     dependencies:
       '@create-figma-plugin/ui':
         specifier: ^3
@@ -46,7 +46,7 @@ importers:
         version: 3.2.1
       '@figma-bridge/protocol':
         specifier: workspace:*
-        version: link:../packages/protocol
+        version: link:../protocol
       preact:
         specifier: ^10
         version: 10.29.3
@@ -67,11 +67,11 @@ importers:
         specifier: ^4.1.9
         version: 4.1.9(@types/node@26.0.1)(@vitest/coverage-v8@4.1.9)(jsdom@29.1.1)(vite@8.1.0(@types/node@26.0.1))
 
-  mcp-bridge:
+  packages/mcp-bridge:
     dependencies:
       '@figma-bridge/protocol':
         specifier: workspace:*
-        version: link:../packages/protocol
+        version: link:../protocol
       '@modelcontextprotocol/sdk':
         specifier: ^1.0.0
         version: 1.29.0(zod@3.25.76)
