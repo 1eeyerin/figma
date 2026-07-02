@@ -1,4 +1,5 @@
 import { getNodeById } from './nodeQuery';
+import type { RectDef, TextDef, FrameDef, NodeTreeDef } from './types';
 import { colorToFill } from './utils/color';
 import { applyStroke, buildEffects } from './utils/effects';
 import { loadFont } from './utils/font';
@@ -8,7 +9,9 @@ import { setIfNumber } from './utils/props';
 
 // 세 props 변환 함수가 공통으로 쓰는 base: x/y 기본값 + 조건부 opacity.
 // name/fills는 함수마다 규칙이 미묘하게 달라(항상 세팅 vs 조건부) 여기서 다루지 않는다.
-function basePropsFrom(def: any): Record<string, unknown> {
+function basePropsFrom(
+  def: RectDef | TextDef | FrameDef,
+): Record<string, unknown> {
   const props: Record<string, unknown> = {
     x: def.x ?? 0,
     y: def.y ?? 0,
@@ -17,7 +20,7 @@ function basePropsFrom(def: any): Record<string, unknown> {
   return props;
 }
 
-export function rectPropsFrom(msg: any): Record<string, unknown> {
+export function rectPropsFrom(msg: RectDef): Record<string, unknown> {
   const props = basePropsFrom(msg);
   if (msg.name) props.name = msg.name;
 
@@ -25,6 +28,7 @@ export function rectPropsFrom(msg: any): Record<string, unknown> {
   if (fill) props.fills = [fill];
   setIfNumber(props, 'cornerRadius', msg.cornerRadius);
   if (Array.isArray(msg.cornerRadii)) {
+    const cornerRadii = msg.cornerRadii;
     const cornerRadiusKeys = [
       'topLeftRadius',
       'topRightRadius',
@@ -32,14 +36,14 @@ export function rectPropsFrom(msg: any): Record<string, unknown> {
       'bottomLeftRadius',
     ] as const;
     cornerRadiusKeys.forEach((key, i) => {
-      props[key] = msg.cornerRadii[i];
+      props[key] = cornerRadii[i];
     });
   }
 
   return props;
 }
 
-export function framePropsFrom(def: any): Record<string, unknown> {
+export function framePropsFrom(def: FrameDef): Record<string, unknown> {
   const props = basePropsFrom(def);
   props.name = def.name ?? 'Frame';
 
@@ -51,7 +55,9 @@ export function framePropsFrom(def: any): Record<string, unknown> {
   return props;
 }
 
-export function frameLayoutPropsFrom(def: any): Record<string, unknown> | null {
+export function frameLayoutPropsFrom(
+  def: FrameDef,
+): Record<string, unknown> | null {
   if (!def.layoutMode || def.layoutMode === 'NONE') return null;
 
   const props: Record<string, unknown> = { layoutMode: def.layoutMode };
@@ -74,12 +80,12 @@ export function frameLayoutPropsFrom(def: any): Record<string, unknown> | null {
   return props;
 }
 
-function applyFrameLayout(frame: FrameNode, def: any): void {
+function applyFrameLayout(frame: FrameNode, def: FrameDef): void {
   const layoutProps = frameLayoutPropsFrom(def);
   if (layoutProps) Object.assign(frame, layoutProps);
 }
 
-export function createRect(msg: any): RectangleNode {
+export function createRect(msg: RectDef): RectangleNode {
   const rect = figma.createRectangle();
   Object.assign(rect, rectPropsFrom(msg));
   rect.resize(msg.width ?? 100, msg.height ?? 100);
@@ -91,7 +97,7 @@ export function createRect(msg: any): RectangleNode {
   return rect;
 }
 
-export function textPropsFrom(msg: any): Record<string, unknown> {
+export function textPropsFrom(msg: TextDef): Record<string, unknown> {
   const props = basePropsFrom(msg);
   props.characters = msg.content ?? '';
   if (msg.name) props.name = msg.name;
@@ -110,7 +116,7 @@ export function textPropsFrom(msg: any): Record<string, unknown> {
   return props;
 }
 
-export async function createText(msg: any): Promise<TextNode> {
+export async function createText(msg: TextDef): Promise<TextNode> {
   const fontName = await loadFont(
     msg.fontFamily ?? 'Inter',
     msg.fontWeight ?? 'Regular',
@@ -127,7 +133,7 @@ export async function createText(msg: any): Promise<TextNode> {
   return text;
 }
 
-export function createFrame(msg: any): FrameNode {
+export function createFrame(msg: FrameDef): FrameNode {
   const frame = figma.createFrame();
   Object.assign(frame, framePropsFrom(msg));
   frame.resize(msg.width ?? 100, msg.height ?? 100);
@@ -153,16 +159,17 @@ export async function appendToParent(
 }
 
 export async function createNodeFromTree(
-  def: any,
+  def: NodeTreeDef,
   parent: BaseNode & ChildrenMixin,
 ): Promise<SceneNode> {
   const type = def.type ?? 'rectangle';
 
   if (type === 'frame') {
-    const frame = createFrame(def);
+    const frame = createFrame(def as FrameDef);
     parent.appendChild(frame);
-    if (Array.isArray(def.children)) {
-      for (const childDef of def.children) {
+    const children = (def as FrameDef).children;
+    if (Array.isArray(children)) {
+      for (const childDef of children) {
         await createNodeFromTree(childDef, frame);
       }
     }
@@ -170,12 +177,12 @@ export async function createNodeFromTree(
   }
 
   if (type === 'text') {
-    const text = await createText(def);
+    const text = await createText(def as TextDef);
     parent.appendChild(text);
     return text;
   }
 
-  const rect = createRect(def);
+  const rect = createRect(def as RectDef);
   parent.appendChild(rect);
   return rect;
 }

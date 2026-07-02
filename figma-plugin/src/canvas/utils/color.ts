@@ -38,7 +38,7 @@ export function parseColor(
 export function colorToFill(colorStr: string | undefined): SolidPaint | null {
   const parsed = parseColor(colorStr);
   if (!parsed) return null;
-  const fill: SolidPaint = { type: 'SOLID', color: parsed.rgb };
-  if (parsed.a < 1) (fill as any).opacity = parsed.a;
-  return fill;
+  return parsed.a < 1
+    ? { type: 'SOLID', color: parsed.rgb, opacity: parsed.a }
+    : { type: 'SOLID', color: parsed.rgb };
 }
