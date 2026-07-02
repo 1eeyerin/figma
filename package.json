@@ -8,6 +8,7 @@
     "build:plugin": "pnpm --filter figma-bridge-protocol build && pnpm --filter figma-plugin build",
     "watch:plugin": "pnpm --filter figma-plugin watch",
     "typecheck:plugin": "pnpm --filter figma-bridge-protocol build && tsc -p packages/figma-plugin/tsconfig.json",
+    "typecheck": "pnpm --filter figma-bridge-protocol build && concurrently --kill-others-on-fail \"tsc -p packages/figma-plugin/tsconfig.json\" \"pnpm --filter figma-bridge-mcp typecheck\"",
     "watch:bridge": "pnpm --filter figma-bridge-protocol build && pnpm --filter figma-bridge-mcp watch",
     "dev:bridge": "pnpm --filter figma-bridge-protocol build && pnpm --filter figma-bridge-mcp build && pnpm --filter figma-bridge-mcp start",
     "dev": "concurrently --names \"plugin,bridge\" --prefix-colors \"cyan,green\" \"pnpm run watch:plugin\" \"pnpm run dev:bridge\"",

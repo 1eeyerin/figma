@@ -26,7 +26,7 @@ Figma 캔버스 작업에는 bridge daemon 프로세스와 Figma 플러그인 �
 
 ## 아키텍처 (필수 준수)
 
-새 기능·리팩터링 시 [docs/architecture-principles.md](docs/architecture-principles.md)의 규칙(상태 배치, FSM 우선, 통신 프로토콜 선택 기준, thin/thick 경계, agentic UI 설계, 관측성 최소 기준)을 어기지 않아야 한다.
+새 기능·리팩터링 시 [docs/architecture-principles.md](docs/architecture-principles.md)의 규칙(상태 배치, FSM 우선, 통신 프로토콜 선택 기준, thin/thick 경계, agentic UI 설계, 관측성 최소 기준, 디렉토리 진입점)을 어기지 않아야 한다.
 
 ## 커밋 원칙
 

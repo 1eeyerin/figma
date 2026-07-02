@@ -51,6 +51,9 @@ importers:
         specifier: ^3.25.76
         version: 3.25.76
     devDependencies:
+      '@types/node':
+        specifier: ^26.0.1
+        version: 26.0.1
       '@types/ws':
         specifier: ^8.5.10
         version: 8.18.1

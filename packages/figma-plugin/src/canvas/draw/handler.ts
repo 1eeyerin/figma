@@ -5,7 +5,7 @@ import type {
 } from 'figma-bridge-protocol';
 
 import { runAction } from '../dispatch/run-action';
-import { appendToParent } from '../shared/append-to-parent';
+import { appendToParent } from '../shared';
 import { createFrame, createRect, createText } from './nodes';
 
 /**

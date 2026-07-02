@@ -5,7 +5,7 @@ import type {
   TextDef,
 } from 'figma-bridge-protocol';
 
-import { createFrame, createRect, createText } from '../draw/nodes';
+import { createFrame, createRect, createText } from '../draw';
 
 export async function createNodeFromTree(
   def: NodeTreeDef,

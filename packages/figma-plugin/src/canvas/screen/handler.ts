@@ -1,7 +1,7 @@
 import type { CreateScreenMsg } from 'figma-bridge-protocol';
 
 import { runAction } from '../dispatch/run-action';
-import { getNodeById } from '../shared/node-lookup';
+import { getNodeById } from '../shared';
 import { createNodeFromTree } from './tree';
 
 export async function handleCreateScreen(msg: CreateScreenMsg): Promise<void> {

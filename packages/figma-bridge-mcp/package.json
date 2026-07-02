@@ -20,6 +20,7 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@types/node": "^26.0.1",
     "@types/ws": "^8.5.10",
     "esbuild": "^0.28.0",
     "ts-node": "^10.9.0",

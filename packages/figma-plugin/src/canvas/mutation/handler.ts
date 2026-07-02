@@ -5,7 +5,7 @@ import type {
 } from 'figma-bridge-protocol';
 
 import { runAction } from '../dispatch/run-action';
-import { getNodeById, requireSceneNode } from '../shared/node-lookup';
+import { getNodeById, requireSceneNode } from '../shared';
 
 export async function handleSetParent(msg: SetParentMsg): Promise<void> {
   await runAction(msg, null, async () => {

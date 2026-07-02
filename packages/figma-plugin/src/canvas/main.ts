@@ -1,6 +1,6 @@
 import { showUI } from '@create-figma-plugin/utilities';
 
-import { handleMessage } from './dispatch/handle-message';
+import { handleMessage } from './dispatch';
 
 export default function () {
   showUI({ width: 300, height: 220 });

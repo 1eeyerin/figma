@@ -1,7 +1,6 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
-import { registerTools } from '../tools/register-tools.js';
-import type { ToolDispatch } from '../tools/tool-definition.js';
+import { registerTools, type ToolDispatch } from '../tools';
 
 export function createMcpServer(dispatch: ToolDispatch): McpServer {
   const server = new McpServer({

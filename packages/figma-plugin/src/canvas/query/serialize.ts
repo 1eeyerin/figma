@@ -1,4 +1,4 @@
-import { copyIfPresent } from '../utils/props';
+import { copyIfPresent } from '../utils';
 
 export interface SerializedNode {
   id: string;

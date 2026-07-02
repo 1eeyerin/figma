@@ -1,7 +1,7 @@
 import type { BridgeResponseMessage, McpAction } from 'figma-bridge-protocol';
 
-import { DaemonClient, type DaemonClientDeps } from './daemon-client.js';
-import { DaemonProcess, type DaemonProcessDeps } from './daemon-process.js';
+import { DaemonClient, type DaemonClientDeps } from './daemon-client';
+import { DaemonProcess, type DaemonProcessDeps } from './daemon-process';
 
 export type WsBridgeDeps = Partial<DaemonClientDeps & DaemonProcessDeps>;
 

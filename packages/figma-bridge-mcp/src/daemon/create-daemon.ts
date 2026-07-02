@@ -2,9 +2,9 @@ import { isMcpAction, type BridgeResponseMessage } from 'figma-bridge-protocol';
 import * as http from 'http';
 import { WebSocketServer, type RawData } from 'ws';
 
-import { createHttpHandler } from './http-api.js';
-import { PendingRequestStore } from './pending-store.js';
-import { PluginSocket } from './plugin-socket.js';
+import { createHttpHandler } from './http-api';
+import { PendingRequestStore } from './pending-store';
+import { PluginSocket } from './plugin-socket';
 
 export interface BridgeDaemonOptions {
   wsPort: number;

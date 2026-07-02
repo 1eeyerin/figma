@@ -1,21 +1,9 @@
 import type { CanvasMessage, CanvasMessageType } from 'figma-bridge-protocol';
 
-import {
-  handleDrawFrame,
-  handleDrawRect,
-  handleDrawText,
-} from '../draw/handler';
-import {
-  handleRemoveNode,
-  handleSetName,
-  handleSetParent,
-} from '../mutation/handler';
-import {
-  handleExportNode,
-  handleGetNode,
-  handleGetPage,
-} from '../query/handler';
-import { handleCreateScreen } from '../screen/handler';
+import { handleDrawFrame, handleDrawRect, handleDrawText } from '../draw';
+import { handleRemoveNode, handleSetName, handleSetParent } from '../mutation';
+import { handleExportNode, handleGetNode, handleGetPage } from '../query';
+import { handleCreateScreen } from '../screen';
 
 const ACTION_HANDLERS: Partial<
   Record<CanvasMessageType, (msg: CanvasMessage) => Promise<void>>

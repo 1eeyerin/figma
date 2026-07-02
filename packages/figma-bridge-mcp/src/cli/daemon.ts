@@ -1,4 +1,4 @@
-import { createBridgeDaemon } from '../daemon/create-daemon.js';
+import { createBridgeDaemon } from '../daemon';
 
 const daemon = createBridgeDaemon({
   wsPort: Number(process.env.WS_PORT ?? 8765),

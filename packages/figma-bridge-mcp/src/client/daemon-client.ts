@@ -7,11 +7,8 @@ import type {
 import { randomUUID } from 'crypto';
 import * as http from 'http';
 
-import { BridgeError } from '../errors.js';
-import {
-  DAEMON_HTTP,
-  type DaemonStatusResponse,
-} from '../protocol/daemon-http.js';
+import { BridgeError } from '../errors';
+import { DAEMON_HTTP, type DaemonStatusResponse } from '../protocol';
 
 export interface DaemonClientDeps {
   httpRequest: typeof http.request;

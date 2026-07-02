@@ -1,7 +1,6 @@
 import { h } from 'preact';
 
-import { WS_URL } from '../bridge/constants';
-import { useBridgeConnection } from '../bridge/useBridgeConnection';
+import { WS_URL, useBridgeConnection } from '../bridge';
 import styles from './App.module.css';
 import { StatusBadge } from './StatusBadge';
 

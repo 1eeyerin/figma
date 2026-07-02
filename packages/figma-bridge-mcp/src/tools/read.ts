@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import type { ToolDefinition } from './tool-definition.js';
+import type { ToolDefinition } from './tool-definition';
 
 export const readToolDefinitions: ToolDefinition[] = [
   {

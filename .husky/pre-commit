@@ -70,3 +70,13 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "✅ 린트/포맷 체크 통과"
+
+echo "🧷 타입 체크 실행 중..."
+pnpm run typecheck
+
+if [ $? -ne 0 ]; then
+  echo "❌ 타입 체크 실패: 커밋이 취소되었습니다."
+  exit 1
+fi
+
+echo "✅ 타입 체크 통과"

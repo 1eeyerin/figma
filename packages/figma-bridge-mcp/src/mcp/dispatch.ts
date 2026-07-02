@@ -6,7 +6,7 @@ import {
   type McpAction,
 } from 'figma-bridge-protocol';
 
-import type { ToolTextResult } from '../protocol/tool-result.js';
+import type { ToolTextResult } from '../protocol';
 
 export interface DispatchBridge {
   sendAndWait(

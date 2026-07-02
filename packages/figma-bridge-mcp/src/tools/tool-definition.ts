@@ -1,7 +1,7 @@
 import type { McpAction } from 'figma-bridge-protocol';
 import type { z } from 'zod';
 
-import type { ToolTextResult } from '../protocol/tool-result.js';
+import type { ToolTextResult } from '../protocol';
 
 export type ToolDispatch = (
   action: McpAction,

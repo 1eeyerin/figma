@@ -51,7 +51,7 @@
 
 ### canvas/ 내부 구조 — action 그룹별 디렉토리
 
-`canvas/` 레이어 내부는 action 종류별로 하위 디렉토리로 나눈다. 새 action을 추가할 때 기존 파일에 이어 붙이지 않고 해당 그룹 디렉토리에 파일을 만든다. 세부 목표 구조와 네이밍 규칙은 [frontend-guidelines.md](frontend-guidelines.md)의 "응집도" 섹션 참고.
+`canvas/` 레이어 내부는 action 종류별로 하위 디렉토리로 나눈다. 새 action을 추가할 때 기존 파일에 이어 붙이지 않고 해당 그룹 디렉토리에 파일을 만든다. 세부 목표 구조와 네이밍 규칙은 [frontend-guidelines.md](frontend-guidelines.md)의 "응집도" 섹션 참고. 이렇게 여러 재료 파일로 쪼갠 디렉토리를 밖에서 어떻게 노출·조립하는지는 7번(디렉토리 진입점)을 따른다.
 
 ## 5. Agentic UI 설계 원칙
 
@@ -71,6 +71,22 @@
 
 - 에러 로그에는 최소한 `action`, `id`, 실패 원인을 함께 남긴다 — id 없는 에러 로그 금지.
 - PII(개인정보)를 로그에 남기지 않는다. 이 시스템은 디자인 데이터만 다뤄 현재 위험은 낮지만, 향후 사용자 인증/계정 정보가 추가되면 이 규칙을 재확인한다.
+
+## 7. 디렉토리 진입점 (Barrel / index.ts)
+
+원칙: 외부 import 대상 디렉토리는 `index.ts`를 순수 배럴로 둔다. 로직 없이 re-export만.
+
+예: `tools/index.ts` → `export { registerTools } from './register-tools'`.
+
+규칙:
+- `index.ts`에 로직 직접 정의 금지. API 1개뿐이어도 배럴 유지.
+- 외부는 파일이 아닌 디렉토리를 import (`../tools`).
+- 재료 파일 외부 직접 import 금지. 필요하면 배럴에 먼저 추가.
+- 형제 파일끼리는 배럴 경유 없이 직접 import (`'./index'` 아님, `'./pending-store'`) — 순환 참조 방지.
+- 배럴을 조립하는 하위 유틸도 배럴 경유 금지 (예: `dispatch/run-action.ts`는 `'../dispatch'` 대신 직접 import).
+- `export *` 금지, 명시적 재노출만.
+
+> 참고 — `.js` 확장자·모듈 해석 설정은 "누가 최종 산출물을 만드는가"로 정한다. esbuild 번들 패키지(`figma-bridge-mcp`)는 `moduleResolution: Bundler` + 확장자 없는 import. tsc가 `dist/`를 그대로 emit하는 패키지(`figma-bridge-protocol`)는 `moduleResolution: NodeNext` + `.js` 확장자 유지(빼면 Node ESM에서 `Cannot find module`).
 
 ---
 

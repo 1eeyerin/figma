@@ -1,5 +1,7 @@
-// props dict 조립용 공용 헬퍼.
-// "값이 있을 때만 세팅" 패턴이 여러 변환 함수에 반복되어 이곳으로 추출한다.
+/**
+ * props dict 조립용 공용 헬퍼입니다.
+ * "값이 있을 때만 세팅" 패턴이 여러 변환 함수에 반복되어 이곳으로 추출합니다.
+ */
 
 /** value가 undefined/null이 아닐 때만 target[key]에 세팅한다. */
 export function setIfDefined<T extends object>(

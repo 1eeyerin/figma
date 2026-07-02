@@ -1,9 +1,9 @@
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 
-import { createMcpServer } from './mcp/create-server.js';
-import { createDispatch } from './mcp/dispatch.js';
-import { formatPreflightReport, runStartupPreflight } from './preflight.js';
-import { WsBridge } from './ws-bridge.js';
+import { WsBridge } from './client';
+import { createMcpServer } from './mcp/create-server';
+import { createDispatch } from './mcp/dispatch';
+import { formatPreflightReport, runStartupPreflight } from './preflight';
 
 async function main(): Promise<void> {
   const preflight = await runStartupPreflight();

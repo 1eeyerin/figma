@@ -3,9 +3,9 @@ import type {
   BridgeResponseMessage,
 } from 'figma-bridge-protocol';
 
-import { DAEMON_HTTP } from '../protocol/daemon-http.js';
-import type { PendingRequestStore } from './pending-store.js';
-import type { PluginSocket } from './plugin-socket.js';
+import { DAEMON_HTTP } from '../protocol';
+import type { PendingRequestStore } from './pending-store';
+import type { PluginSocket } from './plugin-socket';
 
 export interface HttpHandlerRequest {
   method: string;

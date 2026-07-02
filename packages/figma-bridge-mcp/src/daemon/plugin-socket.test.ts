@@ -33,14 +33,15 @@ describe('PluginSocket (플러그인 연결 관리)', () => {
   });
 
   it('열린 소켓에는 JSON 메시지를 전송한다', () => {
-    const socket = new EventEmitter() as WebSocket & {
+    const socket = new EventEmitter() as EventEmitter & {
+      readyState: number;
       send: ReturnType<typeof vi.fn>;
     };
     Object.defineProperty(socket, 'readyState', { value: WebSocket.OPEN });
     socket.send = vi.fn();
 
     const plugin = new PluginSocket();
-    plugin.attach(socket);
+    plugin.attach(socket as unknown as WebSocket);
 
     expect(
       plugin.send({

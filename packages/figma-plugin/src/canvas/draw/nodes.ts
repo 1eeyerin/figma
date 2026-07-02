@@ -1,7 +1,6 @@
 import type { FrameDef, RectDef, TextDef } from 'figma-bridge-protocol';
 
-import { applyStroke, buildEffects } from '../utils/effects';
-import { loadFont } from '../utils/font';
+import { applyStroke, buildEffects, loadFont } from '../utils';
 import {
   frameLayoutPropsFrom,
   framePropsFrom,

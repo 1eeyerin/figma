@@ -1,10 +1,10 @@
-import { batchToolDefinitions } from './batch.js';
-import { createToolDefinitions } from './create.js';
-import { hierarchyToolDefinitions } from './hierarchy.js';
-import { readToolDefinitions } from './read.js';
-import type { ToolDispatch, ToolRegistrar } from './tool-definition.js';
+import { batchToolDefinitions } from './batch';
+import { createToolDefinitions } from './create';
+import { hierarchyToolDefinitions } from './hierarchy';
+import { readToolDefinitions } from './read';
+import type { ToolDispatch, ToolRegistrar } from './tool-definition';
 
-export const toolDefinitions = [
+const toolDefinitions = [
   ...createToolDefinitions,
   ...hierarchyToolDefinitions,
   ...readToolDefinitions,

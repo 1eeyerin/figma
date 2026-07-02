@@ -6,10 +6,7 @@ import * as path from 'path';
 import { fileURLToPath } from 'url';
 import * as wsModule from 'ws';
 
-import {
-  DAEMON_HTTP,
-  type DaemonStatusResponse,
-} from './protocol/daemon-http.js';
+import { DAEMON_HTTP, type DaemonStatusResponse } from './protocol/daemon-http';
 
 export type PreflightStatus = 'pass' | 'fail';
 

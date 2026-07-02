@@ -5,7 +5,7 @@ import type {
 } from 'figma-bridge-protocol';
 
 import { runAction } from '../dispatch/run-action';
-import { resolveTargetNode } from '../shared/node-lookup';
+import { resolveTargetNode } from '../shared';
 import { exportNode, serializeNode } from './serialize';
 
 /**

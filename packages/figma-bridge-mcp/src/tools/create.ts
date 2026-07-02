@@ -5,8 +5,8 @@ import {
   opacitySchema,
   shadowSchema,
   strokeAlignSchema,
-} from './schemas.js';
-import type { ToolDefinition } from './tool-definition.js';
+} from './schemas';
+import type { ToolDefinition } from './tool-definition';
 
 export const createToolDefinitions: ToolDefinition[] = [
   {

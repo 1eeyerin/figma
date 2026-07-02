@@ -3,8 +3,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 
-import { DAEMON_HTTP } from '../protocol/daemon-http.js';
-import type { DaemonClient } from './daemon-client.js';
+import { DAEMON_HTTP } from '../protocol';
+import type { DaemonClient } from './daemon-client';
 
 export interface DaemonProcessDeps {
   spawn: typeof spawn;

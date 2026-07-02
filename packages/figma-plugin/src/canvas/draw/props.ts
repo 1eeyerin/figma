@@ -1,7 +1,6 @@
 import type { FrameDef, RectDef, TextDef } from 'figma-bridge-protocol';
 
-import { colorToFill } from '../utils/color';
-import { setIfNumber } from '../utils/props';
+import { colorToFill, setIfNumber } from '../utils';
 import { CORNER_RADIUS_KEYS, FRAME_PADDING_KEYS } from './constants';
 
 /**

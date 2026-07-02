@@ -39,7 +39,8 @@ describe('runStartupPreflight (MCP 시작 전 검사)', () => {
   it('daemon script가 없으면 실패한다', async () => {
     const result = await runStartupPreflight(
       deps({
-        existsSync: (filePath: string) => !filePath.endsWith('/cli/daemon.js'),
+        existsSync: (filePath: import('fs').PathLike) =>
+          !String(filePath).endsWith('/cli/daemon.js'),
       }),
     );
 
