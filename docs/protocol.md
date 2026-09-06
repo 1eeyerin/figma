@@ -26,7 +26,7 @@ MCP action → canvas 타입 매핑 구현은 `packages/figma-bridge-protocol/sr
 | ------------- | ------------- | -------------------------- | --------------------------------------------- |
 | `GET_NODE`    | `get_node`    | nodeId? (없으면 현재 선택) | `DRAW_RESULT { result: SerializedNode }`     |
 | `GET_PAGE`    | `get_page`    | —                          | `DRAW_RESULT { result: SerializedNode[] }`   |
-| `GET_SELECTION_CONTEXT` | `get_selection_context` | nodeId? (없으면 현재 단일 선택), maxDepth? | `DRAW_RESULT { result: SelectionContextResult }` |
+| `GET_SELECTION_CONTEXT` | `get_selection_context` | nodeId? 또는 nodeIds? (없으면 현재 선택 전체), maxDepth? | `DRAW_RESULT { result: SelectionContextResult 또는 { selectionCount, contexts: SelectionContextResult[] } }` |
 | `EXPORT_NODE` | `export_node` | nodeId?, scale?, format?   | `DRAW_RESULT { result: { base64, nodeId, format } }` |
 
 `EXPORT_NODE`의 `format`은 `PNG`(기본값) 또는 `SVG`입니다. `scale`은 PNG에만 적용됩니다. SVG는 텍스트를 윤곽선으로 내보내며, 응답의 `base64`를 디코딩하면 SVG 원본을 저장할 수 있습니다.
@@ -81,3 +81,5 @@ Figma의 혼합 속성값은 `{ "type": "MIXED" }`로 반환해 임의 값으로
 - 데몬 HTTP API가 `/status`, `/send`에서 `/v1/status`, `/v1/dispatch`로 변경되었다.
 - MCP 브릿지 프로세스가 실행하는 데몬 엔트리포인트가 `dist/ws-server.js`에서 `dist/cli/daemon.js`로 변경되었다.
 - `BridgeMessage.payload`는 성공/실패 union 타입으로 해석한다.
+
+여러 프레임을 Shift로 함께 선택한 뒤 `get_selection_context`를 호출하면 모든 케이스를 함께 읽습니다. `nodeIds`로 ID 목록을 지정할 수도 있습니다. 단일 대상은 기존 `SelectionContextResult`를 반환하고, 여러 대상은 `{ selectionCount, contexts: SelectionContextResult[] }`를 반환합니다. `contexts`는 선택 또는 ID 목록 순서를 유지하며 각 항목의 `root.id`와 `root.name`으로 케이스를 구분합니다. 중복 ID는 한 번만 조회하고, 빈 목록·동시 ID 지정·존재하지 않는 ID는 오류를 반환합니다. `maxDepth`는 각 프레임에 적용되며, 생략하면 전체 계층을 읽습니다.

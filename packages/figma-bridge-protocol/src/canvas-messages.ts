@@ -144,6 +144,7 @@ export interface GetPageMsg extends BaseCanvasMsg {
 export interface GetSelectionContextMsg extends BaseCanvasMsg {
   type: 'GET_SELECTION_CONTEXT';
   nodeId?: string;
+  nodeIds?: string[];
   maxDepth?: number;
 }
 

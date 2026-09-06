@@ -18,12 +18,19 @@ export const readToolDefinitions: ToolDefinition[] = [
   {
     name: 'get_selection_context',
     description:
-      '현재 선택한 단일 노드와 자식 계층의 Figma Inspect CSS, 레이아웃, 스타일, 타이포그래피, 변수 바인딩을 반환합니다',
+      '현재 선택한 하나 이상의 노드와 각각의 자식 계층의 Figma Inspect CSS, 레이아웃, 스타일, 타이포그래피, 변수 바인딩을 반환합니다',
     schema: {
       nodeId: z
         .string()
         .optional()
-        .describe('생략하면 현재 선택한 단일 노드를 사용합니다'),
+        .describe('단일 노드 ID입니다. nodeIds와 함께 지정할 수 없습니다'),
+      nodeIds: z
+        .array(z.string().min(1))
+        .min(1)
+        .optional()
+        .describe(
+          '조회할 노드 ID 목록입니다. ID를 모두 생략하면 현재 선택 전체를 조회합니다',
+        ),
       maxDepth: z
         .number()
         .int()

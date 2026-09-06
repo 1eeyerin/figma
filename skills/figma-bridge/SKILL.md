@@ -61,11 +61,12 @@ Figma 캔버스에 프레임 생성
 
 ### get_selection_context
 
-현재 선택한 단일 노드와 자식 계층의 코드 구현용 디자인 컨텍스트를 조회한다.
+현재 선택한 하나 이상의 노드와 각각의 자식 계층을 코드 구현용 디자인 컨텍스트로 조회한다.
 
 | 파라미터 | 타입 | 필수 | 설명 |
 |---------|------|------|------|
-| nodeId | string | - | 생략하면 현재 선택한 단일 노드 사용 |
+| nodeId | string | - | 단일 노드 ID. nodeIds와 동시 지정 불가 |
+| nodeIds | string[] | - | 노드 ID 목록. ID를 모두 생략하면 현재 선택 전체 사용 |
 | maxDepth | number | - | 재귀 조회 최대 깊이. 생략하면 전체 계층 조회 |
 
 - Figma Inspect CSS와 레이아웃, 스타일, 타이포그래피, 컴포넌트 속성, 변수 바인딩을 반환한다.
@@ -99,3 +100,5 @@ AI 코딩 에이전트 ← MCP 응답(nodeId) ← WS RESPONSE ← postMessage(DR
 - **"Figma 플러그인이 연결되지 않았습니다"** → Figma에서 플러그인 실행 후 UI의 상태 확인
 - **응답 시간 초과** → 플러그인 UI와 MCP 서버가 같은 포트(8765)를 바라보는지 확인
 - **포트 충돌** → `lsof -i :8765` 로 점유 프로세스 확인 후 종료
+
+여러 프레임을 Shift로 함께 선택한 뒤 `get_selection_context`를 호출하면 모든 케이스를 함께 읽습니다. `nodeIds`로 ID 목록을 지정할 수도 있습니다. 단일 대상은 기존 `SelectionContextResult`를 반환하고, 여러 대상은 `{ selectionCount, contexts: SelectionContextResult[] }`를 반환합니다. `contexts`는 선택 또는 ID 목록 순서를 유지하며 각 항목의 `root.id`와 `root.name`으로 케이스를 구분합니다. 중복 ID는 한 번만 조회하고, 빈 목록·동시 ID 지정·존재하지 않는 ID는 오류를 반환합니다. `maxDepth`는 각 프레임에 적용되며, 생략하면 전체 계층을 읽습니다.

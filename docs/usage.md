@@ -19,7 +19,7 @@ Figma 캔버스 작업에는 별도 bridge daemon 프로세스가 필요하다. 
 
 ## 선택 프레임을 코드 구현에 활용
 
-1. Figma에서 구현할 프레임 또는 노드를 정확히 하나 선택한다.
+1. Figma에서 구현할 케이스별 프레임 또는 노드를 하나 이상 선택한다.
 2. `get_selection_context`를 호출해 선택 노드와 전체 자식 계층의 Inspect CSS와 디자인 속성을 조회한다.
 3. 응답이 너무 크면 `maxDepth`로 깊이를 제한하고, 필요한 하위 노드 ID를 `nodeId`로 다시 조회한다.
 4. `export_node`는 PNG로 시각 비교하거나, `format: "SVG"`로 로고·아이콘 원본을 추출할 때 사용한다. 이미지에서 수치나 색상을 추정하지 않는다. SVG 응답의 `format`을 확인하고 `base64`를 디코딩해 저장한다. 응답에 형식이 없으면 Figma 플러그인을 재실행한다.
@@ -48,3 +48,5 @@ daemon을 직접 실행해야 할 때는 아래를 사용한다.
 ```bash
 node packages/figma-bridge-mcp/dist/cli/daemon.js
 ```
+
+여러 프레임을 Shift로 함께 선택한 뒤 `get_selection_context`를 호출하면 모든 케이스를 함께 읽습니다. `nodeIds`로 ID 목록을 지정할 수도 있습니다. 단일 대상은 기존 `SelectionContextResult`를 반환하고, 여러 대상은 `{ selectionCount, contexts: SelectionContextResult[] }`를 반환합니다. `contexts`는 선택 또는 ID 목록 순서를 유지하며 각 항목의 `root.id`와 `root.name`으로 케이스를 구분합니다. 중복 ID는 한 번만 조회하고, 빈 목록·동시 ID 지정·존재하지 않는 ID는 오류를 반환합니다. `maxDepth`는 각 프레임에 적용되며, 생략하면 전체 계층을 읽습니다.
