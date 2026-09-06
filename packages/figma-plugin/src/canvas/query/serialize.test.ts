@@ -68,6 +68,26 @@ describe('serializeNode (노드 직렬화)', () => {
 });
 
 describe('exportNode (노드 내보내기)', () => {
+  it('SVG는 배율 없이 텍스트를 윤곽선으로 내보낸다', async () => {
+    const bytes = new Uint8Array([60, 115, 118, 103, 62]);
+    const node = {
+      id: 'svg',
+      name: '로고',
+      type: 'VECTOR',
+      exportAsync: vi.fn().mockResolvedValue(bytes),
+    } satisfies ExportableSceneNode;
+    vi.mocked(figma.base64Encode).mockReturnValue('svg-encoded');
+
+    await expect(exportNode(sceneNode(node), 2, 'SVG')).resolves.toBe(
+      'svg-encoded',
+    );
+    expect(node.exportAsync).toHaveBeenCalledWith({
+      format: 'SVG',
+      svgOutlineText: true,
+    });
+    expect(figma.base64Encode).toHaveBeenCalledWith(bytes);
+  });
+
   it('PNG SCALE 제약으로 export하고 base64로 변환한다', async () => {
     const node = {
       id: 'export',

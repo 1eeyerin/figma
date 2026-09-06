@@ -34,10 +34,19 @@ export const readToolDefinitions: ToolDefinition[] = [
   },
   {
     name: 'export_node',
-    description: '노드를 PNG로 내보내고 base64를 반환합니다',
+    description: '노드를 PNG 또는 SVG로 내보내고 base64와 형식을 반환합니다',
     schema: {
       nodeId: z.string().optional().describe('노드 ID'),
-      scale: z.number().optional().default(1).describe('배율'),
+      scale: z
+        .number()
+        .optional()
+        .default(1)
+        .describe('PNG 배율 (SVG에서는 무시)'),
+      format: z
+        .enum(['PNG', 'SVG'])
+        .optional()
+        .default('PNG')
+        .describe('내보내기 형식'),
     },
   },
 ];

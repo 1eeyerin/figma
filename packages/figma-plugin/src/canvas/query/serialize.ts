@@ -56,12 +56,17 @@ export function serializeNode(node: SceneNode): SerializedNode {
 }
 
 /**
- * SceneNode를 PNG로 내보내고 MCP 응답에 실을 base64 문자열로 변환합니다.
+ * SceneNode를 지정 형식으로 내보내고 MCP 응답에 실을 base64 문자열로 변환합니다.
  */
-export async function exportNode(node: SceneNode, scale = 1): Promise<string> {
-  const bytes = await node.exportAsync({
-    format: 'PNG',
-    constraint: { type: 'SCALE', value: scale },
-  });
+export async function exportNode(
+  node: SceneNode,
+  scale = 1,
+  format: 'PNG' | 'SVG' = 'PNG',
+): Promise<string> {
+  const settings: ExportSettings =
+    format === 'SVG'
+      ? { format: 'SVG', svgOutlineText: true }
+      : { format: 'PNG', constraint: { type: 'SCALE', value: scale } };
+  const bytes = await node.exportAsync(settings);
   return figma.base64Encode(bytes);
 }

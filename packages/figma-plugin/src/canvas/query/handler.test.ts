@@ -1,6 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { handleGetPage, handleGetSelectionContext } from './handler';
+import {
+  handleExportNode,
+  handleGetPage,
+  handleGetSelectionContext,
+} from './handler';
 
 interface SerializableSceneNode {
   id: string;
@@ -23,6 +27,35 @@ beforeEach(() => {
     configurable: true,
     value: [],
   });
+});
+
+describe('handleExportNode (형식별 내보내기)', () => {
+  it.each([undefined, 'PNG', 'SVG'] as const)(
+    '요청 형식 %s를 반영하고 실제 형식을 회신한다',
+    async (format) => {
+      const exportAsync = vi.fn().mockResolvedValue(new Uint8Array([1]));
+      Object.defineProperty(figma.currentPage, 'selection', {
+        configurable: true,
+        value: [{ id: 'logo', exportAsync }],
+      });
+      vi.mocked(figma.base64Encode).mockReturnValue('encoded');
+      await handleExportNode({ id: 'export-1', type: 'EXPORT_NODE', format });
+      expect(exportAsync).toHaveBeenCalledWith(
+        expect.objectContaining({ format: format ?? 'PNG' }),
+      );
+      expect(figma.ui.postMessage).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: 'export-1',
+          success: true,
+          result: {
+            base64: 'encoded',
+            nodeId: 'logo',
+            format: format ?? 'PNG',
+          },
+        }),
+      );
+    },
+  );
 });
 
 describe('handleGetSelectionContext (선택 디자인 컨텍스트 조회)', () => {

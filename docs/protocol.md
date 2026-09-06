@@ -27,7 +27,9 @@ MCP action → canvas 타입 매핑 구현은 `packages/figma-bridge-protocol/sr
 | `GET_NODE`    | `get_node`    | nodeId? (없으면 현재 선택) | `DRAW_RESULT { result: SerializedNode }`     |
 | `GET_PAGE`    | `get_page`    | —                          | `DRAW_RESULT { result: SerializedNode[] }`   |
 | `GET_SELECTION_CONTEXT` | `get_selection_context` | nodeId? (없으면 현재 단일 선택), maxDepth? | `DRAW_RESULT { result: SelectionContextResult }` |
-| `EXPORT_NODE` | `export_node` | nodeId?, scale?            | `DRAW_RESULT { result: { base64, nodeId } }` |
+| `EXPORT_NODE` | `export_node` | nodeId?, scale?, format?   | `DRAW_RESULT { result: { base64, nodeId, format } }` |
+
+`EXPORT_NODE`의 `format`은 `PNG`(기본값) 또는 `SVG`입니다. `scale`은 PNG에만 적용됩니다. SVG는 텍스트를 윤곽선으로 내보내며, 응답의 `base64`를 디코딩하면 SVG 원본을 저장할 수 있습니다.
 
 `get_selection_context`는 선택한 노드와 자식 계층을 재귀 조회한다. 각 노드에는
 Figma Inspect의 CSS, 위치와 크기, Auto Layout, 도형 스타일, 타이포그래피,

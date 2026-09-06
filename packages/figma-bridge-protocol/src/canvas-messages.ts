@@ -151,6 +151,7 @@ export interface ExportNodeMsg extends BaseCanvasMsg {
   type: 'EXPORT_NODE';
   nodeId?: string;
   scale?: number;
+  format?: 'PNG' | 'SVG';
 }
 
 export interface CreateScreenMsg extends BaseCanvasMsg {

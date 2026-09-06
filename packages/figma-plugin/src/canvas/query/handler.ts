@@ -42,12 +42,13 @@ export async function handleGetSelectionContext(
 }
 
 /**
- * 지정한 노드 또는 현재 선택 노드를 PNG로 export한 base64 결과를 회신합니다.
+ * 지정한 노드 또는 현재 선택 노드를 내보낸 base64와 형식을 회신합니다.
  */
 export async function handleExportNode(msg: ExportNodeMsg): Promise<void> {
   await runAction(msg, null, async () => {
     const node = await resolveTargetNode(msg.nodeId);
-    const base64 = await exportNode(node, msg.scale);
-    return { result: { base64, nodeId: node.id } };
+    const format = msg.format ?? 'PNG';
+    const base64 = await exportNode(node, msg.scale, format);
+    return { result: { base64, nodeId: node.id, format } };
   });
 }
