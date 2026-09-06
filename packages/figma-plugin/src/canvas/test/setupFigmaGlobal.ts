@@ -3,6 +3,7 @@
 import { vi } from 'vitest';
 
 (globalThis as any).figma = {
+  mixed: Symbol('mixed'),
   createRectangle: vi.fn(),
   createText: vi.fn(),
   createFrame: vi.fn(),

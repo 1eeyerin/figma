@@ -26,7 +26,14 @@ MCP action → canvas 타입 매핑 구현은 `packages/figma-bridge-protocol/sr
 | ------------- | ------------- | -------------------------- | --------------------------------------------- |
 | `GET_NODE`    | `get_node`    | nodeId? (없으면 현재 선택) | `DRAW_RESULT { result: SerializedNode }`     |
 | `GET_PAGE`    | `get_page`    | —                          | `DRAW_RESULT { result: SerializedNode[] }`   |
+| `GET_SELECTION_CONTEXT` | `get_selection_context` | nodeId? (없으면 현재 단일 선택), maxDepth? | `DRAW_RESULT { result: SelectionContextResult }` |
 | `EXPORT_NODE` | `export_node` | nodeId?, scale?            | `DRAW_RESULT { result: { base64, nodeId } }` |
+
+`get_selection_context`는 선택한 노드와 자식 계층을 재귀 조회한다. 각 노드에는
+Figma Inspect의 CSS, 위치와 크기, Auto Layout, 도형 스타일, 타이포그래피,
+컴포넌트 속성, 변수 바인딩이 포함된다. `maxDepth`를 생략하면 전체 계층을
+반환하고, 제한 깊이에 자식이 남아 있으면 `childrenTruncated: true`를 표시한다.
+Figma의 혼합 속성값은 `{ "type": "MIXED" }`로 반환해 임의 값으로 대체하지 않는다.
 
 ## 시스템
 

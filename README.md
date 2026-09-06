@@ -76,6 +76,10 @@ Claude Code/Codex별 설치·업데이트 명령과 Figma 플러그인 연동 �
 | Claude Code | Figma 캔버스 조작을 요청하면 `figma-bridge` 스킬이 자동 트리거되어 MCP 툴(`create_rectangle`, `create_text`, `create_frame` 등)을 호출한다 |
 | Codex | `codex:install` 이후 새 세션에서 캔버스 조작을 요청하면 `figma-bridge:figma-bridge` 스킬과 MCP 툴을 사용할 수 있다 |
 
+Figma에서 선택한 프레임을 코드로 구현할 때는 `get_selection_context`로 전체
+노드 계층의 Inspect CSS와 디자인 속성을 조회한다. 자세한 절차는
+[docs/usage.md](docs/usage.md#선택-프레임을-코드-구현에-활용)를 참고한다.
+
 ## 🛠️ 로컬 개발
 
 ```bash

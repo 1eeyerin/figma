@@ -1,1 +1,6 @@
-export { handleGetNode, handleGetPage, handleExportNode } from './handler';
+export {
+  handleGetNode,
+  handleGetPage,
+  handleGetSelectionContext,
+  handleExportNode,
+} from './handler';

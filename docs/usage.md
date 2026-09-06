@@ -17,6 +17,22 @@ Figma 캔버스 작업에는 별도 bridge daemon 프로세스가 필요하다. 
 3. 사용자에게 Figma 앱에서 `figma-bridge` 플러그인을 실행해 `Connected ✓` 상태를 확인해 달라고 안내한다.
 4. 연결이 확인되면 `create_rectangle`, `create_text`, `create_frame` 등 MCP 도구로 캔버스 작업을 수행한다.
 
+## 선택 프레임을 코드 구현에 활용
+
+1. Figma에서 구현할 프레임 또는 노드를 정확히 하나 선택한다.
+2. `get_selection_context`를 호출해 선택 노드와 전체 자식 계층의 Inspect CSS와 디자인 속성을 조회한다.
+3. 응답이 너무 크면 `maxDepth`로 깊이를 제한하고, 필요한 하위 노드 ID를 `nodeId`로 다시 조회한다.
+4. `export_node`는 구현 결과를 시각적으로 비교할 때만 사용한다. 이미지에서 수치나 색상을 추정하지 않는다.
+5. 코드에는 `get_selection_context`가 반환한 값만 사용하며, `MIXED`이거나 누락된 필수 값은 임의로 대체하지 않는다.
+
+예시 요청:
+
+```text
+Figma에서 현재 선택한 프레임을 get_selection_context로 조회하고,
+응답에서 확인한 값만 사용해 현재 저장소의 기존 컴포넌트와 토큰에 맞춰 구현해 주세요.
+필수 값이 MIXED이거나 누락되면 추정하지 말고 중단해 주세요.
+```
+
 ## 수동 진단
 
 MCP 서버는 시작 시 preflight를 실행한다. 검사 항목은 Node 버전, `dist/index.js`, daemon 스크립트, `figma-bridge-protocol`/`ws` 로드 가능 여부, `8765`/`8766` 포트 상태다. 실패하면 MCP stderr에 상세 결과를 출력하고, MCP 도구 호출 시 같은 내용을 에러 응답으로 반환한다.

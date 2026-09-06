@@ -2,10 +2,12 @@ import type {
   ExportNodeMsg,
   GetNodeMsg,
   GetPageMsg,
+  GetSelectionContextMsg,
 } from 'figma-bridge-protocol';
 
 import { runAction } from '../dispatch/run-action';
-import { resolveTargetNode } from '../shared';
+import { resolveSingleTargetNode, resolveTargetNode } from '../shared';
+import { createSelectionContext } from './design-context';
 import { exportNode, serializeNode } from './serialize';
 
 /**
@@ -25,6 +27,18 @@ export async function handleGetPage(msg: GetPageMsg): Promise<void> {
   await runAction(msg, null, () => ({
     result: figma.currentPage.children.map(serializeNode),
   }));
+}
+
+/**
+ * 지정 노드 또는 현재 단일 선택을 재귀 디자인 컨텍스트로 조회해 회신합니다.
+ */
+export async function handleGetSelectionContext(
+  msg: GetSelectionContextMsg,
+): Promise<void> {
+  await runAction(msg, null, async () => {
+    const node = await resolveSingleTargetNode(msg.nodeId);
+    return { result: await createSelectionContext(node, msg.maxDepth) };
+  });
 }
 
 /**

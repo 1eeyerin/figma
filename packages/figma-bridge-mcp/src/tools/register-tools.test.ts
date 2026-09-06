@@ -10,7 +10,7 @@ describe('registerTools (MCP 툴 등록)', () => {
 
     registerTools(server, dispatch);
 
-    expect(tool).toHaveBeenCalledTimes(10);
+    expect(tool).toHaveBeenCalledTimes(11);
     expect(tool.mock.calls.map((call) => call[0])).toEqual([
       'create_rectangle',
       'create_text',
@@ -20,6 +20,7 @@ describe('registerTools (MCP 툴 등록)', () => {
       'remove_node',
       'get_node',
       'get_page',
+      'get_selection_context',
       'export_node',
       'create_screen',
     ]);

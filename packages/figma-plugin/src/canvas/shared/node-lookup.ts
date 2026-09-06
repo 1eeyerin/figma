@@ -18,3 +18,18 @@ export async function resolveTargetNode(
   if (!node) throw new Error('노드를 찾을 수 없습니다');
   return node;
 }
+
+/**
+ * nodeId가 없으면 현재 선택이 정확히 하나인지 확인한 뒤 대상 노드를 반환합니다.
+ */
+export async function resolveSingleTargetNode(
+  nodeId: string | undefined,
+): Promise<SceneNode> {
+  if (nodeId) return requireSceneNode(nodeId);
+
+  const selection = figma.currentPage.selection;
+  if (selection.length !== 1) {
+    throw new Error('Figma에서 프레임 또는 노드를 정확히 하나 선택해 주세요');
+  }
+  return selection[0];
+}

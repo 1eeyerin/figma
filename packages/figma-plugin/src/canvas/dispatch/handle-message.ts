@@ -2,7 +2,12 @@ import type { CanvasMessage, CanvasMessageType } from 'figma-bridge-protocol';
 
 import { handleDrawFrame, handleDrawRect, handleDrawText } from '../draw';
 import { handleRemoveNode, handleSetName, handleSetParent } from '../mutation';
-import { handleExportNode, handleGetNode, handleGetPage } from '../query';
+import {
+  handleExportNode,
+  handleGetNode,
+  handleGetPage,
+  handleGetSelectionContext,
+} from '../query';
 import { handleCreateScreen } from '../screen';
 
 const ACTION_HANDLERS: Partial<
@@ -16,6 +21,9 @@ const ACTION_HANDLERS: Partial<
   REMOVE_NODE: handleRemoveNode as (msg: CanvasMessage) => Promise<void>,
   GET_NODE: handleGetNode as (msg: CanvasMessage) => Promise<void>,
   GET_PAGE: handleGetPage as (msg: CanvasMessage) => Promise<void>,
+  GET_SELECTION_CONTEXT: handleGetSelectionContext as (
+    msg: CanvasMessage,
+  ) => Promise<void>,
   EXPORT_NODE: handleExportNode as (msg: CanvasMessage) => Promise<void>,
   DRAW_SCREEN: handleCreateScreen as (msg: CanvasMessage) => Promise<void>,
 };

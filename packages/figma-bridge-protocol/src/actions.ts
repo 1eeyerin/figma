@@ -9,6 +9,7 @@ export type McpAction =
   | 'remove_node'
   | 'get_node'
   | 'get_page'
+  | 'get_selection_context'
   | 'export_node'
   | 'create_screen';
 
@@ -21,6 +22,7 @@ export const ACTION_MAP: Record<McpAction, CanvasMessageType> = {
   remove_node: 'REMOVE_NODE',
   get_node: 'GET_NODE',
   get_page: 'GET_PAGE',
+  get_selection_context: 'GET_SELECTION_CONTEXT',
   export_node: 'EXPORT_NODE',
   create_screen: 'DRAW_SCREEN',
 };

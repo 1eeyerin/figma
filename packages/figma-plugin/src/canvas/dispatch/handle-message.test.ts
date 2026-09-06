@@ -1,6 +1,7 @@
 import type {
   CloseMsg,
   DrawRectMsg,
+  GetSelectionContextMsg,
   McpAction,
   PingMsg,
 } from 'figma-bridge-protocol';
@@ -90,6 +91,41 @@ describe('handleMessage (DRAW_RECT 라우팅)', () => {
     });
     expect(figma.ui.postMessage).toHaveBeenCalledWith(
       expect.objectContaining({ id: 'm2', success: false, error: 'boom' }),
+    );
+  });
+});
+
+describe('handleMessage (GET_SELECTION_CONTEXT 라우팅)', () => {
+  it('현재 선택 노드의 디자인 컨텍스트를 조회한다', async () => {
+    const selected = {
+      id: 'frame-1',
+      name: 'Frame',
+      type: 'FRAME',
+      visible: true,
+      locked: false,
+      children: [],
+      getCSSAsync: vi.fn().mockResolvedValue({ display: 'flex' }),
+    } as unknown as SceneNode;
+    Object.defineProperty(figma.currentPage, 'selection', {
+      configurable: true,
+      value: [selected],
+    });
+    const msg = {
+      id: 'context-1',
+      action: 'get_selection_context',
+      type: 'GET_SELECTION_CONTEXT',
+    } satisfies GetSelectionContextMsg & { action: McpAction };
+
+    await handleMessage(msg);
+
+    expect(figma.ui.postMessage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 'context-1',
+        success: true,
+        result: expect.objectContaining({
+          root: expect.objectContaining({ id: 'frame-1' }),
+        }),
+      }),
     );
   });
 });

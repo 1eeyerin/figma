@@ -1,23 +1,24 @@
 {
   "name": "figma-bridge",
-  "description": "Claude Code ↔ MCP 서버 ↔ Figma 플러그인 양방향 디자인 브릿지. 사각형/텍스트/프레임 생성 등 Figma 캔버스 조작 MCP 툴 제공.",
-  "version": "0.1.13",
+  "description": "Claude Code ↔ MCP 서버 ↔ Figma 플러그인 양방향 디자인 브릿지. 캔버스 조작과 선택 프레임 디자인 컨텍스트 조회 MCP 툴 제공.",
+  "version": "0.1.14",
   "author": {
     "name": "yerin",
     "email": "dev.yerin@gmail.com"
   },
   "interface": {
     "displayName": "Figma Bridge",
-    "shortDescription": "Figma 캔버스를 MCP 도구로 조작합니다.",
-    "longDescription": "Codex와 Figma 플러그인을 WebSocket 브릿지로 연결해 사각형, 텍스트, 프레임 생성 같은 캔버스 조작 MCP 도구를 제공합니다.",
+    "shortDescription": "Figma 캔버스를 조작하고 선택 디자인을 조회합니다.",
+    "longDescription": "Codex와 Figma 플러그인을 WebSocket 브릿지로 연결해 캔버스 조작과 선택 프레임의 코드 구현용 디자인 컨텍스트 조회 MCP 도구를 제공합니다.",
     "developerName": "yerin",
     "category": "Productivity",
     "capabilities": [
       "Figma 캔버스 도형 생성",
       "Figma 캔버스 텍스트 생성",
-      "Figma 캔버스 프레임 생성"
+      "Figma 캔버스 프레임 생성",
+      "Figma 선택 프레임 디자인 컨텍스트 조회"
     ],
-    "defaultPrompt": "Figma 플러그인 연결 상태를 확인하고 필요한 캔버스 작업을 수행하세요."
+    "defaultPrompt": "Figma 플러그인 연결 상태를 확인하고 캔버스 작업 또는 선택 프레임 디자인 컨텍스트 조회를 수행하세요."
   },
   "mcpServers": {
     "figma-bridge": {

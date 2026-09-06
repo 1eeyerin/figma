@@ -141,6 +141,12 @@ export interface GetPageMsg extends BaseCanvasMsg {
   type: 'GET_PAGE';
 }
 
+export interface GetSelectionContextMsg extends BaseCanvasMsg {
+  type: 'GET_SELECTION_CONTEXT';
+  nodeId?: string;
+  maxDepth?: number;
+}
+
 export interface ExportNodeMsg extends BaseCanvasMsg {
   type: 'EXPORT_NODE';
   nodeId?: string;
@@ -175,6 +181,7 @@ export type CanvasMessage =
   | RemoveNodeMsg
   | GetNodeMsg
   | GetPageMsg
+  | GetSelectionContextMsg
   | ExportNodeMsg
   | CreateScreenMsg
   | LogMsg
