@@ -130,3 +130,12 @@ packages/figma-plugin/src/
 메시지 타입별 상세 계약(파라미터, 응답 형태)은 [protocol.md](protocol.md)와 `packages/figma-bridge-protocol/` 참고.
 
 설계 원칙(왜 이렇게 설계했는가, 무엇을 지켜야 하는가)은 [architecture-principles.md](architecture-principles.md) 참고.
+
+## 플러그인 상태의 실시간 갱신
+
+- `wsClient`는 자동·수동 연결 시도마다 `onConnecting`을 호출합니다. `useBridgeConnection`의 FSM은 `disconnected → connecting → connected` 순서로 화면 상태를 갱신합니다.
+- 소켓 연결 후 `EVENT/ping`에 같은 ID의 `EVENT/pong`이 도착해야 연결됨으로 표시합니다. 이후 3초 간격으로 확인하고, 연결 또는 응답이 3초 동안 없으면 소켓을 정리한 뒤 3초 후 다시 연결합니다. 일반적인 무응답 감지는 마지막 확인 후 최대 약 6초이며, 앱이 백그라운드에서 정지되면 타이머도 지연될 수 있습니다.
+- 이전 소켓의 이벤트와 타이머는 교체·종료 시 해제합니다. 여러 플러그인 인스턴스의 동시 작업은 기존과 같이 지원하지 않습니다.
+- UI가 준비되면 `GET_SELECTION_SUMMARY`로 초기 선택을 요청합니다. 이후 canvas의 `selectionchange`(페이지 전환 포함)와 선택 레이어·현재 페이지의 이름 변경 이벤트가 표시를 갱신합니다. 이 경로는 WS 연결 여부와 무관합니다.
+- UI가 보관하는 선택 요약은 페이지와 선택 레이어의 ID·이름·종류만 포함하는 표시용 스냅샷입니다. 크기·스타일·계층 등의 디자인 데이터는 저장하지 않으며, MCP 조회는 항상 캔버스를 다시 읽습니다.
+- 연결됨 표시는 플러그인과 브릿지 데몬 사이의 응답을 뜻합니다. 특정 AI 클라이언트의 실행 상태나 코드 생성 완료를 뜻하지 않습니다.

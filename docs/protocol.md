@@ -83,3 +83,14 @@ Figma의 혼합 속성값은 `{ "type": "MIXED" }`로 반환해 임의 값으로
 - `BridgeMessage.payload`는 성공/실패 union 타입으로 해석한다.
 
 여러 프레임을 Shift로 함께 선택한 뒤 `get_selection_context`를 호출하면 모든 케이스를 함께 읽습니다. `nodeIds`로 ID 목록을 지정할 수도 있습니다. 단일 대상은 기존 `SelectionContextResult`를 반환하고, 여러 대상은 `{ selectionCount, contexts: SelectionContextResult[] }`를 반환합니다. `contexts`는 선택 또는 ID 목록 순서를 유지하며 각 항목의 `root.id`와 `root.name`으로 케이스를 구분합니다. 중복 ID는 한 번만 조회하고, 빈 목록·동시 ID 지정·존재하지 않는 ID는 오류를 반환합니다. `maxDepth`는 각 프레임에 적용되며, 생략하면 전체 계층을 읽습니다.
+
+## 연결 확인과 선택 표시
+
+- UI → 데몬: `{ type: 'EVENT', action: 'ping', id }`
+- 데몬 → UI: `{ type: 'EVENT', action: 'pong', id, payload: {} }` — 요청 ID를 그대로 반환합니다.
+- UI → canvas: `{ type: 'GET_SELECTION_SUMMARY', id }`
+- canvas → UI: `{ type: 'SELECTION_CHANGED', id, summary: { page: { id, name }, nodes: [{ id, name, type }] } }`
+
+초기 선택 요청의 응답은 요청 ID를 유지합니다. 이후 선택·페이지 전환·이름 변경 이벤트는 새 ID를 사용합니다. 선택 해제는 빈 `nodes` 배열로 알립니다. 선택 요약은 UI 표시 전용이며 WS로 중계하거나 MCP 디자인 컨텍스트로 재사용하지 않습니다.
+
+새 UI의 생존 확인에는 `EVENT/ping`을 지원하는 데몬이 필요합니다. 이 변경을 처음 적용할 때는 두 패키지를 함께 빌드하고 실행 중인 데몬과 Figma 플러그인을 한 번 다시 시작해야 합니다. 이후 연결 복구에는 Reconnect 버튼이나 플러그인 재실행이 필요하지 않습니다.

@@ -30,3 +30,12 @@
 .button:hover {
   background: #f5f5f5;
 }
+
+.layerName {
+  overflow-wrap: anywhere;
+}
+
+.selectionList {
+  padding-left: 16px;
+  margin: 12px 0 0;
+}

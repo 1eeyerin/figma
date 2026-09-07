@@ -43,6 +43,28 @@ function httpRequest(
 }
 
 describe('createBridgeDaemon (브릿지 데몬)', () => {
+  it('생존 확인 ping에 같은 ID의 pong으로 응답한다', async () => {
+    const { wsPort } = startDaemon();
+    const plugin = new WebSocket(`ws://localhost:${wsPort}`);
+    await new Promise((resolve) => plugin.on('open', resolve));
+    try {
+      const response = new Promise((resolve) =>
+        plugin.once('message', (raw) => resolve(JSON.parse(raw.toString()))),
+      );
+      plugin.send(
+        JSON.stringify({ id: 'heartbeat-1', type: 'EVENT', action: 'ping' }),
+      );
+      expect(await response).toEqual({
+        id: 'heartbeat-1',
+        type: 'EVENT',
+        action: 'pong',
+        payload: {},
+      });
+    } finally {
+      plugin.close();
+    }
+  });
+
   it('GET /v1/status는 플러그인 미연결 시 pluginConnected:false를 반환한다', async () => {
     const { httpPort } = startDaemon();
 

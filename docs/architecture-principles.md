@@ -7,6 +7,7 @@
 | 상태 | Source of Truth | 규칙 |
 |---|---|---|
 | Figma 노드 데이터 (위치, 크기, 색상 등) | Figma 캔버스 자체 (`canvas/` 레이어) | UI/bridge 레이어에 노드 데이터를 캐싱·복제 **금지**. 조회는 항상 `GET_NODE`/`GET_PAGE`로 canvas에 재질의한다. |
+| 선택 표시 요약 (페이지·레이어 ID/이름/종류) | Figma 캔버스의 선택·이름 변경 이벤트 | UI에는 표시용 스냅샷만 유지한다. 디자인 속성·계층은 포함하지 않고 MCP 조회에는 재사용하지 않는다. |
 | WS 연결 상태 (`connecting`/`connected`/`disconnected`) | `useBridgeConnection`의 FSM | 다른 곳(전역 변수, 별도 `useState`)으로 이중 관리 금지 — 파생 필요 시 FSM에서 파생한다. |
 | in-flight 요청 상태 (REQUEST↔RESPONSE 매칭) | `BridgeMessage.id` | id 없는 요청/응답 매칭 로직 추가 금지. 새 메시지 타입도 반드시 id로 왕복을 추적한다. |
 

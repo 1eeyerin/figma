@@ -9,6 +9,7 @@ import {
   handleGetSelectionContext,
 } from '../query';
 import { handleCreateScreen } from '../screen';
+import { publishSelection } from '../selection';
 
 const ACTION_HANDLERS: Partial<
   Record<CanvasMessageType, (msg: CanvasMessage) => Promise<void>>
@@ -32,6 +33,11 @@ export async function handleMessage(msg: unknown): Promise<void> {
   if (!msg || typeof (msg as Record<string, unknown>).type !== 'string') return;
 
   const canvasMsg = msg as CanvasMessage;
+
+  if (canvasMsg.type === 'GET_SELECTION_SUMMARY') {
+    publishSelection(canvasMsg.id);
+    return;
+  }
 
   if (canvasMsg.type === 'LOG') {
     console.log('[Plugin]', canvasMsg.message);

@@ -1,4 +1,9 @@
-import { isMcpAction, type BridgeResponseMessage } from 'figma-bridge-protocol';
+import {
+  createBridgeMessage,
+  isMcpAction,
+  type BridgeEventMessage,
+  type BridgeResponseMessage,
+} from 'figma-bridge-protocol';
 import * as http from 'http';
 import { WebSocketServer, type RawData } from 'ws';
 
@@ -17,12 +22,28 @@ export interface BridgeDaemon {
   close: () => void;
 }
 
-function parsePluginResponse(raw: RawData): BridgeResponseMessage | null {
+/** 플러그인의 응답과 생존 확인 이벤트를 해석합니다. */
+function parsePluginResponse(
+  raw: RawData,
+): BridgeResponseMessage | BridgeEventMessage | null {
   let parsed: unknown;
   try {
     parsed = JSON.parse(raw.toString());
   } catch {
     return null;
+  }
+
+  if (
+    typeof parsed === 'object' &&
+    parsed !== null &&
+    'type' in parsed &&
+    parsed.type === 'EVENT' &&
+    'action' in parsed &&
+    parsed.action === 'ping' &&
+    'id' in parsed &&
+    typeof parsed.id === 'string'
+  ) {
+    return { id: parsed.id, type: 'EVENT', action: 'ping' };
   }
 
   if (
@@ -61,6 +82,13 @@ export function createBridgeDaemon(options: BridgeDaemonOptions): BridgeDaemon {
     socket.on('message', (raw) => {
       const message = parsePluginResponse(raw);
       if (!message) return;
+
+      if (message.type === 'EVENT') {
+        socket.send(
+          JSON.stringify(createBridgeMessage(message.id, 'EVENT', 'pong')),
+        );
+        return;
+      }
 
       console.error(
         `[WS-daemon] ← plugin: ${message.type}/${message.action} (${message.id})`,
